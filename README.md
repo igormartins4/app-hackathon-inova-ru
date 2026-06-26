@@ -14,6 +14,8 @@ O InovaRU resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes
 
 ## Telas do Protótipo
 
+> **[Figma — Telas Hackathon](https://www.figma.com/design/dfXpSXKWY3FOLlIZIbQNGC/Telas-Hackathon?node-id=0-1&t=rAANqahZo3F58UAm-1)** · **[Visualizar protótipo interativo](https://www.figma.com/proto/dfXpSXKWY3FOLlIZIbQNGC/Telas-Hackathon)**
+
 | Tela | Descrição |
 |------|-----------|
 | **Login** | Autenticação via CPF + senha FUMP. Token JWT armazenado com Android Keystore. |
