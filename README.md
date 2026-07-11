@@ -112,6 +112,15 @@ docs/telas/
 
 ---
 
+## Entregas
+
+| Arquivo | Descrição |
+|---------|-----------|
+| [`apresentacao-prototipo-hackathon.pdf`](apresentacao-prototipo-hackathon.pdf) | Apresentação de slides do conceito e protótipo (Beamer/LaTeX) |
+| [`Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf`](Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf) | Documento conceitual assinado pela equipe |
+
+---
+
 ## Licença
 
 MIT License — Software Livre conforme exigido pelo edital (Seção 8.1).
