@@ -18,7 +18,7 @@ O InovaRU resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes
 
 | Tela | Descrição |
 |------|-----------|
-| **Login** | Autenticação via CPF + senha FUMP. Token JWT armazenado com Android Keystore. |
+| **Login** | Autenticação via CPF + senha FUMP. Token JWT armazenado com Expo Secure Store. |
 | **Início** | Dashboard com saldo disponível, ações rápidas (Saldo, Cardápio, Histórico) e últimas recargas. |
 | **Saldo** | Detalhes do saldo atual, limite de recarga, dados do consumidor (nome, tipo, centro de custo, situação). |
 | **Recarga** | Seleção de valor (R$ 5,00 a R$ 500,00) com opções predefinidas e campo personalizado. Valores usados recentemente. |
@@ -48,7 +48,7 @@ O InovaRU resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes
 
 ---
 
-## Integrção com a API
+## Integração com a API
 
 O app consome a API RESTful fornecida pela FUMP. Todos os dados são extraídos automaticamente do token JWT — o CPF nunca é enviado no body ou URL.
 
@@ -65,7 +65,7 @@ O app consome a API RESTful fornecida pela FUMP. Todos os dados são extraídos 
 
 ### Segurança
 
-- Token JWT armazenado em `EncryptedSharedPreferences` / Android Keystore
+- Token JWT armazenado em `expo-secure-store` (keystore nativo do sistema)
 - Nunca persistir senha no dispositivo
 - Tratamento de HTTP 401 → redireciona para login
 - Tratamento de HTTP 429 → mensagem amigável com `Retry-After`
@@ -95,12 +95,12 @@ docs/telas/
 
 | Camada | Tecnologia |
 |--------|------------|
-| Mobile | Kotlin + Jetpack Compose |
+| Mobile | React Native + Expo |
 | Design System | Material Design 3 (Material You) |
-| HTTP | Retrofit |
+| HTTP | Axios / fetch |
 | QR Code | Decodificação Base64 → Bitmap |
-| Armazenamento Local | Room (cache offline opcional) |
-| Segurança | Android Keystore / EncryptedSharedPreferences |
+| Armazenamento Local | MMKV / AsyncStorage |
+| Segurança | Expo Secure Store |
 
 ---
 
