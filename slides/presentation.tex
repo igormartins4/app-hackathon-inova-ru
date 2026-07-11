@@ -1,0 +1,390 @@
+\documentclass[10pt, aspectratio=169]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{tikz}
+\usepackage{caption}
+
+\usetikzlibrary{arrows.meta,backgrounds,calc,positioning,shapes.geometric}
+
+% Cores InovaRU
+\definecolor{inovateal}{HTML}{006A6A}
+\definecolor{inovasurface}{HTML}{EFF1F0}
+\definecolor{inovacontainer}{HTML}{D1E8E6}
+\definecolor{darkgray}{HTML}{191C1C}
+
+\usetheme[
+  accent=inovateal,
+  progressbar=foot,
+  sectionpage=none,
+  subsectionpage=none,
+  numbering=fraction,
+  block=fill
+]{cookie}
+
+\setbeamercolor{background canvas}{bg=inovasurface}
+\setbeamercolor{normal text}{fg=darkgray}
+
+\tcbset{
+    m3card/.style={
+        colback=white,
+        colframe=inovateal!30!white,
+        arc=10pt,
+        boxrule=1pt,
+        top=10pt, bottom=10pt, left=10pt, right=10pt,
+        fonttitle=\bfseries\color{inovateal},
+        colbacktitle=inovacontainer!50!white,
+        arc=8pt
+    }
+}
+
+% Metadados
+\title[InovaRU — Pitch]{InovaRU}
+\subtitle{App de Créditos para Restaurantes Universitários da UFMG}
+\author[Equipe InovaRU]{Equipe InovaRU}
+\cookieemail{equipe@inovaru.ufmg.br}
+\cookieuni{Universidade Federal de Minas Gerais (UFMG)}
+\cookielocation{Belo Horizonte, MG}
+\cookietagline{HACKATHON INOVARU 2026/01 — FUMP}
+
+\titlegraphic{%
+  \begin{tikzpicture}[scale=0.65]
+    \fill[white,opacity=.95] (0,0) circle[radius=1.2];
+    \draw[inovateal,line width=2.5pt] (0,0) circle[radius=1.0];
+    \draw[inovateal,line width=1.5pt,line cap=round] (-0.35,0.4) -- (-0.35,-0.1);
+    \draw[inovateal,line width=1.5pt,line cap=round] (-0.45,0.4) -- (-0.45,0.1) -- (-0.25,0.1) -- (-0.25,0.4);
+    \draw[inovateal,line width=1.5pt,line cap=round] (-0.35,0.1) -- (-0.35,-0.4);
+    \draw[inovateal,line width=1.5pt,line cap=round] (0.35,0.4) -- (0.35,-0.4);
+    \fill[inovateal] (0.25,0.1) .. controls (0.25,0.4) and (0.35,0.4) .. (0.35,0.1) -- cycle;
+  \end{tikzpicture}%
+}
+
+\cookieclosingtitle{Obrigado!}
+\cookieclosingtext{Perguntas ou sugestões?}
+
+\begin{document}
+
+% --- CAPA ---
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% --- O PROBLEMA ---
+\begin{frame}{O Gargalo das Filas nos Restaurantes Universitários}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \vspace{0.3cm}
+            \begin{tcolorbox}[m3card, title=A Dor do Estudante]
+                \small
+                Estudantes perdem tempo precioso enfrentando filas para compra de créditos físicos nos caixas dos RUs. O cansaço diário e a baixa conectividade nos campi agravam a experiência.
+            \end{tcolorbox}
+            \vspace{0.15cm}
+            \begin{tcolorbox}[m3card, title=Nossa Solução]
+                \small
+                Consulta de saldo e recarga via PIX em \textbf{menos de 30 segundos}, de forma intuitiva, segura e resiliente a conexões instáveis.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.40\textwidth}
+            \centering
+            \vspace{0.2cm}
+            \begin{tikzpicture}
+                \draw[fill=inovateal, draw=none, rounded corners=15pt] (0,0) rectangle (3.8, 5.0);
+                \node[white] at (1.9, 3.2) {\Huge \textbf{InovaRU}};
+                \node[white] at (1.9, 2.2) {\small FUMP / UFMG};
+                \node[white] at (1.9, 1.2) {\scriptsize Hackathon 2026/01};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- FLUXO PRINCIPAL ---
+\begin{frame}{Como Funciona: Fluxo de Uso}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \vspace{0.2cm}
+            \begin{tcolorbox}[m3card, title=Passo a Passo]
+                \small
+                \begin{enumerate}
+                    \item \textbf{Login:} CPF + senha FUMP (autenticação JWT)
+                    \item \textbf{Saldo:} Consulta instantânea do crédito disponível
+                    \item \textbf{Recarga:} Seleciona valor e gera QR Code PIX
+                    \item \textbf{Pagamento:} Escaneia QR ou copia código PIX
+                    \item \textbf{Confirmação:} App polling automático até aprovação
+                    \item \textbf{Crédito:} Saldo atualizado nos RUs
+                \end{enumerate}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.40\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.85]
+                \draw[fill=inovateal!12, rounded corners=8pt] (0,0) rectangle (4,5.5);
+                \node[anchor=west, font=\small\bfseries, text=inovateal] at (0.3,5.0) {App Mobile};
+                \node[anchor=west, font=\small\bfseries, text=inovateal] at (0.3,4.2) {MercadoPago};
+                \node[anchor=west, font=\small\bfseries, text=inovateal] at (0.3,3.4) {API FUMP};
+                \draw[-{Latex[length=2mm]}, inovateal, thick] (2.0,4.7) -- (2.0,4.4);
+                \draw[-{Latex[length=2mm]}, inovateal, thick] (2.0,3.9) -- (2.0,3.6);
+                \node[anchor=west, font=\scriptsize, text=darkgray] at (0.3,4.55) {Login (CPF+senha)};
+                \node[anchor=west, font=\scriptsize, text=darkgray] at (0.3,3.75) {PIX (QR Code)};
+                \node[anchor=west, font=\scriptsize, text=darkgray] at (0.3,2.95) {Webhook (crédito)};
+                \draw[-{Latex[length=2mm]}, inovateal, thick] (2.0,3.2) -- (2.0,2.9);
+                \node[anchor=west, font=\scriptsize, text=darkgray] at (0.3,2.15) {Polling status};
+                \node[anchor=west, font=\scriptsize, text=darkgray] at (0.3,1.35) {Saldo atualizado};
+                \node[anchor=west, font=\scriptsize, text=darkgray] at (0.3,0.55) {Histórico};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- LOGIN E INÍCIO ---
+\begin{frame}{Entrada Descomplicada e Dashboard Dinâmico}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \begin{tcolorbox}[m3card, title=Jornada Sem Fricção]
+                \small
+                \begin{itemize}
+                    \item \textbf{Login Institucional:} Autenticação segura via CPF (11 dígitos) e senha FUMP
+                    \item \textbf{Home Inteligente:} Saudação personalizada, saldo em destaque e acesso rápido a Cardápio e Histórico
+                    \item \textbf{Segurança:} Token JWT em Keystore nativo, senha nunca persistida
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/1 - login.png}
+            \captionof{figure}{\scriptsize Tela de Login}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/2 - inicio.png}
+            \captionof{figure}{\scriptsize Tela Inicial}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- SALDO E RECARGA ---
+\begin{frame}{Consulta de Saldo e Opções de Recarga}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \begin{tcolorbox}[m3card, title=Transparência e Rapidez]
+                \small
+                \begin{itemize}
+                    \item \textbf{Saldo Detalhado:} Limite de recarga (R\$ 500), dados do consumidor e situação da conta
+                    \item \textbf{Chips de Valor:} Atalhos de R\$ 5 a R\$ 50 + campo personalizado
+                    \item \textbf{Favoritos:} Últimos valores usados para recarga rápida
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/3 - saldo.png}
+            \captionof{figure}{\scriptsize Detalhe de Saldo}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/4 - recarga.png}
+            \captionof{figure}{\scriptsize Opções de Recarga}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- PIX E SUCESSO ---
+\begin{frame}{Pagamento PIX e Confirmação}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \begin{tcolorbox}[m3card, title=Recarga em Segundos]
+                \small
+                \begin{itemize}
+                    \item \textbf{QR Code Nativo:} Renderização via Base64 da API FUMP
+                    \item \textbf{Copia-e-Cola:} Código PIX para compartilhar ou colar no app do banco
+                    \item \textbf{Timer de Expiração:} Contagem regressiva com aviso visual
+                    \item \textbf{Polling Resiliente:} Backoff exponencial com jitter (3s, 5s, 8s...)
+                    \item \textbf{Confirmação Segura:} Apenas quando \texttt{status=approved} e \texttt{creditado=true}
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/5 - pix-qr-code.png}
+            \captionof{figure}{\scriptsize QR Code PIX}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/6 - sucesso.png}
+            \captionof{figure}{\scriptsize Sucesso}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- CARDÁPIO E HISTÓRICO ---
+\begin{frame}{Cardápio e Histórico de Consumo}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \begin{tcolorbox}[m3card, title=Rotina Simplificada]
+                \small
+                \begin{itemize}
+                    \item \textbf{Cardápio por RU:} Filtro por unidade (Setorial I, II, Saúde, Direito) e refeição (Almoço/Jantar)
+                    \item \textbf{Tags de Restrição:} Indicação de opções Veganas, Vegetarianas, etc.
+                    \item \textbf{Histórico Unificado:} Abas de Recargas e Refeições com filtros por data
+                    \item \textbf{Paginação:} Scroll infinito para grandes volumes de dados
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/7 - cardapio.png}
+            \captionof{figure}{\scriptsize Cardápio do Dia}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/8 - historico.png}
+            \captionof{figure}{\scriptsize Extrato de Consumo}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- PERFIL E ACESSIBILIDADE ---
+\begin{frame}{Perfil do Usuário e Acessibilidade}
+    \begin{columns}[T]
+        \begin{column}{0.45\textwidth}
+            \begin{tcolorbox}[m3card, title=Design para Todos]
+                \small
+                \begin{itemize}
+                    \item \textbf{Modo Escuro:} Segue o sistema por padrão, alternância manual disponível
+                    \item \textbf{Fonte Ajustável:} Tamanhos P, M, G para diferentes necessidades
+                    \item \textbf{Contraste Adequado:} WCAG AA em valores essenciais de saldo
+                    \item \textbf{Touch Targets:} Botões amplos para uso em movimento
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/9 - perfil.png}
+            \captionof{figure}{\scriptsize Tela de Perfil}
+        \end{column}
+        \begin{column}{0.25\textwidth}
+            \centering
+            \includegraphics[height=4.8cm]{images/10 - todas telas.png}
+            \captionof{figure}{\scriptsize Light \& Dark Mode}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- SEGURANÇA E API ---
+\begin{frame}{Integração com API FUMP e Segurança}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[m3card, title=Segurança em Primeiro Lugar]
+                \small
+                \begin{itemize}
+                    \item \textbf{JWT Keystore:} Token em Android Keystore / EncryptedSharedPreferences
+                    \item \textbf{Ownership:} API valida CPF extraído do token (nunca enviado no body)
+                    \item \textbf{Rate Limits:} Tratamento de HTTP 429 com Retry-After
+                    \item \textbf{HTTPS:} TLS 1.2+ obrigatório
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[m3card, title=Endpoints da API]
+                \small
+                \begin{tabular}{lll}
+                    \toprule
+                    \textbf{Método} & \textbf{Endpoint} \\
+                    \midrule
+                    \texttt{POST} & \texttt{/usuarios/login} \\
+                    \texttt{GET}  & \texttt{/creditos/saldo} \\
+                    \texttt{POST} & \texttt{/creditos/pagamento} \\
+                    \texttt{GET}  & \texttt{/creditos/pagamento/:id/status} \\
+                    \texttt{GET}  & \texttt{/creditos/recargas} \\
+                    \texttt{GET}  & \texttt{/creditos/refeicoes} \\
+                    \bottomrule
+                \end{tabular}
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- TECNOLOGIAS ---
+\begin{frame}{Tecnologias Propostas}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[m3card, title=Stack Técnico]
+                \small
+                \begin{tabular}{ll}
+                    \toprule
+                    \textbf{Camada} & \textbf{Tecnologia} \\
+                    \midrule
+                    Mobile & Kotlin + Jetpack Compose \\
+                    Design System & Material Design 3 \\
+                    HTTP Client & Retrofit \\
+                    QR Code & Base64 $\to$ Bitmap \\
+                    Cache Local & Room \\
+                    Segurança & Android Keystore \\
+                    \bottomrule
+                \end{tabular}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[m3card, title=Conectividade e Acessibilidade]
+                \small
+                \begin{itemize}
+                    \item \textbf{Baixa Conectividade:} Cache offline de saldo e histórico
+                    \item \textbf{Interface Acessível:} Botões grandes, contraste adequado, modo escuro
+                    \item \textbf{Letramento Digital:} Fluxo simples, linguagem clara, feedback visual
+                    \item \textbf{Licença:} MIT (Software Livre, conforme edital 8.1)
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- CRITÉRIOS DE AVALIAÇÃO ---
+\begin{frame}{Aderência aos Critérios do Edital}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[m3card, title=Viabilidade Técnica]
+                \small
+                \begin{itemize}
+                    \item Integração fiel com endpoints FUMP
+                    \item Validação de payloads e rate limits
+                    \item Fluxo completo de recarga PIX documentado
+                \end{itemize}
+            \end{tcolorbox}
+            \vspace{0.1cm}
+            \begin{tcolorbox}[m3card, title=Código e Versionamento]
+                \small
+                \begin{itemize}
+                    \item Git contínuo no repositório público
+                    \item README detalhado com instruções
+                    \item Licença MIT configurada
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[m3card, title=Usabilidade e Acessibilidade]
+                \small
+                \begin{itemize}
+                    \item Material Design 3 Expressive
+                    \item Modo escuro e fonte ajustável
+                    \item WCAG AA / AAA em valores críticos
+                \end{itemize}
+            \end{tcolorbox}
+            \vspace{0.1cm}
+            \begin{tcolorbox}[m3card, title=Originalidade]
+                \small
+                \begin{itemize}
+                    \item Combate às filas via agilidade extrema
+                    \item UX focada no uso diário do refeitório
+                    \item Cardápio integrado com restrições alimentares
+                \end{itemize}
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- ENCERRAMENTO ---
+\makeclosing
+
+\end{document}

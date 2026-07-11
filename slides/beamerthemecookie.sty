@@ -1,0 +1,356 @@
+\begin{filecontents*}{beamerthemecookie.sty}
+%% Cookie Beamer Theme (simplified for InovaRU)
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemecookie}[2026/07/10 InovaRU Cookie Theme]
+
+\RequirePackage{etoolbox}
+\RequirePackage{pgfopts}
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\RequirePackage{calc}
+\RequirePackage{adjustbox}
+\RequirePackage{listings}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins,listings,breakable}
+\usetikzlibrary{calc,positioning,fit,backgrounds,arrows.meta,shapes.geometric}
+
+\mode<presentation>
+\makeatletter
+
+% Palette — InovaRU
+\definecolor{cookieInk}{HTML}{191C1C}
+\definecolor{cookiePaper}{HTML}{FBFAF7}
+\definecolor{cookieAccentDefault}{HTML}{006A6A}
+\definecolor{cookieMuted}{HTML}{717784}
+\definecolor{cookieLine}{HTML}{DADDE4}
+\definecolor{cookieSoft}{HTML}{EFF1F0}
+\definecolor{cookieAlert}{HTML}{CF3F4F}
+\definecolor{cookieExample}{HTML}{27845F}
+\definecolor{cookieWarm}{HTML}{FFB800}
+\definecolor{cookieTheorem}{HTML}{6757C8}
+\colorlet{cookieAccent}{cookieAccentDefault}
+
+% Options
+\def\cookie@progressbar{foot}
+\def\cookie@sectionpage{none}
+\def\cookie@subsectionpage{none}
+\def\cookie@numbering{fraction}
+\def\cookie@blockstyle{fill}
+\def\cookie@background{light}
+\def\cookie@titleformat{regular}
+\def\cookie@toc{none}
+\def\cookie@covered{invisible}
+
+\pgfkeys{
+  /cookie/.is family,
+  /cookie/.cd,
+  progressbar/.is choice,
+  progressbar/none/.code=\def\cookie@progressbar{none},
+  progressbar/head/.code=\def\cookie@progressbar{head},
+  progressbar/frametitle/.code=\def\cookie@progressbar{frametitle},
+  progressbar/foot/.code=\def\cookie@progressbar{foot},
+  sectionpage/.is choice,
+  sectionpage/none/.code=\def\cookie@sectionpage{none},
+  sectionpage/simple/.code=\def\cookie@sectionpage{simple},
+  sectionpage/progressbar/.code=\def\cookie@sectionpage{progressbar},
+  subsectionpage/.is choice,
+  subsectionpage/none/.code=\def\cookie@subsectionpage{none},
+  numbering/.is choice,
+  numbering/none/.code=\def\cookie@numbering{none},
+  numbering/fraction/.code=\def\cookie@numbering{fraction},
+  numbering/counter/.code=\def\cookie@numbering{counter},
+  block/.is choice,
+  block/transparent/.code=\def\cookie@blockstyle{transparent},
+  block/fill/.code=\def\cookie@blockstyle{fill},
+  background/.is choice,
+  background/light/.code=\def\cookie@background{light},
+  background/dark/.code=\def\cookie@background{dark},
+  titleformat/.is choice,
+  titleformat/regular/.code=\def\cookie@titleformat{regular},
+  titleformat/allcaps/.code=\def\cookie@titleformat{allcaps},
+  accent/.code=\colorlet{cookieAccent}{#1},
+  toc/.is choice,
+  toc/none/.code=\def\cookie@toc{none},
+  covered/.is choice,
+  covered/invisible/.code=\def\cookie@covered{invisible},
+  covered/transparent/.code=\def\cookie@covered{transparent},
+  .unknown/.code={}
+}
+
+\ProcessPgfPackageOptions{/cookie}
+
+\newcommand{\cookie@format}[1]{%
+  \ifdefstring{\cookie@titleformat}{allcaps}{\MakeUppercase{#1}}{#1}%
+}
+
+\newcommand{\cookie@applycovered}{%
+  \ifdefstring{\cookie@covered}{transparent}{%
+    \setbeamercovered{transparent=18}%
+  }{%
+    \setbeamercovered{invisible}%
+  }%
+}
+
+\newcommand{\cookieset}[1]{\pgfkeys{/cookie/.cd,#1}\cookie@applycovered}
+\newcommand{\cookiekicker}[1]{{\usebeamerfont{cookie kicker}\color{cookieAccent}\MakeUppercase{#1}}}
+
+\tikzset{
+  invisible/.style={opacity=0,text opacity=0},
+  visible on/.style={alt={#1{}{invisible}}},
+  alt/.code args={<#1>#2#3}{\alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}}},
+  cookie node/.style={rounded corners=1.5mm,draw=cookieLine,fill=white,inner sep=2mm},
+  cookie accent node/.style={cookie node,draw=cookieAccent,fill=cookieAccent!7}
+}
+
+% Meta
+\newcommand{\insertcookieemail}{}
+\newcommand{\insertcookielocation}{}
+\newcommand{\insertcookieuni}{}
+\newcommand{\insertcookietagline}{}
+\newcommand{\insertcookieclosingtitle}{Obrigado!}
+\newcommand{\insertcookieclosingtext}{Perguntas?}
+\newcommand{\cookieemail}[1]{\gdef\insertcookieemail{#1}}
+\newcommand{\cookielocation}[1]{\gdef\insertcookielocation{#1}}
+\newcommand{\cookieuni}[1]{\gdef\insertcookieuni{#1}}
+\newcommand{\cookietagline}[1]{\gdef\insertcookietagline{#1}}
+\newcommand{\cookieclosingtitle}[1]{\gdef\insertcookieclosingtitle{#1}}
+\newcommand{\cookieclosingtext}[1]{\gdef\insertcookieclosingtext{#1}}
+
+% Colors
+\newcommand{\cookie@applycolors}{%
+  \ifdefstring{\cookie@background}{dark}{%
+    \setbeamercolor{normal text}{fg=cookiePaper,bg=cookieInk}%
+    \setbeamercolor{background canvas}{bg=cookieInk}%
+    \setbeamercolor{frametitle}{fg=cookiePaper,bg=cookieInk}%
+    \setbeamercolor{footline}{fg=cookiePaper!78!cookieInk,bg=cookieInk!88!black}%
+    \setbeamercolor{title}{fg=cookiePaper}%
+    \setbeamercolor{subtitle}{fg=cookiePaper!72!cookieInk}%
+    \setbeamercolor{author}{fg=cookiePaper}%
+    \setbeamercolor{date}{fg=cookiePaper!70!cookieInk}%
+  }{%
+    \setbeamercolor{normal text}{fg=cookieInk,bg=cookiePaper}%
+    \setbeamercolor{background canvas}{bg=cookiePaper}%
+    \setbeamercolor{structure}{fg=cookieInk}%
+    \setbeamercolor{frametitle}{fg=cookieInk,bg=cookiePaper}%
+    \setbeamercolor{framesubtitle}{fg=cookieMuted,bg=cookiePaper}%
+    \setbeamercolor{footline}{fg=cookieMuted,bg=cookieSoft}%
+    \setbeamercolor{title}{fg=cookieInk}%
+    \setbeamercolor{subtitle}{fg=cookieMuted}%
+    \setbeamercolor{author}{fg=cookieInk}%
+    \setbeamercolor{date}{fg=cookieMuted}%
+  }%
+  \setbeamercolor{footline right}{fg=white,bg=cookieAccent}%
+  \setbeamercolor{alerted text}{fg=cookieAccent}%
+  \setbeamercolor{example text}{fg=cookieExample}%
+  \setbeamercolor{progress bar}{fg=cookieAccent,bg=cookieLine}%
+  \setbeamercolor{page number in head/foot}{fg=white,bg=cookieAccent}%
+  \setbeamercolor{caption name}{fg=cookieAccent}%
+  \ifdefstring{\cookie@blockstyle}{transparent}{%
+    \setbeamercolor{block title}{fg=cookieAccent,bg=}%
+    \setbeamercolor{block body}{fg=,bg=}%
+    \setbeamercolor{block title alerted}{fg=cookieAlert,bg=}%
+    \setbeamercolor{block body alerted}{fg=,bg=}%
+    \setbeamercolor{block title example}{fg=cookieExample,bg=}%
+    \setbeamercolor{block body example}{fg=,bg=}%
+  }{%
+    \setbeamercolor{block title}{fg=cookieInk,bg=cookieAccent!16}%
+    \setbeamercolor{block body}{fg=cookieInk,bg=cookieAccent!5}%
+    \setbeamercolor{block title alerted}{fg=cookieInk,bg=cookieAlert!18}%
+    \setbeamercolor{block body alerted}{fg=cookieInk,bg=cookieAlert!6}%
+    \setbeamercolor{block title example}{fg=cookieInk,bg=cookieExample!18}%
+    \setbeamercolor{block body example}{fg=cookieInk,bg=cookieExample!6}%
+  }%
+}
+\cookie@applycolors
+\cookie@applycovered
+
+% Fonts
+\setbeamerfont{normal text}{size=\fontsize{11.8}{14.4}}
+\setbeamerfont{title}{size=\fontsize{27}{31},series=\bfseries}
+\setbeamerfont{subtitle}{size=\fontsize{11.4}{15}}
+\setbeamerfont{author}{size=\normalsize,series=\bfseries}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{frametitle}{size=\fontsize{17}{20},series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\fontsize{9.5}{12}}
+\setbeamerfont{section title}{size=\fontsize{27}{31},series=\bfseries}
+\setbeamerfont{standout}{size=\fontsize{29}{34},series=\bfseries}
+\setbeamerfont{footline}{size=\fontsize{6.8}{8}}
+\setbeamerfont{footline number}{size=\fontsize{7.2}{8.4},series=\bfseries}
+\setbeamerfont{block title}{series=\bfseries}
+\setbeamerfont{cookie kicker}{size=\fontsize{7.5}{9},series=\bfseries}
+
+\setbeamersize{text margin left=.070\paperwidth,text margin right=.055\paperwidth}
+
+% Progress bar
+\newdimen\cookie@progresswidth
+\newcommand{\cookie@computeprogress}[1]{%
+  \cookie@progresswidth=0pt%
+  \@tempcnta=\inserttotalframenumber\relax
+  \@tempcntb=\insertframenumber\relax
+  \ifnum\@tempcnta<\@tempcntb\relax\@tempcnta=\@tempcntb\relax\fi
+  \ifnum\@tempcnta>0\relax
+    \cookie@progresswidth=#1\relax
+    \divide\cookie@progresswidth by \@tempcnta
+    \multiply\cookie@progresswidth by \@tempcntb
+  \fi
+}
+
+\newcommand{\cookie@progressrule}[1]{%
+  \cookie@computeprogress{#1}%
+  \begin{tikzpicture}[baseline]
+    \path[use as bounding box] (0,-.055cm) rectangle (#1,.10cm);
+    \clip (0,-.055cm) rectangle (#1,.10cm);
+    \fill[cookieLine] (0,0) rectangle (#1,.045cm);
+    \fill[cookieAccent] (0,0) rectangle (\cookie@progresswidth,.045cm);
+    \fill[cookieAccent] (\cookie@progresswidth,.0225cm) circle[radius=.055cm];
+  \end{tikzpicture}%
+}
+
+% Templates
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{%
+  \ifdefstring{\cookie@progressbar}{head}{\hbox{\cookie@progressrule{\paperwidth}}}{}%
+}
+\setbeamertemplate{caption label separator}{: }
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{bibliography item}{\tikz[baseline=-.50ex]\fill[cookieAccent] (0,0) circle[radius=.28ex];}
+\setbeamertemplate{itemize item}{\tikz[baseline=-.55ex]\fill[cookieAccent] (0,0) circle[radius=.34ex];}
+\setbeamertemplate{itemize subitem}{\tikz[baseline=-.48ex]\fill[cookieMuted] (0,0) circle[radius=.25ex];}
+\setbeamertemplate{enumerate item}{\color{cookieAccent}\bfseries\insertenumlabel.}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Frame title
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,sep=0pt]{frametitle}%
+    \vbox{%
+      \vskip.18cm
+      \hbox to \paperwidth{%
+        \hskip.070\paperwidth
+        \vtop{%
+          \hsize=\dimexpr\paperwidth-.125\paperwidth\relax
+          \raggedright
+          {\usebeamerfont{frametitle}\cookie@format{\strut\insertframetitle\strut}\par}%
+          \ifx\insertframesubtitle\@empty\else
+            \vskip.04cm
+            {\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}%
+              \strut\insertframesubtitle\strut\par}%
+          \fi
+        }%
+        \hfil
+      }%
+      \vskip.16cm
+    }%
+  \end{beamercolorbox}%
+  \par\nointerlineskip
+  \hbox to \textwidth{\hspace*{-\beamer@leftmargin}%
+  \ifdefstring{\cookie@progressbar}{frametitle}{\hbox{\cookie@progressrule{\paperwidth}}}{}%
+  \hss}%
+}
+
+% Numbering
+\newcommand{\cookie@insertnumber}{%
+  \ifdefstring{\cookie@numbering}{none}{}{%
+    \ifdefstring{\cookie@numbering}{counter}{\insertframenumber}{\insertframenumber\,/\,\inserttotalframenumber}%
+  }%
+}
+
+% Footline
+\setbeamertemplate{footline}{%
+  \leavevmode\vbox{%
+    \ifdefstring{\cookie@progressbar}{foot}{\hbox{\cookie@progressrule{\paperwidth}}}{}%
+    \hbox{%
+      \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.7ex,dp=1.15ex,leftskip=.045\paperwidth]{footline}%
+        \usebeamerfont{footline}\insertshortauthor
+      \end{beamercolorbox}%
+      \begin{beamercolorbox}[wd=.64\paperwidth,ht=2.7ex,dp=1.15ex,leftskip=.012\paperwidth,rightskip=.012\paperwidth]{footline}%
+        \usebeamerfont{footline}\insertshorttitle%
+      \end{beamercolorbox}%
+      \begin{beamercolorbox}[wd=.18\paperwidth,ht=2.7ex,dp=1.15ex,leftskip=.027\paperwidth,rightskip=.014\paperwidth plus 1fil]{footline right}%
+        \usebeamerfont{footline number}\strut\cookie@insertnumber
+      \end{beamercolorbox}%
+    }%
+  }%
+}
+
+% Title page
+\setbeamertemplate{title page}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \coordinate (cuttop) at ($(current page.north east)+(-.31\paperwidth,0)$);
+    \coordinate (cutbottom) at ($(current page.south east)+(-.43\paperwidth,0)$);
+    \path[fill=cookieAccent]
+      (cuttop) -- (current page.north east) -- (current page.south east) -- (cutbottom) -- cycle;
+    \draw[white,opacity=.18,line width=4pt] ($(current page.center)+(.34\paperwidth,.10\paperheight)$) circle[radius=.115\paperheight];
+    \draw[white,opacity=.12,line width=3pt] ($(current page.center)+(.27\paperwidth,-.15\paperheight)$) circle[radius=.072\paperheight];
+    \fill[white,opacity=.18] ($(current page.center)+(.40\paperwidth,-.22\paperheight)$) circle[radius=.018\paperheight];
+    \fill[white,opacity=.22] ($(current page.center)+(.34\paperwidth,.26\paperheight)$) circle[radius=.012\paperheight];
+  \end{tikzpicture}%
+  \vspace*{.055\paperheight}%
+  \begin{minipage}[t]{.58\paperwidth}
+    \raggedright
+    \ifdefempty{\insertcookietagline}{}{\cookiekicker{\insertcookietagline}\par\vspace{.9em}}%
+    {\usebeamerfont{title}\usebeamercolor[fg]{title}\cookie@format{\inserttitle}\par}%
+    \ifx\@subtitle\@empty\else\vspace{.45em}{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}\fi%
+    \vspace{1.05em}{\color{cookieAccent}\rule{.16\paperwidth}{1.4pt}}\par
+    \vspace{1.25em}
+    \ifx\@author\@empty\else\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor\par\fi%
+    \ifdefempty{\insertcookieemail}{}{\vspace{.18em}{\small\href{mailto:\insertcookieemail}{\insertcookieemail}\par}}%
+    \vspace{1.2em}
+    \ifx\@institute\@empty\else\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute\par\fi%
+    \ifdefempty{\insertcookieuni}{}{\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertcookieuni\par}%
+    \vfill
+    \ifdefempty{\insertcookielocation}{}{\usebeamerfont{date}\usebeamercolor[fg]{date}\insertcookielocation\hspace{.55em}\textcolor{cookieLine}{/}\hspace{.55em}}%
+    \ifx\@date\@empty\else\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate\fi%
+  \end{minipage}%
+}
+
+% Section pages
+\newcommand{\cookie@sectionpageframe}{%
+  \begin{frame}[plain,noframenumbering,c]
+    \begin{tikzpicture}[remember picture,overlay]
+      \fill[cookieAccent]
+        (current page.south west) rectangle ($(current page.north west)+(.012\paperwidth,0)$);
+      \node[anchor=west,text=cookieAccent,font=\fontsize{46}{46}\selectfont\bfseries]
+        at ($(current page.west)+(.07\paperwidth,.12\paperheight)$) {\insertsectionnumber};
+      \node[anchor=west,text width=.70\paperwidth,align=left]
+        at ($(current page.west)+(.07\paperwidth,-.01\paperheight)$)
+        {{\usebeamerfont{section title}\usebeamercolor[fg]{section title}\insertsectionhead}};
+    \end{tikzpicture}
+  \end{frame}%
+}
+
+\AtBeginSection[]{%
+  \ifdefstring{\cookie@sectionpage}{none}{}{\cookie@sectionpageframe}%
+}
+
+% Wide environment
+\newenvironment{wide}{%
+  \par\begingroup
+  \hspace*{\dimexpr-\beamer@leftmargin+.035\paperwidth\relax}%
+  \begin{minipage}{.91\paperwidth}%
+}{%
+  \end{minipage}\endgroup\par
+}
+
+% Closing
+\newcommand{\makeclosing}{%
+  \begin{frame}[noframenumbering,standout]
+    \begin{minipage}[c]{.62\paperwidth}
+      \raggedright
+      {\usebeamerfont{standout}\insertcookieclosingtitle\par}
+      \vspace{.55em}
+      {\Large\mdseries\insertcookieclosingtext\par}
+      \vspace{1.15em}
+      {\small\mdseries
+        \ifx\@author\@empty\else\insertauthor\fi%
+        \ifdefempty{\insertcookieemail}{}{\par\vspace{.22em}\href{mailto:\insertcookieemail}{\insertcookieemail}}%
+      }
+    \end{minipage}%
+  \end{frame}%
+}
+
+\makeatother
+\mode<all>
+\endinput
+\end{filecontents*}
