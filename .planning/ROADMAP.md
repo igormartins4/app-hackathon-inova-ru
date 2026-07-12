@@ -13,15 +13,15 @@ InovaRU is an Android app for UFMG students to check meal balances and recharge 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Project Foundation** - Expo setup, navigation, shared services, build pipeline
-- [ ] **Phase 2: Authentication** - Login flow with secure JWT storage and token management
-- [ ] **Phase 3: Balance & Profile** - Balance display, user profile, tab navigation
-- [ ] **Phase 4: PIX Payment Flow** - Complete recharge: amount → QR Code → polling → confirmation
-- [ ] **Phase 5: History** - Recharge and meal history with pagination and date filtering
-- [ ] **Phase 6: Offline & Connectivity** - Network-aware caching, stale-while-revalidate, offline UX
-- [ ] **Phase 7: Error Handling & Resilience** - Retry logic, HTTP error handling, user-friendly messages
-- [ ] **Phase 8: Accessibility** - TalkBack, WCAG AA contrast, font scaling, Switch Access
-- [ ] **Phase 9: Design & Polish** - Creative UI, fluid animations, visual consistency
-- [ ] **Phase 10: Build & Delivery** - EAS Build APK, GitHub repo, README, final QA
+- [x] **Phase 2: Authentication** - Login flow with secure JWT storage and token management
+- [x] **Phase 3: Balance & Profile** - Balance display, user profile, tab navigation
+- [x] **Phase 4: PIX Payment Flow** - Complete recharge: amount → QR Code → polling → confirmation
+- [x] **Phase 5: History** - Recharge and meal history with pagination and date filtering
+- [x] **Phase 6: Offline & Connectivity** - Network-aware caching, stale-while-revalidate, offline UX
+- [x] **Phase 7: Error Handling & Resilience** - Retry logic, HTTP error handling, user-friendly messages
+- [x] **Phase 8: Accessibility** - TalkBack, WCAG AA contrast, font scaling, Switch Access
+- [x] **Phase 9: Design & Polish** - Creative UI, fluid animations, visual consistency
+- [x] **Phase 10: Build & Delivery** - EAS Build APK, GitHub repo, README, final QA
 
 ## Phase Details
 
@@ -217,12 +217,12 @@ Note: Phases 3, 4 can be parallelized only if balance query hook is built first 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Foundation | 6/6 | Complete ✓ | 2026-07-12 |
-| 2. Authentication | 0/5 | Not started | - |
-| 3. Balance & Profile | 0/4 | Not started | - |
-| 4. PIX Payment Flow | 0/7 | Not started | - |
-| 5. History | 0/4 | Not started | - |
-| 6. Offline & Connectivity | 0/4 | Not started | - |
-| 7. Error Handling & Resilience | 0/4 | Not started | - |
-| 8. Accessibility | 0/5 | Not started | - |
-| 9. Design & Polish | 0/4 | Not started | - |
-| 10. Build & Delivery | 0/4 | Not started | - |
+| 2. Authentication | 5/5 | Complete ✓ | 2026-07-12 |
+| 3. Balance & Profile | 4/4 | Complete ✓ | 2026-07-12 |
+| 4. PIX Payment Flow | 7/7 | Complete ✓ | 2026-07-12 |
+| 5. History | 4/4 | Complete ✓ | 2026-07-12 |
+| 6. Offline & Connectivity | 4/4 | Complete ✓ | 2026-07-12 |
+| 7. Error Handling & Resilience | 4/4 | Complete ✓ | 2026-07-12 |
+| 8. Accessibility | 5/5 | Complete ✓ | 2026-07-12 |
+| 9. Design & Polish | 4/4 | Complete ✓ | 2026-07-12 |
+| 10. Build & Delivery | 4/4 | Complete ✓ | 2026-07-12 |
