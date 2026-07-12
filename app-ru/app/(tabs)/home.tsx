@@ -4,23 +4,29 @@ import { BalanceCard } from '@/features/balance/components/BalanceCard'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
 import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
+import { getErrorMessage } from '@/shared/utils'
 
 export default function HomeScreen() {
   const { user } = useAuth()
   const { data, isLoading, isError, error, refetch } = useBalance()
-  const { message } = useConsumerStatus()
+  const { isInactive, message } = useConsumerStatus()
 
   if (isLoading) {
     return <LoadingSpinner message="Carregando" />
   }
 
+  if (isInactive) {
+    return (
+      <View className="flex-1 bg-gray-50 px-4 pt-8">
+        <ErrorMessage message={message ?? 'Conta inativa. Procure a FUMP.'} />
+      </View>
+    )
+  }
+
   if (isError) {
     return (
       <View className="flex-1 bg-gray-50 px-4 pt-8">
-        <ErrorMessage
-          message={error?.userMessage ?? 'Ocorreu um erro. Tente novamente em instantes.'}
-          onRetry={refetch}
-        />
+        <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />
       </View>
     )
   }

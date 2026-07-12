@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { getToken } from './secureStorage'
+import { ERROR_MESSAGES } from '@/config'
+import { emitUnauthorized } from './authEvents'
+import { getToken, removeToken, removeUser } from './secureStorage'
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:3000'
 
@@ -18,20 +20,25 @@ apiClient.interceptors.request.use(async (config) => {
   return config
 })
 
-// Normalize errors into user-friendly messages (PT-BR)
+// Normalize errors into user-friendly messages (PT-BR) without losing the
+// original Error instance — callers rely on `instanceof Error` upstream.
 apiClient.interceptors.response.use(
   (res) => res,
   (error) => {
-    const status = error.response?.status
-    const messages: Record<number, string> = {
-      401: 'Usuário ou senha inválidos.',
-      403: 'Acesso não autorizado. Verifique suas credenciais.',
-      404: 'Recurso não encontrado. Tente novamente.',
-      429: 'Muitas tentativas. Aguarde um momento e tente de novo.',
-      422: 'Valor fora do limite. Mínimo R$ 5,00 e máximo R$ 500,00.',
-      500: 'Ocorreu um erro. Tente novamente em instantes.',
+    const status = error.response?.status as number | undefined
+    const userMessage = status
+      ? (ERROR_MESSAGES[status as keyof typeof ERROR_MESSAGES] ?? ERROR_MESSAGES[500])
+      : ERROR_MESSAGES.NETWORK
+
+    error.userMessage = userMessage
+
+    if (status === 401) {
+      // Token expired/invalid — clear it and let the auth layer redirect to login.
+      removeToken()
+      removeUser()
+      emitUnauthorized()
     }
-    const message = messages[status] ?? 'Ocorreu um erro. Tente novamente em instantes.'
-    return Promise.reject({ ...error, userMessage: message })
+
+    return Promise.reject(error)
   },
 )

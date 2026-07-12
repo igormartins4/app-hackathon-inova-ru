@@ -4,6 +4,7 @@ import { BalanceCard } from '@/features/balance/components/BalanceCard'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
+import { getErrorMessage } from '@/shared/utils'
 
 export default function BalanceScreen() {
   const { data, isLoading, isError, error, refetch, isStale } = useBalance()
@@ -23,10 +24,7 @@ export default function BalanceScreen() {
   if (isError) {
     return (
       <View className="flex-1 bg-gray-50 px-4 pt-8">
-        <ErrorMessage
-          message={error?.userMessage ?? 'Ocorreu um erro. Tente novamente em instantes.'}
-          onRetry={refetch}
-        />
+        <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />
       </View>
     )
   }

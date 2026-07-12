@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getToken, getUser, removeToken, removeUser, setToken, setUser } from '@/shared/services'
+import {
+  getToken,
+  getUser,
+  onUnauthorized,
+  removeToken,
+  removeUser,
+  setToken,
+  setUser,
+} from '@/shared/services'
+import { getErrorMessage } from '@/shared/utils'
 import { loginApi } from '../services/authApi'
 import type { User } from '../types/auth.types'
 
@@ -40,6 +49,23 @@ export function useAuth(): UseAuthReturn {
     checkAuth()
   }, [checkAuth])
 
+  const logout = useCallback(async () => {
+    await removeToken()
+    await removeUser()
+    setUserState(null)
+    setIsAuthenticated(false)
+    setError(null)
+  }, [])
+
+  // The API client already cleared the token/user on a 401 — just sync local state
+  // so the root layout's auth gate redirects to login.
+  useEffect(() => {
+    return onUnauthorized(() => {
+      setUserState(null)
+      setIsAuthenticated(false)
+    })
+  }, [])
+
   const login = useCallback(async (cpf: string, password: string) => {
     try {
       setError(null)
@@ -50,21 +76,11 @@ export function useAuth(): UseAuthReturn {
       setUserState(response.usuario)
       setIsAuthenticated(true)
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Ocorreu um erro. Tente novamente em instantes.'
-      setError(message)
+      setError(getErrorMessage(err))
       throw err
     } finally {
       setIsLoading(false)
     }
-  }, [])
-
-  const logout = useCallback(async () => {
-    await removeToken()
-    await removeUser()
-    setUserState(null)
-    setIsAuthenticated(false)
-    setError(null)
   }, [])
 
   const clearError = useCallback(() => {
