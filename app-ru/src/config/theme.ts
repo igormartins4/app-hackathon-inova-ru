@@ -51,3 +51,15 @@ export const fontSize = {
   xxl: 24,
   title: 28,
 } as const
+
+// Animation timing constants
+export const timing = {
+  fast: 150,
+  normal: 250,
+  slow: 400,
+} as const
+
+// Touch target minimum (WCAG 2.5.5)
+export const touchTarget = {
+  min: 48,
+} as const
