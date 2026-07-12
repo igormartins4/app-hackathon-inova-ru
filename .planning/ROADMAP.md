@@ -12,7 +12,7 @@ InovaRU is an Android app for UFMG students to check meal balances and recharge 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Project Foundation** - Expo setup, navigation, shared services, build pipeline
+- [x] **Phase 1: Project Foundation** - Expo setup, navigation, shared services, build pipeline
 - [ ] **Phase 2: Authentication** - Login flow with secure JWT storage and token management
 - [ ] **Phase 3: Balance & Profile** - Balance display, user profile, tab navigation
 - [ ] **Phase 4: PIX Payment Flow** - Complete recharge: amount → QR Code → polling → confirmation
@@ -216,7 +216,7 @@ Note: Phases 3, 4 can be parallelized only if balance query hook is built first 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Foundation | 0/6 | Not started | - |
+| 1. Project Foundation | 6/6 | Complete ✓ | 2026-07-12 |
 | 2. Authentication | 0/5 | Not started | - |
 | 3. Balance & Profile | 0/4 | Not started | - |
 | 4. PIX Payment Flow | 0/7 | Not started | - |
