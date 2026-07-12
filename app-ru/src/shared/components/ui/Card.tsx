@@ -4,7 +4,7 @@ interface CardProps {
   children: React.ReactNode
   className?: string
   accessibilityLabel?: string
-  accessibilityRole?: 'none' | 'summary' | 'region' | 'search'
+  accessibilityRole?: 'none' | 'summary' | 'search' | 'alert'
 }
 
 export function Card({

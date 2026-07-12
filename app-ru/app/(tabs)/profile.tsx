@@ -32,7 +32,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50" contentContainerClassName="p-4 gap-4">
-      <Card accessibilityLabel="Dados do usuário" accessibilityRole="region">
+      <Card accessibilityLabel="Dados do usuário" accessibilityRole="summary">
         <Text accessibilityRole="text" className="text-lg font-semibold text-gray-900 mb-2">
           Dados Pessoais
         </Text>
@@ -41,7 +41,7 @@ export default function ProfileScreen() {
       </Card>
 
       {data && (
-        <Card accessibilityLabel="Dados do consumidor" accessibilityRole="region">
+        <Card accessibilityLabel="Dados do consumidor" accessibilityRole="summary">
           <Text accessibilityRole="text" className="text-lg font-semibold text-gray-900 mb-2">
             Dados do Consumidor
           </Text>
