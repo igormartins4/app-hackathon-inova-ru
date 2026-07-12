@@ -1,2 +1,1 @@
-// Profile feature - public API surface
-export {}
+export type { Consumidor, Saldo } from '@/features/balance/types/balance.types';
