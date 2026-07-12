@@ -4,13 +4,15 @@ import type { HistoryParams } from '../types/history.types'
 
 const PAGE_SIZE = 20
 
-export function useRechargeHistory(extraParams: Omit<HistoryParams, 'pagina' | 'por_pagina'> = {}) {
+export function useRechargeHistory(extraParams: Omit<HistoryParams, 'page' | 'perPage'> = {}) {
   return useInfiniteQuery({
     queryKey: ['history', 'recharges', extraParams],
     queryFn: ({ pageParam = 1 }) =>
-      fetchRechargeHistory({ ...extraParams, pagina: pageParam, por_pagina: PAGE_SIZE }),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.dados.length < PAGE_SIZE ? undefined : allPages.length + 1,
+      fetchRechargeHistory({ ...extraParams, page: pageParam, perPage: PAGE_SIZE }),
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.currentPage < lastPage.pagination.lastPage
+        ? lastPage.pagination.currentPage + 1
+        : undefined,
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
   })

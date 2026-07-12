@@ -1,7 +1,14 @@
 import { useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { DateFilter, HistoryList, useMealHistory, useRechargeHistory } from '@/features/history'
+import {
+  DateFilter,
+  HistoryList,
+  type MealRecord,
+  type RechargeRecord,
+  useMealHistory,
+  useRechargeHistory,
+} from '@/features/history'
 import { Button } from '@/shared/components/ui'
 
 type Tab = 'recharges' | 'meals'
@@ -9,16 +16,22 @@ type Tab = 'recharges' | 'meals'
 export default function HistoryScreen() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('recharges')
-  const [_dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
+  const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
     start: null,
     end: null,
   })
 
-  const rechargeQuery = useRechargeHistory()
-  const mealQuery = useMealHistory()
+  const dateParams = {
+    dataInicio: dateRange.start ?? undefined,
+    dataFim: dateRange.end ?? undefined,
+  }
+
+  const rechargeQuery = useRechargeHistory(dateParams)
+  const mealQuery = useMealHistory(dateParams)
 
   const activeQuery = activeTab === 'recharges' ? rechargeQuery : mealQuery
-  const items = activeQuery.data?.pages.flatMap((p) => p.dados) ?? []
+  const items: (RechargeRecord | MealRecord)[] =
+    activeQuery.data?.pages.flatMap((p) => p.data as (RechargeRecord | MealRecord)[]) ?? []
 
   const handleRefresh = useCallback(() => {
     activeQuery.refetch()

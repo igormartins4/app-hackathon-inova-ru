@@ -14,6 +14,11 @@ const QUICK_OPTIONS = [
 export function DateFilter({ onFilter }: DateFilterProps) {
   const [selected, setSelected] = useState<number | null>(null)
 
+  // API expects dataInicio/dataFim as YYYY-MM-DD (see seção 7.5/7.6 do contrato).
+  function toDateParam(date: Date): string {
+    return date.toISOString().slice(0, 10)
+  }
+
   const handlePress = (days: number | null) => {
     setSelected(days)
     if (days === null) {
@@ -22,7 +27,7 @@ export function DateFilter({ onFilter }: DateFilterProps) {
       const end = new Date()
       const start = new Date()
       start.setDate(start.getDate() - days)
-      onFilter(start.toISOString(), end.toISOString())
+      onFilter(toDateParam(start), toDateParam(end))
     }
   }
 
