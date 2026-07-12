@@ -1,23 +1,12 @@
 import { useState } from 'react'
 import { View } from 'react-native'
 import { Button, ErrorMessage, Input } from '@/shared/components/ui'
+import { cleanCpf, formatCpf } from '@/shared/utils'
 
 interface LoginFormProps {
   onSubmit: (cpf: string, password: string) => void
   isLoading: boolean
   error: string | null
-}
-
-function formatCpf(text: string): string {
-  const digits = text.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 3) return digits
-  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`
-  if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`
-  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`
-}
-
-function cleanCpf(formatted: string): string {
-  return formatted.replace(/\D/g, '')
 }
 
 export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
@@ -76,13 +65,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
         accessibilityLabel="Campo de senha"
       />
       {error ? <ErrorMessage message={error} /> : null}
-      <Button
-        label="Entrar"
-        onPress={handleSubmit}
-        loading={isLoading}
-        disabled={isLoading}
-        accessibilityLabel="Botão de entrada"
-      />
+      <Button label="Entrar" onPress={handleSubmit} loading={isLoading} disabled={isLoading} />
     </View>
   )
 }

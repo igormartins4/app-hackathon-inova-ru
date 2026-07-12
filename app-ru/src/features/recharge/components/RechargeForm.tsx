@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
+import { MAX_VALUE, MIN_VALUE, parseAmount, validateRechargeAmount } from '@/shared/utils'
 
 const PRESET_AMOUNTS = [10, 20, 30, 50, 100, 200]
-const MIN_VALUE = 5
-const MAX_VALUE = 500
 
 interface RechargeFormProps {
   currentBalance: number
@@ -15,10 +14,11 @@ export function RechargeForm({ currentBalance, disabled, onSubmit }: RechargeFor
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
   const [customAmount, setCustomAmount] = useState('')
 
-  const customValue = Number(customAmount.replace(',', '.'))
+  const customValue = parseAmount(customAmount)
   const activeAmount = selectedAmount ?? (customValue >= MIN_VALUE ? customValue : 0)
-  const exceedsLimit = currentBalance + activeAmount > MAX_VALUE
-  const isValid = activeAmount >= MIN_VALUE && activeAmount <= MAX_VALUE && !exceedsLimit
+  const validation = validateRechargeAmount(activeAmount, currentBalance)
+  const exceedsLimit = activeAmount > 0 && !validation.valid
+  const isValid = activeAmount > 0 && validation.valid
 
   function handlePreset(value: number) {
     setSelectedAmount(value)
@@ -92,8 +92,7 @@ export function RechargeForm({ currentBalance, disabled, onSubmit }: RechargeFor
           accessibilityLiveRegion="assertive"
           className="text-sm text-red-500"
         >
-          Valor fora do limite. Máximo R$ 500,00 (limite restante:{' '}
-          {formatCurrency(MAX_VALUE - currentBalance)}).
+          {validation.error}
         </Text>
       )}
 
