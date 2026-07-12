@@ -49,28 +49,35 @@ src/
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
-- Expo CLI (`npm install -g expo-cli`)
-- Android Studio (for emulator) or Expo Go app
+- pnpm (`corepack enable` or `npm install -g pnpm`)
+- Android Studio (for emulator) or a custom development build (see note below)
 
 ### Install
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Run
 
 ```bash
-npx expo start
+pnpm start
 ```
+
+> **Note on Expo Go:** this project depends on native modules (e.g. `react-native-mmkv`) that are **not** bundled in the generic Expo Go client. Scanning the QR code with plain Expo Go fails with "Failed to download remote update". Build and install a development client instead:
+>
+> ```bash
+> pnpm exec expo run:android
+> ```
+>
+> or, without a local Android setup, `pnpm exec eas build --profile development --platform android` and install the resulting APK once.
 
 ### Android Emulator
 
 The app connects to a mock server at `http://10.0.2.2:3000` (Android emulator localhost alias). Ensure your mock server is running on port 3000.
 
 ```bash
-npx expo start --android
+pnpm android
 ```
 
 > **Note:** The emulator must have `android:usesCleartextTraffic="true"` for HTTP connections to the local mock server. This is already configured in debug builds.
@@ -78,7 +85,7 @@ npx expo start --android
 ### EAS Build
 
 ```bash
-npx eas build --platform android
+pnpm exec eas build --platform android
 ```
 
 ## Project Structure
@@ -106,8 +113,8 @@ Connects to FUMP v2.0 API. See `src/config/constants.ts` for endpoints.
 | `/creditos/saldo` | GET | Get balance and consumer data |
 | `/creditos/pagamento` | POST | Create PIX payment |
 | `/creditos/pagamento/:id/status` | GET | Poll payment status |
-| `/creditos/historico-recargas` | GET | Recharge history |
-| `/creditos/historico-refeicoes` | GET | Meal history |
+| `/creditos/recargas` | GET | Recharge history |
+| `/creditos/refeicoes` | GET | Meal history |
 
 ## License
 
