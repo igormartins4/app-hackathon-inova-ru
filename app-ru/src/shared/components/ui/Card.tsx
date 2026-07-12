@@ -1,15 +1,15 @@
-import { View } from "react-native";
+import { View } from 'react-native'
 
 interface CardProps {
-  children: React.ReactNode;
-  className?: string;
-  accessibilityLabel?: string;
-  accessibilityRole?: "none" | "summary" | "region" | "search";
+  children: React.ReactNode
+  className?: string
+  accessibilityLabel?: string
+  accessibilityRole?: 'none' | 'summary' | 'region' | 'search'
 }
 
 export function Card({
   children,
-  className = "",
+  className = '',
   accessibilityLabel,
   accessibilityRole,
 }: CardProps) {
@@ -21,5 +21,5 @@ export function Card({
     >
       {children}
     </View>
-  );
+  )
 }

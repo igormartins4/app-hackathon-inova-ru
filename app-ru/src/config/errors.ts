@@ -9,6 +9,6 @@ export const ERROR_MESSAGES = {
   EMPTY_RECHARGES: 'Você ainda não fez recargas no período.',
   EMPTY_MEALS: 'Nenhuma refeição encontrada no período.',
   INACTIVE_ACCOUNT: 'Conta inativa. Procure a FUMP para regularizar sua situação.',
-} as const;
+} as const
 
-export type ErrorCode = keyof typeof ERROR_MESSAGES;
+export type ErrorCode = keyof typeof ERROR_MESSAGES

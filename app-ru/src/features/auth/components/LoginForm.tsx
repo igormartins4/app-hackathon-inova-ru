@@ -1,60 +1,59 @@
-import { useState } from 'react';
-import { View } from 'react-native';
-import { Button, ErrorMessage, Input } from '@/shared/components/ui';
+import { useState } from 'react'
+import { View } from 'react-native'
+import { Button, ErrorMessage, Input } from '@/shared/components/ui'
 
 interface LoginFormProps {
-  onSubmit: (cpf: string, password: string) => void;
-  isLoading: boolean;
-  error: string | null;
+  onSubmit: (cpf: string, password: string) => void
+  isLoading: boolean
+  error: string | null
 }
 
 function formatCpf(text: string): string {
-  const digits = text.replace(/\D/g, '').slice(0, 11);
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
-  if (digits.length <= 9)
-    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
-  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+  const digits = text.replace(/\D/g, '').slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`
+  if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`
 }
 
 function cleanCpf(formatted: string): string {
-  return formatted.replace(/\D/g, '');
+  return formatted.replace(/\D/g, '')
 }
 
 export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
-  const [cpf, setCpf] = useState('');
-  const [password, setPassword] = useState('');
-  const [cpfError, setCpfError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [cpf, setCpf] = useState('')
+  const [password, setPassword] = useState('')
+  const [cpfError, setCpfError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
 
   const handleCpfChange = (text: string) => {
-    setCpf(formatCpf(text));
-    if (cpfError) setCpfError('');
-  };
+    setCpf(formatCpf(text))
+    if (cpfError) setCpfError('')
+  }
 
   const handlePasswordChange = (text: string) => {
-    setPassword(text);
-    if (passwordError) setPasswordError('');
-  };
+    setPassword(text)
+    if (passwordError) setPasswordError('')
+  }
 
   const handleSubmit = () => {
-    const clean = cleanCpf(cpf);
-    let hasError = false;
+    const clean = cleanCpf(cpf)
+    let hasError = false
 
     if (clean.length !== 11) {
-      setCpfError('CPF deve conter 11 dígitos.');
-      hasError = true;
+      setCpfError('CPF deve conter 11 dígitos.')
+      hasError = true
     }
 
     if (!password.trim()) {
-      setPasswordError('Senha é obrigatória.');
-      hasError = true;
+      setPasswordError('Senha é obrigatória.')
+      hasError = true
     }
 
-    if (hasError) return;
+    if (hasError) return
 
-    onSubmit(clean, password);
-  };
+    onSubmit(clean, password)
+  }
 
   return (
     <View className="gap-4">
@@ -85,5 +84,5 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
         accessibilityLabel="Botão de entrada"
       />
     </View>
-  );
+  )
 }

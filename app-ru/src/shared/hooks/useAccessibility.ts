@@ -1,28 +1,28 @@
-import { AccessibilityInfo, PixelRatio, type AccessibilityChangeEvent } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
+import { type AccessibilityChangeEvent, AccessibilityInfo, PixelRatio } from 'react-native'
 
 interface AccessibilityState {
-  isReduceMotionEnabled: boolean;
-  fontScale: number;
+  isReduceMotionEnabled: boolean
+  fontScale: number
 }
 
 export function useAccessibility(): AccessibilityState {
-  const [isReduceMotionEnabled, setIsReduceMotionEnabled] = useState(false);
-  const [fontScale, setFontScale] = useState(() => PixelRatio.getFontScale());
+  const [isReduceMotionEnabled, setIsReduceMotionEnabled] = useState(false)
+  const [fontScale, setFontScale] = useState(() => PixelRatio.getFontScale())
 
   useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setIsReduceMotionEnabled);
+    AccessibilityInfo.isReduceMotionEnabled().then(setIsReduceMotionEnabled)
     const sub = AccessibilityInfo.addEventListener(
       'reduceMotionChanged',
       (event: AccessibilityChangeEvent) => setIsReduceMotionEnabled(event),
-    );
-    return () => sub.remove();
-  }, []);
+    )
+    return () => sub.remove()
+  }, [])
 
   // fontScale doesn't change at runtime without app restart, but read it on mount
   useEffect(() => {
-    setFontScale(PixelRatio.getFontScale());
-  }, []);
+    setFontScale(PixelRatio.getFontScale())
+  }, [])
 
-  return { isReduceMotionEnabled, fontScale };
+  return { isReduceMotionEnabled, fontScale }
 }

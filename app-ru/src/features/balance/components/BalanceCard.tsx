@@ -1,13 +1,13 @@
-import { Text, View } from 'react-native';
-import { Card } from '@/shared/components/ui';
+import { Text, View } from 'react-native'
+import { Card } from '@/shared/components/ui'
 
 function formatCurrency(value: number): string {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 interface BalanceCardProps {
-  creditoDisponivel: number;
-  limiteRecarga: number;
+  creditoDisponivel: number
+  limiteRecarga: number
 }
 
 export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardProps) {
@@ -37,5 +37,5 @@ export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardPro
         </Text>
       </View>
     </Card>
-  );
+  )
 }

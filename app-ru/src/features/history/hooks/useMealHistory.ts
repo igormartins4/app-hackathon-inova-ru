@@ -1,8 +1,8 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { fetchMealHistory } from '../services/historyApi';
-import type { MealHistoryParams } from '../types/history.types';
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { fetchMealHistory } from '../services/historyApi'
+import type { MealHistoryParams } from '../types/history.types'
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 20
 
 export function useMealHistory(extraParams: Omit<MealHistoryParams, 'pagina' | 'por_pagina'> = {}) {
   return useInfiniteQuery({
@@ -13,5 +13,5 @@ export function useMealHistory(extraParams: Omit<MealHistoryParams, 'pagina' | '
       lastPage.dados.length < PAGE_SIZE ? undefined : allPages.length + 1,
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
-  });
+  })
 }

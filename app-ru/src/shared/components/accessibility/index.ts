@@ -1,1 +1,1 @@
-export { AccessibleText } from './AccessibleText';
+export { AccessibleText } from './AccessibleText'

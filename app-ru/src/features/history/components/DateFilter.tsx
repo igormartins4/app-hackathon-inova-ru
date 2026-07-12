@@ -1,35 +1,37 @@
-import { useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { Button } from '@/shared/components/ui';
+import { useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
 
 interface DateFilterProps {
-  onFilter: (start: string | null, end: string | null) => void;
-  active?: boolean;
+  onFilter: (start: string | null, end: string | null) => void
 }
 
 const QUICK_OPTIONS = [
   { label: '7 dias', days: 7 },
   { label: '30 dias', days: 30 },
   { label: 'Todos', days: null },
-] as const;
+] as const
 
-export function DateFilter({ onFilter, active }: DateFilterProps) {
-  const [selected, setSelected] = useState<number | null>(null);
+export function DateFilter({ onFilter }: DateFilterProps) {
+  const [selected, setSelected] = useState<number | null>(null)
 
   const handlePress = (days: number | null) => {
-    setSelected(days);
+    setSelected(days)
     if (days === null) {
-      onFilter(null, null);
+      onFilter(null, null)
     } else {
-      const end = new Date();
-      const start = new Date();
-      start.setDate(start.getDate() - days);
-      onFilter(start.toISOString(), end.toISOString());
+      const end = new Date()
+      const start = new Date()
+      start.setDate(start.getDate() - days)
+      onFilter(start.toISOString(), end.toISOString())
     }
-  };
+  }
 
   return (
-    <View accessibilityLabel="Filtro de período" accessibilityRole="search" className="flex-row gap-2">
+    <View
+      accessibilityLabel="Filtro de período"
+      accessibilityRole="search"
+      className="flex-row gap-2"
+    >
       {QUICK_OPTIONS.map((opt) => (
         <Pressable
           key={opt.label}
@@ -41,11 +43,13 @@ export function DateFilter({ onFilter, active }: DateFilterProps) {
             selected === opt.days ? 'bg-blue-600' : 'bg-gray-200'
           }`}
         >
-          <Text className={`text-sm font-medium ${selected === opt.days ? 'text-white' : 'text-gray-700'}`}>
+          <Text
+            className={`text-sm font-medium ${selected === opt.days ? 'text-white' : 'text-gray-700'}`}
+          >
             {opt.label}
           </Text>
         </Pressable>
       ))}
     </View>
-  );
+  )
 }

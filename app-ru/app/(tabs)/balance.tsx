@@ -1,23 +1,23 @@
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
-import { useState, useCallback } from 'react';
-import { useBalance } from '@/features/balance/hooks/useBalance';
-import { BalanceCard } from '@/features/balance/components/BalanceCard';
-import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus';
-import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui';
+import { useCallback, useState } from 'react'
+import { RefreshControl, ScrollView, Text, View } from 'react-native'
+import { BalanceCard } from '@/features/balance/components/BalanceCard'
+import { useBalance } from '@/features/balance/hooks/useBalance'
+import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
+import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 
 export default function BalanceScreen() {
-  const { data, isLoading, isError, error, refetch, isFetching, isStale } = useBalance();
-  const { isOffline } = useNetworkStatus();
-  const [refreshing, setRefreshing] = useState(false);
+  const { data, isLoading, isError, error, refetch, isStale } = useBalance()
+  const { isOffline } = useNetworkStatus()
+  const [refreshing, setRefreshing] = useState(false)
 
   const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await refetch();
-    setRefreshing(false);
-  }, [refetch]);
+    setRefreshing(true)
+    await refetch()
+    setRefreshing(false)
+  }, [refetch])
 
   if (isLoading) {
-    return <LoadingSpinner message="Carregando saldo" />;
+    return <LoadingSpinner message="Carregando saldo" />
   }
 
   if (isError) {
@@ -28,7 +28,7 @@ export default function BalanceScreen() {
           onRetry={refetch}
         />
       </View>
-    );
+    )
   }
 
   return (
@@ -51,5 +51,5 @@ export default function BalanceScreen() {
         />
       )}
     </ScrollView>
-  );
+  )
 }

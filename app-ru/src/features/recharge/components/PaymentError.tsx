@@ -1,21 +1,25 @@
-import { View, Text, Pressable } from 'react-native';
-import type { PaymentStatusResponse } from '../types/recharge.types';
+import { Pressable, Text, View } from 'react-native'
+import type { PaymentStatusResponse } from '../types/recharge.types'
 
 const ERROR_MESSAGES: Record<string, string> = {
   rejected: 'Pagamento não autorizado.',
   cancelled: 'Pagamento cancelado.',
   expired: 'Código PIX expirado.',
   timeout: 'Tempo esgotado.',
-};
+}
 
 interface PaymentErrorProps {
-  status: PaymentStatusResponse['status'] | 'timeout';
-  onRetry: () => void;
+  status: PaymentStatusResponse['status'] | 'timeout'
+  onRetry: () => void
 }
 
 export function PaymentError({ status, onRetry }: PaymentErrorProps) {
   return (
-    <View accessibilityRole="alert" accessibilityLiveRegion="assertive" className="items-center gap-6 py-8">
+    <View
+      accessibilityRole="alert"
+      accessibilityLiveRegion="assertive"
+      className="items-center gap-6 py-8"
+    >
       <View className="w-16 h-16 rounded-full bg-red-100 items-center justify-center">
         <Text className="text-3xl">✕</Text>
       </View>
@@ -33,5 +37,5 @@ export function PaymentError({ status, onRetry }: PaymentErrorProps) {
         <Text className="text-white font-bold">Tentar novamente</Text>
       </Pressable>
     </View>
-  );
+  )
 }

@@ -1,11 +1,11 @@
-import { Text, View } from 'react-native';
+import { Text, View } from 'react-native'
 
 interface OfflineBannerProps {
-  visible: boolean;
+  visible: boolean
 }
 
 export function OfflineBanner({ visible }: OfflineBannerProps) {
-  if (!visible) return null;
+  if (!visible) return null
 
   return (
     <View
@@ -17,5 +17,5 @@ export function OfflineBanner({ visible }: OfflineBannerProps) {
         Sem conexão. Verifique sua internet e tente novamente.
       </Text>
     </View>
-  );
+  )
 }

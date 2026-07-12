@@ -1,13 +1,15 @@
-import { ScrollView, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useBalance } from '@/features/balance/hooks/useBalance';
-import { Button, Card, LoadingSpinner } from '@/shared/components/ui';
+import { useRouter } from 'expo-router'
+import { ScrollView, Text, View } from 'react-native'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useBalance } from '@/features/balance/hooks/useBalance'
+import { Button, Card, LoadingSpinner } from '@/shared/components/ui'
 
 function DataRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row justify-between py-2 border-b border-gray-100">
-      <Text accessibilityRole="text" className="text-sm text-gray-500">{label}</Text>
+      <Text accessibilityRole="text" className="text-sm text-gray-500">
+        {label}
+      </Text>
       <Text
         accessibilityLabel={`${label}: ${value}`}
         accessibilityRole="text"
@@ -16,16 +18,16 @@ function DataRow({ label, value }: { label: string; value: string }) {
         {value}
       </Text>
     </View>
-  );
+  )
 }
 
 export default function ProfileScreen() {
-  const { user } = useAuth();
-  const { data, isLoading } = useBalance();
-  const router = useRouter();
+  const { user } = useAuth()
+  const { data, isLoading } = useBalance()
+  const router = useRouter()
 
   if (isLoading) {
-    return <LoadingSpinner message="Carregando perfil" />;
+    return <LoadingSpinner message="Carregando perfil" />
   }
 
   return (
@@ -47,15 +49,18 @@ export default function ProfileScreen() {
           <DataRow label="Centro de custo" value={data.consumidor.centro_custo.descricao} />
           <DataRow
             label="Situação"
-            value={data.consumidor.situacao === 'A' ? 'Ativo' : data.consumidor.situacao === 'B' ? 'Bloqueado' : 'Inativo'}
+            value={
+              data.consumidor.situacao === 'A'
+                ? 'Ativo'
+                : data.consumidor.situacao === 'B'
+                  ? 'Bloqueado'
+                  : 'Inativo'
+            }
           />
         </Card>
       )}
 
-      <Button
-        label="Ver Histórico"
-        onPress={() => router.push('/history')}
-      />
+      <Button label="Ver Histórico" onPress={() => router.push('/history')} />
     </ScrollView>
-  );
+  )
 }

@@ -1,17 +1,17 @@
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from 'react-native'
 
 interface LoadingSpinnerProps {
-  size?: "small" | "large";
-  color?: string;
-  message?: string;
+  size?: 'small' | 'large'
+  color?: string
+  message?: string
 }
 
 export function LoadingSpinner({
-  size = "large",
-  color = "#2563eb",
+  size = 'large',
+  color = '#2563eb',
   message,
 }: LoadingSpinnerProps) {
-  const label = message ? `Carregando: ${message}` : "Carregando";
+  const label = message ? `Carregando: ${message}` : 'Carregando'
 
   return (
     <View
@@ -22,5 +22,5 @@ export function LoadingSpinner({
       <ActivityIndicator size={size} color={color} />
       {message ? <Text className="text-sm text-gray-500">{message}</Text> : null}
     </View>
-  );
+  )
 }

@@ -1,43 +1,46 @@
-import { FlatList, Text, View, ActivityIndicator } from 'react-native';
-import { Card } from '@/shared/components/ui';
+import { ActivityIndicator, FlatList, Text, View } from 'react-native'
+import { Card } from '@/shared/components/ui'
 
 type HistoryItem = {
-  id: number;
-  data: string;
-  valor: number;
-  status?: string;
-  restaurante?: string;
-  filial?: string;
-};
+  id: number
+  data: string
+  valor: number
+  status?: string
+  restaurante?: string
+  filial?: string
+}
 
 interface HistoryListProps {
-  data: HistoryItem[];
-  type: 'recharge' | 'meal';
-  isLoading?: boolean;
-  isFetchingNextPage?: boolean;
-  hasNextPage?: boolean;
-  fetchNextPage?: () => void;
-  onRefresh?: () => void;
-  refreshing?: boolean;
+  data: HistoryItem[]
+  type: 'recharge' | 'meal'
+  isLoading?: boolean
+  isFetchingNextPage?: boolean
+  hasNextPage?: boolean
+  fetchNextPage?: () => void
+  onRefresh?: () => void
+  refreshing?: boolean
 }
 
 const EMPTY_MESSAGES = {
   recharge: 'Você ainda não fez recargas no período.',
   meal: 'Nenhuma refeição encontrada no período.',
-};
+}
 
 function formatDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const d = new Date(iso)
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
 function formatCurrency(value: number) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 function RechargeItem({ item }: { item: HistoryItem }) {
   return (
-    <Card accessibilityLabel={`Recarga de ${formatCurrency(item.valor)} em ${formatDate(item.data)} — ${item.status}`} className="mb-2">
+    <Card
+      accessibilityLabel={`Recarga de ${formatCurrency(item.valor)} em ${formatDate(item.data)} — ${item.status}`}
+      className="mb-2"
+    >
       <View className="flex-row justify-between items-center">
         <View>
           <Text accessibilityRole="text" className="text-sm font-medium text-gray-900">
@@ -57,12 +60,15 @@ function RechargeItem({ item }: { item: HistoryItem }) {
         </Text>
       </View>
     </Card>
-  );
+  )
 }
 
 function MealItem({ item }: { item: HistoryItem }) {
   return (
-    <Card accessibilityLabel={`Refeição em ${item.restaurante} — ${formatCurrency(item.valor)}`} className="mb-2">
+    <Card
+      accessibilityLabel={`Refeição em ${item.restaurante} — ${formatCurrency(item.valor)}`}
+      className="mb-2"
+    >
       <View className="flex-row justify-between items-center">
         <View>
           <Text accessibilityRole="text" className="text-sm font-medium text-gray-900">
@@ -77,7 +83,7 @@ function MealItem({ item }: { item: HistoryItem }) {
         </Text>
       </View>
     </Card>
-  );
+  )
 }
 
 export function HistoryList({
@@ -98,7 +104,7 @@ export function HistoryList({
           Carregando histórico
         </Text>
       </View>
-    );
+    )
   }
 
   if (data.length === 0) {
@@ -108,10 +114,10 @@ export function HistoryList({
           {EMPTY_MESSAGES[type]}
         </Text>
       </View>
-    );
+    )
   }
 
-  const renderItem = type === 'recharge' ? RechargeItem : MealItem;
+  const renderItem = type === 'recharge' ? RechargeItem : MealItem
 
   return (
     <FlatList
@@ -119,7 +125,7 @@ export function HistoryList({
       keyExtractor={(item) => String(item.id)}
       renderItem={renderItem}
       onEndReached={() => {
-        if (hasNextPage && !isFetchingNextPage) fetchNextPage?.();
+        if (hasNextPage && !isFetchingNextPage) fetchNextPage?.()
       }}
       onEndReachedThreshold={0.5}
       ListFooterComponent={
@@ -133,5 +139,5 @@ export function HistoryList({
       onRefresh={onRefresh}
       contentContainerClassName="p-4"
     />
-  );
+  )
 }

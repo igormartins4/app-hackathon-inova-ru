@@ -1,30 +1,30 @@
-import { Component, type ReactNode } from 'react';
-import { View, Text } from 'react-native';
-import { Button } from './Button';
+import { Component, type ReactNode } from 'react'
+import { Text, View } from 'react-native'
+import { Button } from './Button'
 
 interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallbackMessage?: string;
+  children: ReactNode
+  fallbackMessage?: string
 }
 
 interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+  hasError: boolean
+  error: Error | null
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
+    super(props)
+    this.state = { hasError: false, error: null }
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, error: null });
-  };
+    this.setState({ hasError: false, error: null })
+  }
 
   render() {
     if (this.state.hasError) {
@@ -42,9 +42,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           </Text>
           <Button label="Tentar novamente" onPress={this.handleRetry} />
         </View>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }

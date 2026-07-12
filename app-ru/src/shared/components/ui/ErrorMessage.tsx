@@ -1,13 +1,13 @@
-import { Text, View } from "react-native";
-import { ERROR_MESSAGES } from "@/config/errors";
-import { Button } from "./Button";
+import { Text, View } from 'react-native'
+import { ERROR_MESSAGES } from '@/config/errors'
+import { Button } from './Button'
 
 interface ErrorMessageProps {
-  message?: string;
-  onRetry?: () => void;
+  message?: string
+  onRetry?: () => void
 }
 
-const DEFAULT_ERROR = ERROR_MESSAGES[500];
+const DEFAULT_ERROR = ERROR_MESSAGES[500]
 
 export function ErrorMessage({ message = DEFAULT_ERROR, onRetry }: ErrorMessageProps) {
   return (
@@ -17,9 +17,7 @@ export function ErrorMessage({ message = DEFAULT_ERROR, onRetry }: ErrorMessageP
       className="items-center gap-4 py-8"
     >
       <Text className="text-center text-base text-red-600">{message}</Text>
-      {onRetry ? (
-        <Button label="Tentar novamente" onPress={onRetry} variant="secondary" />
-      ) : null}
+      {onRetry ? <Button label="Tentar novamente" onPress={onRetry} variant="secondary" /> : null}
     </View>
-  );
+  )
 }

@@ -1,1 +1,1 @@
-export type { Consumidor, Saldo } from '@/features/balance/types/balance.types';
+export type { Consumidor, Saldo } from '@/features/balance/types/balance.types'

@@ -1,11 +1,11 @@
-import { View, Text, ActivityIndicator } from 'react-native';
-import { QrCodeDisplay } from './QrCodeDisplay';
+import { ActivityIndicator, Text, View } from 'react-native'
+import { QrCodeDisplay } from './QrCodeDisplay'
 
 interface PaymentStatusProps {
-  qrCode: string;
-  amount: number;
-  expiration: string;
-  isTimedOut: boolean;
+  qrCode: string
+  amount: number
+  expiration: string
+  isTimedOut: boolean
 }
 
 export function PaymentStatus({ qrCode, amount, expiration, isTimedOut }: PaymentStatusProps) {
@@ -21,10 +21,14 @@ export function PaymentStatus({ qrCode, amount, expiration, isTimedOut }: Paymen
       )}
 
       {isTimedOut && (
-        <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" className="text-sm text-red-500">
+        <Text
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
+          className="text-sm text-red-500"
+        >
           Tempo esgotado. O pagamento não foi confirmado.
         </Text>
       )}
     </View>
-  );
+  )
 }

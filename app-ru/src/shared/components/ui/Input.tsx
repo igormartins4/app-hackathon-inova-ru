@@ -1,14 +1,14 @@
-import { Text, TextInput, View } from "react-native";
+import { Text, TextInput, View } from 'react-native'
 
 interface InputProps {
-  label: string;
-  value: string;
-  onChangeText: (text: string) => void;
-  placeholder?: string;
-  error?: string;
-  secureTextEntry?: boolean;
-  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
-  accessibilityLabel?: string;
+  label: string
+  value: string
+  onChangeText: (text: string) => void
+  placeholder?: string
+  error?: string
+  secureTextEntry?: boolean
+  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad'
+  accessibilityLabel?: string
 }
 
 export function Input({
@@ -18,7 +18,7 @@ export function Input({
   placeholder,
   error,
   secureTextEntry,
-  keyboardType = "default",
+  keyboardType = 'default',
   accessibilityLabel,
 }: InputProps) {
   return (
@@ -32,13 +32,17 @@ export function Input({
         keyboardType={keyboardType}
         accessibilityLabel={accessibilityLabel ?? label}
         accessibilityState={{ disabled: false }}
-        className={`min-h-[48px] rounded-lg border px-4 py-3 text-base ${error ? "border-red-500" : "border-gray-300"}`}
+        className={`min-h-[48px] rounded-lg border px-4 py-3 text-base ${error ? 'border-red-500' : 'border-gray-300'}`}
       />
       {error ? (
-        <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" className="text-sm text-red-600">
+        <Text
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
+          className="text-sm text-red-600"
+        >
           {error}
         </Text>
       ) : null}
     </View>
-  );
+  )
 }

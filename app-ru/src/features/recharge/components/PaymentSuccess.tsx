@@ -1,13 +1,12 @@
-import { View, Text, Pressable } from 'react-native';
+import { Pressable, Text, View } from 'react-native'
 
 interface PaymentSuccessProps {
-  newBalance: number;
-  onBack: () => void;
+  newBalance: number
+  onBack: () => void
 }
 
 export function PaymentSuccess({ newBalance, onBack }: PaymentSuccessProps) {
-  const formatCurrency = (v: number) =>
-    `R$ ${v.toFixed(2).replace('.', ',')}`;
+  const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
   return (
     <View className="items-center gap-6 py-8">
@@ -31,5 +30,5 @@ export function PaymentSuccess({ newBalance, onBack }: PaymentSuccessProps) {
         <Text className="text-white font-bold">Voltar</Text>
       </Pressable>
     </View>
-  );
+  )
 }

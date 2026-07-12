@@ -1,39 +1,38 @@
-import { useState, useEffect, useCallback } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
-import QRCode from 'react-native-qrcode-svg';
+import * as Clipboard from 'expo-clipboard'
+import { useCallback, useEffect, useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
+import QRCode from 'react-native-qrcode-svg'
 
 interface QrCodeDisplayProps {
-  qrCode: string;
-  amount: number;
-  expiration: string;
+  qrCode: string
+  amount: number
+  expiration: string
 }
 
 function getTimeLeft(expiration: string): string {
-  const diff = new Date(expiration).getTime() - Date.now();
-  if (diff <= 0) return 'Expirado';
-  const min = Math.floor(diff / 60000);
-  const sec = Math.floor((diff % 60000) / 1000);
-  return `${min}:${sec.toString().padStart(2, '0')}`;
+  const diff = new Date(expiration).getTime() - Date.now()
+  if (diff <= 0) return 'Expirado'
+  const min = Math.floor(diff / 60000)
+  const sec = Math.floor((diff % 60000) / 1000)
+  return `${min}:${sec.toString().padStart(2, '0')}`
 }
 
 export function QrCodeDisplay({ qrCode, amount, expiration }: QrCodeDisplayProps) {
-  const [copied, setCopied] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(expiration));
+  const [copied, setCopied] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(expiration))
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeLeft(getTimeLeft(expiration)), 1000);
-    return () => clearInterval(timer);
-  }, [expiration]);
+    const timer = setInterval(() => setTimeLeft(getTimeLeft(expiration)), 1000)
+    return () => clearInterval(timer)
+  }, [expiration])
 
   const handleCopy = useCallback(async () => {
-    await Clipboard.setStringAsync(qrCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [qrCode]);
+    await Clipboard.setStringAsync(qrCode)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [qrCode])
 
-  const formatCurrency = (v: number) =>
-    `R$ ${v.toFixed(2).replace('.', ',')}`;
+  const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
   return (
     <View className="items-center gap-4">
@@ -58,5 +57,5 @@ export function QrCodeDisplay({ qrCode, amount, expiration }: QrCodeDisplayProps
         </Text>
       </Pressable>
     </View>
-  );
+  )
 }

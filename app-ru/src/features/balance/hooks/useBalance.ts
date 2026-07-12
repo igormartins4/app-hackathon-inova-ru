@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchBalance } from '../services/balanceApi';
+import { useQuery } from '@tanstack/react-query'
+import { fetchBalance } from '../services/balanceApi'
 
 export function useBalance() {
   return useQuery({
@@ -7,5 +7,5 @@ export function useBalance() {
     queryFn: fetchBalance,
     staleTime: 5 * 60 * 1000,
     networkMode: 'offlineFirst',
-  });
+  })
 }

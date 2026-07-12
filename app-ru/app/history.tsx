@@ -1,28 +1,28 @@
-import { useState, useCallback } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useRechargeHistory, useMealHistory, HistoryList, DateFilter } from '@/features/history';
-import { Button } from '@/shared/components/ui';
+import { useRouter } from 'expo-router'
+import { useCallback, useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
+import { DateFilter, HistoryList, useMealHistory, useRechargeHistory } from '@/features/history'
+import { Button } from '@/shared/components/ui'
 
-type Tab = 'recharges' | 'meals';
+type Tab = 'recharges' | 'meals'
 
 export default function HistoryScreen() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<Tab>('recharges');
-  const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState<Tab>('recharges')
+  const [_dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
     start: null,
     end: null,
-  });
+  })
 
-  const rechargeQuery = useRechargeHistory();
-  const mealQuery = useMealHistory();
+  const rechargeQuery = useRechargeHistory()
+  const mealQuery = useMealHistory()
 
-  const activeQuery = activeTab === 'recharges' ? rechargeQuery : mealQuery;
-  const items = activeQuery.data?.pages.flatMap((p) => p.dados) ?? [];
+  const activeQuery = activeTab === 'recharges' ? rechargeQuery : mealQuery
+  const items = activeQuery.data?.pages.flatMap((p) => p.dados) ?? []
 
   const handleRefresh = useCallback(() => {
-    activeQuery.refetch();
-  }, [activeQuery]);
+    activeQuery.refetch()
+  }, [activeQuery])
 
   return (
     <View accessibilityViewIsModal={true} className="flex-1 bg-gray-50">
@@ -38,7 +38,9 @@ export default function HistoryScreen() {
           onPress={() => setActiveTab('recharges')}
           className={`flex-1 rounded-lg py-3 ${activeTab === 'recharges' ? 'bg-blue-600' : 'bg-gray-200'}`}
         >
-          <Text className={`text-center text-sm font-medium ${activeTab === 'recharges' ? 'text-white' : 'text-gray-700'}`}>
+          <Text
+            className={`text-center text-sm font-medium ${activeTab === 'recharges' ? 'text-white' : 'text-gray-700'}`}
+          >
             Recargas
           </Text>
         </Pressable>
@@ -49,16 +51,16 @@ export default function HistoryScreen() {
           onPress={() => setActiveTab('meals')}
           className={`flex-1 rounded-lg py-3 ${activeTab === 'meals' ? 'bg-blue-600' : 'bg-gray-200'}`}
         >
-          <Text className={`text-center text-sm font-medium ${activeTab === 'meals' ? 'text-white' : 'text-gray-700'}`}>
+          <Text
+            className={`text-center text-sm font-medium ${activeTab === 'meals' ? 'text-white' : 'text-gray-700'}`}
+          >
             Refeições
           </Text>
         </Pressable>
       </View>
 
       <View className="px-4 mb-2">
-        <DateFilter
-          onFilter={(start, end) => setDateRange({ start, end })}
-        />
+        <DateFilter onFilter={(start, end) => setDateRange({ start, end })} />
       </View>
 
       <HistoryList
@@ -72,5 +74,5 @@ export default function HistoryScreen() {
         refreshing={activeQuery.isRefetching}
       />
     </View>
-  );
+  )
 }

@@ -1,17 +1,17 @@
-import { Text, View } from 'react-native';
-import { useBalance } from '@/features/balance/hooks/useBalance';
-import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus';
-import { useAuth } from '@/features/auth/hooks/useAuth';
-import { BalanceCard } from '@/features/balance/components/BalanceCard';
-import { Card, LoadingSpinner, ErrorMessage } from '@/shared/components/ui';
+import { Text, View } from 'react-native'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { BalanceCard } from '@/features/balance/components/BalanceCard'
+import { useBalance } from '@/features/balance/hooks/useBalance'
+import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
+import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
 
 export default function HomeScreen() {
-  const { user } = useAuth();
-  const { data, isLoading, isError, error, refetch } = useBalance();
-  const { isActive, message } = useConsumerStatus();
+  const { user } = useAuth()
+  const { data, isLoading, isError, error, refetch } = useBalance()
+  const { message } = useConsumerStatus()
 
   if (isLoading) {
-    return <LoadingSpinner message="Carregando" />;
+    return <LoadingSpinner message="Carregando" />
   }
 
   if (isError) {
@@ -22,7 +22,7 @@ export default function HomeScreen() {
           onRetry={refetch}
         />
       </View>
-    );
+    )
   }
 
   return (
@@ -48,5 +48,5 @@ export default function HomeScreen() {
         />
       )}
     </View>
-  );
+  )
 }
