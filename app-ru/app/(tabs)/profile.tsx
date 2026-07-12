@@ -1,7 +1,8 @@
 import { ScrollView, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useBalance } from '@/features/balance/hooks/useBalance';
-import { Card, LoadingSpinner } from '@/shared/components/ui';
+import { Button, Card, LoadingSpinner } from '@/shared/components/ui';
 
 function DataRow({ label, value }: { label: string; value: string }) {
   return (
@@ -21,6 +22,7 @@ function DataRow({ label, value }: { label: string; value: string }) {
 export default function ProfileScreen() {
   const { user } = useAuth();
   const { data, isLoading } = useBalance();
+  const router = useRouter();
 
   if (isLoading) {
     return <LoadingSpinner message="Carregando perfil" />;
@@ -49,6 +51,11 @@ export default function ProfileScreen() {
           />
         </Card>
       )}
+
+      <Button
+        label="Ver Histórico"
+        onPress={() => router.push('/history')}
+      />
     </ScrollView>
   );
 }

@@ -8,6 +8,8 @@ export const API = {
   PAGAMENTO: '/creditos/pagamento',
   PAGAMENTO_STATUS: (paymentId: number | string) =>
     `/creditos/pagamento/${paymentId}/status`,
+  HISTORICO_RECARGAS: '/creditos/historico-recargas',
+  HISTORICO_REFEICOES: '/creditos/historico-refeicoes',
 } as const
 
 // Storage keys
