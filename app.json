@@ -3,6 +3,7 @@
     "name": "InovaRU",
     "slug": "inova-ru",
     "version": "1.0.0",
+    "scheme": "inova-ru",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +20,8 @@
       "package": "com.inovaru.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
