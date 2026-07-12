@@ -2,10 +2,12 @@ import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useState, useCallback } from 'react';
 import { useBalance } from '@/features/balance/hooks/useBalance';
 import { BalanceCard } from '@/features/balance/components/BalanceCard';
+import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus';
 import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui';
 
 export default function BalanceScreen() {
   const { data, isLoading, isError, error, refetch, isFetching, isStale } = useBalance();
+  const { isOffline } = useNetworkStatus();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
@@ -35,10 +37,10 @@ export default function BalanceScreen() {
       contentContainerClassName="p-4 gap-4"
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      {isStale && (
-        <Card accessibilityLabel="Aviso de dados aproximados">
+      {(isStale || isOffline) && (
+        <Card accessibilityLabel={isOffline ? 'Sem conexão' : 'Aviso de dados aproximados'}>
           <Text accessibilityRole="text" className="text-center text-xs text-amber-600">
-            Dados aproximados
+            {isOffline ? 'Sem conexão — dados podem estar desatualizados' : 'Dados aproximados'}
           </Text>
         </Card>
       )}

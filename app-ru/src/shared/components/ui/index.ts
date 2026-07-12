@@ -1,5 +1,7 @@
 export { Button } from "./Button";
 export { Card } from "./Card";
+export { ErrorBoundary } from "./ErrorBoundary";
 export { ErrorMessage } from "./ErrorMessage";
 export { Input } from "./Input";
 export { LoadingSpinner } from "./LoadingSpinner";
+export { OfflineBanner } from "./OfflineBanner";

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Text } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useBalance, useConsumerStatus } from '@/features/balance';
 import { RechargeForm } from '@/features/recharge/components/RechargeForm';
@@ -8,6 +8,7 @@ import { PaymentSuccess } from '@/features/recharge/components/PaymentSuccess';
 import { PaymentError } from '@/features/recharge/components/PaymentError';
 import { createPayment } from '@/features/recharge/services/rechargeApi';
 import { usePolling } from '@/features/recharge/hooks/usePolling';
+import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus';
 import type { PaymentStatusResponse } from '@/features/recharge/types/recharge.types';
 
 type FlowStep = 'amount' | 'polling' | 'success' | 'error';
@@ -16,6 +17,7 @@ export default function RechargeScreen() {
   const queryClient = useQueryClient();
   const { data: balanceData } = useBalance();
   const { isBlocked, isInactive } = useConsumerStatus();
+  const { isOffline } = useNetworkStatus();
 
   const [step, setStep] = useState<FlowStep>('amount');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,7 +54,7 @@ export default function RechargeScreen() {
     onTimeout: handleTimeout,
   });
 
-  const consumerDisabled = isBlocked || isInactive;
+  const consumerDisabled = isBlocked || isInactive || isOffline;
 
   const handleSubmit = useCallback(async (valor: number) => {
     if (isSubmitting) return; // No idempotency — never retry POST
@@ -90,11 +92,20 @@ export default function RechargeScreen() {
     <ScrollView className="flex-1 bg-white">
       <View className="p-6 gap-6">
         {step === 'amount' && (
-          <RechargeForm
-            currentBalance={currentBalance}
-            disabled={consumerDisabled || isSubmitting}
-            onSubmit={handleSubmit}
-          />
+          <>
+            {isOffline && (
+              <View accessibilityRole="alert" className="bg-red-50 rounded-lg p-3">
+                <Text className="text-center text-sm text-red-600">
+                  Conecte-se à internet para recarregar
+                </Text>
+              </View>
+            )}
+            <RechargeForm
+              currentBalance={currentBalance}
+              disabled={consumerDisabled || isSubmitting}
+              onSubmit={handleSubmit}
+            />
+          </>
         )}
 
         {step === 'polling' && paymentData && (
