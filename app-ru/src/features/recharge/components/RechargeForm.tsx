@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Pressable } from 'react-native';
 
 const PRESET_AMOUNTS = [10, 20, 30, 50, 100, 200];
 const MIN_VALUE = 5;
@@ -50,17 +50,17 @@ export function RechargeForm({ currentBalance, disabled, onSubmit }: RechargeFor
         {PRESET_AMOUNTS.map((amount) => {
           const wouldExceed = currentBalance + amount > MAX_VALUE;
           return (
-            <TouchableOpacity
+            <Pressable
               key={amount}
               onPress={() => handlePreset(amount)}
               disabled={disabled || wouldExceed}
+              accessibilityRole="button"
               accessibilityLabel={`Recarregar ${formatCurrency(amount)}`}
-              className={`rounded-lg px-4 py-3 ${
+              accessibilityState={{ selected: selectedAmount === amount, disabled: disabled || wouldExceed }}
+              className={`min-h-[48px] min-w-[48px] items-center justify-center rounded-lg px-4 py-3 ${
                 selectedAmount === amount
                   ? 'bg-emerald-600'
-                  : wouldExceed
-                    ? 'bg-gray-100'
-                    : 'bg-gray-100'
+                  : 'bg-gray-100'
               } ${wouldExceed ? 'opacity-40' : ''}`}
             >
               <Text
@@ -70,7 +70,7 @@ export function RechargeForm({ currentBalance, disabled, onSubmit }: RechargeFor
               >
                 {formatCurrency(amount)}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </View>
@@ -89,24 +89,26 @@ export function RechargeForm({ currentBalance, disabled, onSubmit }: RechargeFor
       </View>
 
       {exceedsLimit && (
-        <Text className="text-sm text-red-500">
+        <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" className="text-sm text-red-500">
           Valor fora do limite. Máximo R$ 500,00 (limite restante:{' '}
           {formatCurrency(MAX_VALUE - currentBalance)}).
         </Text>
       )}
 
-      <TouchableOpacity
+      <Pressable
         onPress={handleSubmit}
         disabled={!isValid || disabled}
-        accessibilityLabel="Pagar com PIX"
-        className={`rounded-lg py-4 items-center ${
+        accessibilityRole="button"
+        accessibilityLabel={`Pagar com PIX${activeAmount > 0 ? ` — ${formatCurrency(activeAmount)}` : ''}`}
+        accessibilityState={{ disabled: !isValid || disabled }}
+        className={`min-h-[48px] items-center justify-center rounded-lg py-4 ${
           isValid && !disabled ? 'bg-emerald-600' : 'bg-gray-300'
         }`}
       >
         <Text className={`text-base font-bold ${isValid && !disabled ? 'text-white' : 'text-gray-500'}`}>
           Pagar com PIX — {activeAmount > 0 ? formatCurrency(activeAmount) : '—'}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }

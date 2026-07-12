@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 
 interface PaymentSuccessProps {
   newBalance: number;
@@ -22,13 +22,14 @@ export function PaymentSuccess({ newBalance, onBack }: PaymentSuccessProps) {
         </Text>
       </View>
 
-      <TouchableOpacity
+      <Pressable
         onPress={onBack}
+        accessibilityRole="button"
         accessibilityLabel="Voltar para tela de recarga"
-        className="bg-emerald-600 rounded-lg px-8 py-4"
+        className="min-h-[48px] min-w-[48px] items-center justify-center bg-emerald-600 rounded-lg px-8 py-4"
       >
         <Text className="text-white font-bold">Voltar</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }

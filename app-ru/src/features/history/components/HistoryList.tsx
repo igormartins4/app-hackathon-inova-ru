@@ -103,8 +103,8 @@ export function HistoryList({
 
   if (data.length === 0) {
     return (
-      <View accessibilityRole="text" className="flex-1 items-center justify-center py-12 px-4">
-        <Text className="text-center text-base text-gray-500">
+      <View className="flex-1 items-center justify-center py-12 px-4">
+        <Text accessibilityRole="alert" className="text-center text-base text-gray-500">
           {EMPTY_MESSAGES[type]}
         </Text>
       </View>

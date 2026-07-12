@@ -35,7 +35,7 @@ export function Input({
         className={`min-h-[48px] rounded-lg border px-4 py-3 text-base ${error ? "border-red-500" : "border-gray-300"}`}
       />
       {error ? (
-        <Text accessibilityLiveRegion="polite" className="text-sm text-red-600">
+        <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" className="text-sm text-red-600">
           {error}
         </Text>
       ) : null}

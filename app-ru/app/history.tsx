@@ -25,7 +25,7 @@ export default function HistoryScreen() {
   }, [activeQuery]);
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View accessibilityViewIsModal={true} className="flex-1 bg-gray-50">
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
         <Button label="Voltar" onPress={() => router.back()} variant="secondary" />
       </View>

@@ -21,7 +21,7 @@ export function PaymentStatus({ qrCode, amount, expiration, isTimedOut }: Paymen
       )}
 
       {isTimedOut && (
-        <Text className="text-sm text-red-500">
+        <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" className="text-sm text-red-500">
           Tempo esgotado. O pagamento não foi confirmado.
         </Text>
       )}

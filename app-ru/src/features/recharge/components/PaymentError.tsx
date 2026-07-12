@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import type { PaymentStatusResponse } from '../types/recharge.types';
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -15,7 +15,7 @@ interface PaymentErrorProps {
 
 export function PaymentError({ status, onRetry }: PaymentErrorProps) {
   return (
-    <View className="items-center gap-6 py-8">
+    <View accessibilityRole="alert" accessibilityLiveRegion="assertive" className="items-center gap-6 py-8">
       <View className="w-16 h-16 rounded-full bg-red-100 items-center justify-center">
         <Text className="text-3xl">✕</Text>
       </View>
@@ -24,13 +24,14 @@ export function PaymentError({ status, onRetry }: PaymentErrorProps) {
         {ERROR_MESSAGES[status] ?? 'Ocorreu um erro.'}
       </Text>
 
-      <TouchableOpacity
+      <Pressable
         onPress={onRetry}
+        accessibilityRole="button"
         accessibilityLabel="Tentar novamente"
-        className="bg-emerald-600 rounded-lg px-8 py-4"
+        className="min-h-[48px] min-w-[48px] items-center justify-center bg-emerald-600 rounded-lg px-8 py-4"
       >
         <Text className="text-white font-bold">Tentar novamente</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }

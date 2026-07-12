@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -47,15 +47,16 @@ export function QrCodeDisplay({ qrCode, amount, expiration }: QrCodeDisplayProps
         Expira em: <Text className="font-bold text-amber-600">{timeLeft}</Text>
       </Text>
 
-      <TouchableOpacity
+      <Pressable
         onPress={handleCopy}
-        accessibilityLabel="Copiar código PIX"
-        className="bg-gray-100 rounded-lg px-6 py-3 w-full items-center"
+        accessibilityRole="button"
+        accessibilityLabel={copied ? 'Código copiado' : 'Copiar código PIX'}
+        className="min-h-[48px] min-w-[48px] items-center justify-center bg-gray-100 rounded-lg px-6 py-3 w-full"
       >
         <Text className="text-sm font-semibold text-gray-700">
           {copied ? '✓ Código copiado!' : 'Copiar código'}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
