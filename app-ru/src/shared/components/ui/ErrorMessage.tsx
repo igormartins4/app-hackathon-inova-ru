@@ -1,12 +1,15 @@
 import { Text, View } from "react-native";
+import { ERROR_MESSAGES } from "@/config/errors";
 import { Button } from "./Button";
 
 interface ErrorMessageProps {
-  message: string;
+  message?: string;
   onRetry?: () => void;
 }
 
-export function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
+const DEFAULT_ERROR = ERROR_MESSAGES[500];
+
+export function ErrorMessage({ message = DEFAULT_ERROR, onRetry }: ErrorMessageProps) {
   return (
     <View
       accessibilityRole="alert"
