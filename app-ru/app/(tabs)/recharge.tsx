@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
+import type { BalanceResponse } from '@/features/balance'
 import { useBalance, useConsumerStatus } from '@/features/balance'
 import { PaymentError } from '@/features/recharge/components/PaymentError'
 import { PaymentStatus } from '@/features/recharge/components/PaymentStatus'
@@ -33,10 +34,8 @@ export default function RechargeScreen() {
   const [newBalance, setNewBalance] = useState(0)
 
   const handleApproved = useCallback(async () => {
-    const res = await queryClient.refetchQueries({ queryKey: ['balance'] })
-    const latest = res.queries[0]?.state.data as
-      | { saldo?: { credito_disponivel?: number } }
-      | undefined
+    await queryClient.refetchQueries({ queryKey: ['balance'] })
+    const latest = queryClient.getQueryData<BalanceResponse>(['balance'])
     setNewBalance(latest?.saldo?.credito_disponivel ?? 0)
     setStep('success')
   }, [queryClient])
