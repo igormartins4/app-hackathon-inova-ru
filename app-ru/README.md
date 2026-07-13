@@ -2,79 +2,96 @@
 
 App Android para estudantes da UFMG que permite consultar saldo e recarregar créditos para uso nos Restaurantes Universitários (RUs) via PIX. Desenvolvido para o Hackathon InovaRU 2026/01.
 
-## Tech Stack
+## Stack Tecnológica
 
-- **Runtime:** Expo SDK 57 (React Native 0.86, React 19)
-- **Navigation:** Expo Router (file-based)
-- **State:** TanStack Query (server state) + Zustand (client state)
-- **Styling:** NativeWind v4 (Tailwind CSS 3.4)
-- **Security:** expo-secure-store (Android Keystore)
-- **Storage:** AsyncStorage (Expo Go-compatible local cache)
+- **Runtime:** Expo SDK 54 (React Native 0.81.5, React 19.1)
+- **Navegação:** Expo Router 6 (file-based, React Navigation 7)
+- **Estado:** TanStack Query 5 (estado do servidor) + Zustand 5 (estado do cliente)
+- **Estilo:** NativeWind 4 (Tailwind CSS 3.4)
+- **Segurança:** expo-secure-store (Android Keystore)
+- **Armazenamento:** AsyncStorage (compatível com Expo Go)
 - **QR Code:** react-native-qrcode-svg
-- **Animations:** React Native Reanimated v4
+- **Animações:** React Native Reanimated 4
 - **Build:** EAS Build
 
-## Architecture
+## Arquitetura
 
-Feature-based folder structure with strict domain isolation:
+Estrutura de pastas por domínio com isolamento estrito:
 
 ```
 src/
-├── app/                    # Expo Router — file-based routes
-│   ├── _layout.tsx         # Root layout: auth gate
-│   ├── (auth)/             # Unauthenticated routes (login)
-│   └── (tabs)/             # Authenticated routes (home, balance, recharge, profile)
+├── app/                    # Expo Router — rotas baseadas em arquivos
+│   ├── _layout.tsx         # Layout raiz: autenticação
+│   ├── (auth)/             # Rotas não autenticadas (login)
+│   └── (tabs)/             # Rotas autenticadas (home, saldo, recarga, perfil)
 ├── features/
-│   ├── auth/               # Login, token management
-│   ├── balance/            # Balance display, consumer data
-│   ├── recharge/           # PIX flow, QR Code, polling
-│   └── history/            # Recharge and meal history
+│   ├── auth/               # Login, gerenciamento de token
+│   ├── balance/            # Exibição de saldo, dados do consumidor
+│   ├── recharge/           # Fluxo PIX, QR Code, polling
+│   ├── history/            # Histórico de recargas e refeições
+│   └── profile/            # Perfil do usuário (reutiliza dados do balance)
 ├── shared/
-│   ├── components/         # Reusable UI primitives
+│   ├── components/
 │   │   ├── ui/             # Button, Card, Input, ErrorMessage, etc.
-│   │   └── accessibility/  # AccessibleText, useAccessibility
-│   ├── hooks/              # Custom hooks (useNetworkStatus, useAccessibility)
-│   ├── services/           # API client, secure storage, cache
-│   └── utils/              # Helpers
-├── store/                  # Zustand stores (client state only)
-└── config/                 # Constants, theme, error messages
+│   │   └── accessibility/  # AccessibleText
+│   ├── hooks/              # useNetworkStatus, useAccessibility
+│   ├── services/           # Cliente API, armazenamento seguro, cache, mock
+│   └── utils/              # Helpers (CPF, erros, validação de recarga)
+├── store/                  # Stores Zustand
+└── config/                 # Constantes, tema, mensagens de erro
 ```
 
-**Data Flow:** API → TanStack Query → Components → Zustand (UI state)
-**Security:** JWT in expo-secure-store, never in plaintext
-**Offline:** TanStack Query stale-while-revalidate + AsyncStorage cache
+**Fluxo de dados:** API → TanStack Query → Componentes → Zustand (estado da UI)
+**Segurança:** JWT no expo-secure-store, nunca em texto plano
+**Offline:** TanStack Query stale-while-revalidate + cache AsyncStorage
 
-## Setup
+## Configuração
 
-### Prerequisites
+### Pré-requisitos
 
 - Node.js 18+
-- pnpm (`corepack enable` or `npm install -g pnpm`)
-- Expo Go app (Android) or Android Studio (for emulator)
+- pnpm (`corepack enable` ou `npm install -g pnpm`)
+- App Expo Go (Android) ou Android Studio (para emulador)
 
-### Install
+### Instalação
 
 ```bash
 pnpm install
 ```
 
-### Run
+### Executar
 
 ```bash
 pnpm start
 ```
 
-Scan the QR code with the Expo Go app. All native dependencies (AsyncStorage, secure-store, SVG, gesture-handler, reanimated, screens) ship with Expo Go — no custom development build needed.
+Escaneie o QR Code com o app Expo Go. Todas as dependências nativas vêm com o Expo Go — não precisa de build customizado.
 
-### Android Emulator
+### Credenciais de teste (modo mock)
 
-The app connects to a mock server at `http://10.0.2.2:3000` (Android emulator localhost alias). Ensure your mock server is running on port 3000.
+Por padrão, o app roda em **modo mock** — não precisa de servidor. Use qualquer credencial para logar:
+
+- **CPF:** `12345678901`
+- **Senha:** qualquer valor (ex: `123456`)
+
+O mock fornece dados fictícios de saldo, histórico de recargas e histórico de refeições.
+
+Para usar a API real da FUMP, crie um arquivo `.env`:
+
+```
+EXPO_PUBLIC_USE_MOCK=false
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3000
+```
+
+### Emulador Android
 
 ```bash
 pnpm android
 ```
 
-> **Note:** The emulator must have `android:usesCleartextTraffic="true"` for HTTP connections to the local mock server. This is already configured in debug builds.
+Ao usar a API real, o emulador conecta em `http://10.0.2.2:3000` (alias de localhost). Certifique-se de que o servidor mock está rodando na porta 3000.
+
+> **Nota:** O emulador deve ter `android:usesCleartextTraffic="true"` para conexões HTTP. Já está configurado em builds de debug via o plugin `withNetworkSecurityConfig`.
 
 ### EAS Build
 
@@ -82,34 +99,42 @@ pnpm android
 pnpm exec eas build --platform android
 ```
 
-## Project Structure
+## Testes
 
-| Directory | Purpose |
-|-----------|---------|
-| `app/` | Expo Router file-based routes |
-| `features/auth/` | Login, JWT management |
-| `features/balance/` | Balance display, consumer status |
-| `features/recharge/` | PIX payment flow, QR code, polling |
-| `features/history/` | Recharge and meal history |
-| `shared/components/ui/` | Reusable UI primitives |
-| `shared/components/accessibility/` | Accessibility helpers |
-| `shared/hooks/` | Custom React hooks |
-| `shared/services/` | API client, storage |
-| `config/` | Constants, theme tokens, errors |
+```bash
+pnpm test
+```
+
+Os testes unitários cobrem o algoritmo de polling, validação de CPF e lógica de limites de recarga.
+
+## Estrutura do Projeto
+
+| Diretório | Finalidade |
+|-----------|------------|
+| `app/` | Rotas Expo Router (file-based) |
+| `features/auth/` | Login, gerenciamento de JWT |
+| `features/balance/` | Exibição de saldo, status do consumidor |
+| `features/recharge/` | Fluxo de pagamento PIX, QR Code, polling |
+| `features/history/` | Histórico de recargas e refeições |
+| `features/profile/` | Perfil do usuário (dados do consumidor) |
+| `shared/components/ui/` | Componentes reutilizáveis |
+| `shared/hooks/` | Hooks React customizados |
+| `shared/services/` | Cliente API, armazenamento, handler de mock |
+| `config/` | Constantes, tokens de tema, erros |
 
 ## API
 
-Connects to FUMP v2.0 API. See `src/config/constants.ts` for endpoints.
+Conecta na API FUMP v2.0. Veja `src/config/constants.ts` para os endpoints.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/usuarios/login` | POST | Authenticate with CPF + password |
-| `/creditos/saldo` | GET | Get balance and consumer data |
-| `/creditos/pagamento` | POST | Create PIX payment |
-| `/creditos/pagamento/:id/status` | GET | Poll payment status |
-| `/creditos/recargas` | GET | Recharge history |
-| `/creditos/refeicoes` | GET | Meal history |
+| Endpoint | Método | Descrição |
+|----------|--------|-----------|
+| `/usuarios/login` | POST | Autenticar com CPF + senha |
+| `/creditos/saldo` | GET | Obter saldo e dados do consumidor |
+| `/creditos/pagamento` | POST | Criar pagamento PIX |
+| `/creditos/pagamento/:id/status` | GET | Consultar status do pagamento |
+| `/creditos/recargas` | GET | Histórico de recargas |
+| `/creditos/refeicoes` | GET | Histórico de refeições |
 
-## License
+## Licença
 
-Hackathon InovaRU 2026/01
+MIT License — Hackathon InovaRU 2026/01

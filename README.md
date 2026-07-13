@@ -21,14 +21,11 @@ O InovaRU resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes
 | **Login** | Autenticação via CPF + senha FUMP. Token JWT armazenado com Expo Secure Store. |
 | **Início** | Dashboard com saldo disponível, ações rápidas (Saldo, Cardápio, Histórico) e últimas recargas. |
 | **Saldo** | Detalhes do saldo atual, limite de recarga, dados do consumidor (nome, tipo, centro de custo, situação). |
-| **Recarga** | Seleção de valor (R$ 5,00 a R$ 500,00) com opções predefinidas e campo personalizado. Valores usados recentemente. |
+| **Recarga** | Seleção de valor (R$ 5,00 a R$ 500,00) com opções predefinidas e campo personalizado. |
 | **PIX QR Code** | Exibição do QR Code PIX com código copia-e-cola, timer de expiração e botão de compartilhamento. Polling de status com backoff exponencial. |
-| **Sucesso** | Confirmação da recarga com valor adicionado, novo saldo e horário. Compartilhamento de comprovante. |
-| **Cardápio** | Cardápio do dia por RU (Setorial I, Setorial II, Saúde, Direito), com filtro por data e tipo de refeição (Almoço/Jantar). Itens com tags (Vegano, etc). |
+| **Sucesso** | Confirmação da recarga com valor adicionado, novo saldo e horário. |
 | **Histórico** | Abas de Recargas e Refeições com filtros por data. Paginação e scroll infinito. |
-| **Perfil** | Dados do usuário, preferências (modo escuro, tamanho da fonte), informações do app e licença. |
-
-**Modo escuro** disponível em todas as telas, seguindo o sistema por padrão.
+| **Perfil** | Dados do consumidor, tipo, centro de custo e situação da conta. |
 
 ---
 
@@ -68,47 +65,63 @@ O app consome a API RESTful fornecida pela FUMP. Todos os dados são extraídos 
 - Token JWT armazenado em `expo-secure-store` (keystore nativo do sistema)
 - Nunca persistir senha no dispositivo
 - Tratamento de HTTP 401 → redireciona para login
-- Tratamento de HTTP 429 → mensagem amigável com `Retry-After`
 - HTTPS obrigatório (TLS 1.2+)
 
 ---
 
-## Estrutura de Telas
+## Estrutura do Projeto
 
 ```
-docs/telas/
-├── 1 - login.png
-├── 2 - inicio.png
-├── 3 - saldo.png
-├── 4 - recarga.png
-├── 5 - pix-qr-code.png
-├── 6 - sucesso.png
-├── 7 - cardapio.png
-├── 8 - historico.png
-├── 9 - perfil.png
-└── 10 - todas telas.png
+app-ru/
+├── src/
+│   ├── app/                    # Expo Router — file-based routes
+│   │   ├── _layout.tsx         # Root layout: auth gate
+│   │   ├── (auth)/             # Login
+│   │   └── (tabs)/             # Home, Saldo, Recarga, Perfil
+│   ├── features/
+│   │   ├── auth/               # Login, JWT management
+│   │   ├── balance/            # Saldo, dados do consumidor
+│   │   ├── recharge/           # Fluxo PIX, QR Code, polling
+│   │   ├── history/            # Histórico de recargas e refeições
+│   │   └── profile/            # Perfil do usuário
+│   ├── shared/
+│   │   ├── components/ui/      # Button, Card, Input, ErrorMessage
+│   │   ├── hooks/              # useNetworkStatus
+│   │   ├── services/           # API client, secure storage, mock
+│   │   └── utils/              # CPF, erros, validação de recarga
+│   └── config/                 # Constantes, tema, mensagens de erro
+├── app/                        # Expo Router routes
+└── .env                        # Variáveis de ambiente (mock mode)
 ```
 
 ---
 
-## Tecnologias (Propostas)
+## Tecnologias
 
 | Camada | Tecnologia |
 |--------|------------|
-| Mobile | React Native + Expo |
-| Design System | Material Design 3 (Material You) |
-| HTTP | Axios / fetch |
-| QR Code | Decodificação Base64 → Bitmap |
-| Armazenamento Local | MMKV / AsyncStorage |
-| Segurança | Expo Secure Store |
+| Runtime | Expo SDK 54 (React Native 0.81.5, React 19.1) |
+| Navegação | Expo Router 6 (file-based) |
+| State | TanStack Query 5 + Zustand 5 |
+| Estilo | NativeWind 4 (Tailwind CSS 3.4) |
+| HTTP | Axios |
+| QR Code | react-native-qrcode-svg |
+| Armazenamento | AsyncStorage + expo-secure-store |
+| Segurança | Expo Secure Store (Android Keystore) |
 
 ---
 
-## Acessibilidade e Conectividade
+## Como Testar
 
-- **Baixa conectividade**: Cache local de dados essenciais (saldo, histórico) para uso em contextos de sinal fraco nos campi
-- **Interface acessível**: Navegação por botões grandes, contraste adequado, suporte a tamanho de fonte (P/M/G), modo escuro
-- **Letramento digital**: Fluxo simples e direto, linguagem clara, feedback visual em cada etapa
+```bash
+cd app-ru
+pnpm install
+pnpm start
+```
+
+O app roda em **mock mode** por padrão — não precisa de servidor. Use CPF `12345678901` e qualquer senha para logar.
+
+Veja mais detalhes em [`app-ru/README.md`](app-ru/README.md).
 
 ---
 
@@ -116,13 +129,12 @@ docs/telas/
 
 | Arquivo | Descrição |
 |---------|-----------|
-| [`apresentacao-prototipo-hackathon.pdf`](apresentacao-prototipo-hackathon.pdf) | Apresentação de slides do conceito e protótipo (Beamer/LaTeX) |
-| [`Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf`](Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf) | Documento conceitual assinado pela equipe |
+| [`docs/apresentacao-prototipo-hackathon.pdf`](docs/apresentacao-prototipo-hackathon.pdf) | Apresentação de slides do conceito e protótipo |
+| [`docs/Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf`](docs/Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf) | Documento conceitual assinado pela equipe |
+| [`docs/Especificacao_Tecnica_API_InovaRU_v2_03.07.2026_assinado.pdf`](docs/Especificacao_Tecnica_API_InovaRU_v2_03.07.2026_assinado.pdf) | Especificação técnica da API FUMP v2.0 |
 
 ---
 
 ## Licença
 
 MIT License — Software Livre conforme exigido pelo edital (Seção 8.1).
-
----

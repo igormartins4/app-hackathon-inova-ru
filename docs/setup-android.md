@@ -2,7 +2,7 @@
 
 ## Contexto
 
-O app usa Expo SDK 55. O diretório `android/` é gerado por `npx expo prebuild`. Após o prebuild, é necessário configurar o `network_security_config.xml` para permitir tráfego HTTP ao mock server local no emulador.
+O app usa Expo SDK 54. O diretório `android/` é gerado por `npx expo prebuild`. Após o prebuild, é necessário configurar o `network_security_config.xml` para permitir tráfego HTTP ao mock server local no emulador.
 
 Sem essa configuração, o Android bloqueia requisições HTTP ao `10.0.2.2`.
 
