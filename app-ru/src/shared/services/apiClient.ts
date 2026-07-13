@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import { ERROR_MESSAGES } from '@/config'
 import { emitUnauthorized } from './authEvents'
 import { getMockResponse } from './mockHandler'
@@ -7,13 +7,13 @@ import { getToken, removeToken, removeUser } from './secureStorage'
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:3000'
 const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
 
-function mockAdapter(config: AxiosRequestConfig) {
+function mockAdapter(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
   const data = getMockResponse(config)
   return Promise.resolve({
     data,
     status: 200,
     statusText: 'OK',
-    headers: {},
+    headers: new AxiosHeaders(),
     config,
   })
 }

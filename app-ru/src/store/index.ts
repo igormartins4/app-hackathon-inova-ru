@@ -1,2 +1,2 @@
 // Zustand stores (client state only)
-export {}
+export { useAuthStore } from './authStore'

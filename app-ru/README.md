@@ -18,7 +18,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 
 Estrutura de pastas por domínio com isolamento estrito:
 
-```
+``` html
 src/
 ├── app/                    # Expo Router — rotas baseadas em arquivos
 │   ├── _layout.tsx         # Layout raiz: autenticação
@@ -78,7 +78,7 @@ O mock fornece dados fictícios de saldo, histórico de recargas e histórico de
 
 Para usar a API real da FUMP, crie um arquivo `.env`:
 
-```
+``` json
 EXPO_PUBLIC_USE_MOCK=false
 EXPO_PUBLIC_API_URL=http://10.0.2.2:3000
 ```
