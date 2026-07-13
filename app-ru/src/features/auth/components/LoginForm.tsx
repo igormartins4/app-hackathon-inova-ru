@@ -56,10 +56,10 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
         accessibilityLabel="Campo de CPF"
       />
       <Input
-        label="Senha"
+        label="SENHA"
         value={password}
         onChangeText={handlePasswordChange}
-        placeholder="Digite sua senha"
+        placeholder="minhaSenha"
         secureTextEntry
         error={passwordError}
         accessibilityLabel="Campo de senha"
