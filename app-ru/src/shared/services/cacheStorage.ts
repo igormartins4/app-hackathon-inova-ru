@@ -18,3 +18,11 @@ export function deleteCache(key: string): void {
 export function getAllCacheKeys(): string[] {
   return mmkv.getAllKeys()
 }
+
+// Raw string storage adapter (no extra JSON layer) for TanStack Query's
+// sync storage persister — it already serializes the whole cache itself.
+export const mmkvStorage = {
+  getItem: (key: string): string | null => mmkv.getString(key) ?? null,
+  setItem: (key: string, value: string): void => mmkv.set(key, value),
+  removeItem: (key: string): void => mmkv.delete(key),
+}
