@@ -1,4 +1,5 @@
 import { ActivityIndicator, FlatList, Text, View } from 'react-native'
+import { useThemeColors } from '@/config'
 import { Card } from '@/shared/components/ui'
 import type { MealRecord, RechargeRecord } from '../types/history.types'
 
@@ -88,10 +89,12 @@ export function HistoryList({
   onRefresh,
   refreshing,
 }: HistoryListProps) {
+  const themeColors = useThemeColors()
+
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center py-12">
-        <ActivityIndicator size="large" color="#006A6A" />
+        <ActivityIndicator size="large" color={themeColors.primary} />
         <Text accessibilityRole="text" className="text-sm text-text-secondary mt-2">
           Carregando histórico
         </Text>
@@ -129,7 +132,7 @@ export function HistoryList({
       ListFooterComponent={
         isFetchingNextPage ? (
           <View className="py-4">
-            <ActivityIndicator size="small" color="#006A6A" />
+            <ActivityIndicator size="small" color={themeColors.primary} />
           </View>
         ) : null
       }

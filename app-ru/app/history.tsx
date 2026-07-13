@@ -39,7 +39,11 @@ export default function HistoryScreen() {
   }, [activeQuery])
 
   return (
-    <SafeAreaView edges={['top', 'bottom']} accessibilityViewIsModal={true}>
+    <SafeAreaView
+      edges={['top', 'bottom']}
+      className="flex-1 bg-background"
+      accessibilityViewIsModal={true}
+    >
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
         <Button label="Voltar" onPress={() => router.back()} variant="secondary" />
       </View>

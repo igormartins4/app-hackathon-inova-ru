@@ -1,4 +1,5 @@
 import { Text, TextInput, View } from 'react-native'
+import { useThemeColors } from '@/config'
 
 interface InputProps {
   label: string
@@ -21,6 +22,8 @@ export function Input({
   keyboardType = 'default',
   accessibilityLabel,
 }: InputProps) {
+  const themeColors = useThemeColors()
+
   return (
     <View className="gap-1.5">
       <Text className="text-sm font-medium text-primary">{label}</Text>
@@ -28,7 +31,7 @@ export function Input({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#A0A5AD"
+        placeholderTextColor={themeColors.textDisabled}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         accessibilityLabel={accessibilityLabel ?? label}

@@ -29,7 +29,7 @@ export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardPro
           R$ {creditoDisponivel.toFixed(2).replace('.', ',')}
         </Text>
         <View className="flex-row gap-4">
-          <View className="flex-1 bg-white/20 rounded-lg p-3">
+          <View className="flex-1 bg-text-inverse/20 rounded-lg p-3">
             <Text className="text-xs text-text-inverse opacity-70">Limite de recarga</Text>
             <Text className="text-sm font-semibold text-text-inverse">
               {formatCurrency(limiteRecarga)}

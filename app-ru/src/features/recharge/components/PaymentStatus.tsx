@@ -1,4 +1,5 @@
 import { ActivityIndicator, Text, View } from 'react-native'
+import { useThemeColors } from '@/config'
 import { QrCodeDisplay } from './QrCodeDisplay'
 
 interface PaymentStatusProps {
@@ -18,6 +19,8 @@ export function PaymentStatus({
   expiration,
   isTimedOut,
 }: PaymentStatusProps) {
+  const themeColors = useThemeColors()
+
   return (
     <View className="gap-6 items-center">
       <QrCodeDisplay
@@ -30,7 +33,7 @@ export function PaymentStatus({
 
       {!isTimedOut && (
         <View className="items-center gap-2">
-          <ActivityIndicator size="small" color="#006A6A" />
+          <ActivityIndicator size="small" color={themeColors.primary} />
           <Text className="text-sm text-text-secondary">Aguardando pagamento...</Text>
         </View>
       )}

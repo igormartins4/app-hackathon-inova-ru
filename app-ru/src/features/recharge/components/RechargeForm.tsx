@@ -1,154 +1,124 @@
 import { useState } from 'react'
-import { Alert, ScrollView, Text, View } from 'react-native'
-import { useBalance } from '@/features/balance/hooks/useBalance'
-import { useRechargeHistory } from '@/features/history/hooks/useRechargeHistory'
-import { useRecharge } from '@/features/recharge/hooks/useRecharge'
-import { Card } from '@/shared/components/ui'
-import { usePolling } from '@/shared/hooks/usePolling'
-import { getErrorMessage } from '@/shared/utils'
-import { PaymentError } from './PaymentError'
-import { PaymentSuccess } from './PaymentSuccess'
-import { QrCodeDisplay } from './QrCodeDisplay'
-import { RechargeForm } from './RechargeForm'
+import { Pressable, Text, TextInput, View } from 'react-native'
+import { useThemeColors } from '@/config'
+import { MAX_VALUE, MIN_VALUE, parseAmount, validateRechargeAmount } from '@/shared/utils'
 
-type PaymentStep = 'form' | 'qr_code' | 'success' | 'error'
+const PRESET_AMOUNTS = [10, 20, 30, 50, 100, 200]
 
-export function RechargeFormContainer() {
-  const [step, setStep] = useState<PaymentStep>('form')
-  const [paymentId, setPaymentId] = useState<number | null>(null)
-  const [qrCode, setQrCode] = useState('')
-  const [qrCodeBase64, setQrCodeBase64] = useState('')
-  const [paymentError, setPaymentError] = useState('')
-  const [rechargedAmount, setRechargedAmount] = useState(0)
-  const { data: balanceData, refetch: refetchBalance } = useBalance()
-  const { startPolling, stopPolling } = usePolling()
-  const { mutate: recharge, isPending } = useRecharge()
-  const { refetch: refetchHistory } = useRechargeHistory({
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear(),
-  })
+interface RechargeFormProps {
+  currentBalance: number
+  disabled?: boolean
+  onSubmit: (valor: number) => void
+}
 
-  const handleSelectAmount = (amount: number) => {
-    Alert.alert(
-      'Confirmar Recarga',
-      `Deseja recarregar R$ ${amount.toFixed(2).replace('.', ',')}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Confirmar',
-          onPress: () =>
-            recharge(amount, {
-              onSuccess: (data) => {
-                setPaymentId(data.payment_id)
-                setQrCode(data.qr_code)
-                setQrCodeBase64(data.qr_code_base64)
-                setRechargedAmount(amount)
-                setStep('qr_code')
-                startPolling(data.payment_id)
-              },
-              onError: (error) => {
-                setPaymentError(getErrorMessage(error))
-                setStep('error')
-              },
-            }),
-        },
-      ],
-    )
+export function RechargeForm({ currentBalance, disabled, onSubmit }: RechargeFormProps) {
+  const themeColors = useThemeColors()
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
+  const [customAmount, setCustomAmount] = useState('')
+
+  const customValue = parseAmount(customAmount)
+  const activeAmount = selectedAmount ?? (customValue >= MIN_VALUE ? customValue : 0)
+  const validation = validateRechargeAmount(activeAmount, currentBalance)
+  const exceedsLimit = activeAmount > 0 && !validation.valid
+  const isValid = activeAmount > 0 && validation.valid
+
+  function handlePreset(value: number) {
+    setSelectedAmount(value)
+    setCustomAmount('')
   }
 
-  const handlePollingSuccess = async () => {
-    stopPolling()
-    await Promise.all([refetchBalance(), refetchHistory()])
-    setStep('success')
+  function handleCustomChange(text: string) {
+    // Allow only digits and one comma/dot
+    const cleaned = text.replace(/[^0-9.,]/g, '').replace(/([.,]).*?\1/, '$1')
+    setCustomAmount(cleaned)
+    setSelectedAmount(null)
   }
 
-  const handlePollingError = (message: string) => {
-    stopPolling()
-    setPaymentError(message)
-    setStep('error')
+  function handleSubmit() {
+    if (!isValid || disabled) return
+    onSubmit(activeAmount)
   }
 
-  const handleRetry = () => {
-    setStep('form')
-    setPaymentId(null)
-    setQrCode('')
-    setQrCodeBase64('')
-    setPaymentError('')
-  }
-
-  const handleDismiss = () => {
-    setStep('form')
-    setPaymentId(null)
-  }
-
-  if (step === 'qr_code' && paymentId) {
-    return (
-      <QrCodeDisplay
-        paymentId={paymentId}
-        qrCode={qrCode}
-        qrCodeBase64={qrCodeBase64}
-        amount={rechargedAmount}
-        onPollingSuccess={handlePollingSuccess}
-        onPollingError={handlePollingError}
-      />
-    )
-  }
-
-  if (step === 'success') {
-    return <PaymentSuccess amount={rechargedAmount} onPress={handleDismiss} />
-  }
-
-  if (step === 'error') {
-    return <PaymentError message={paymentError} onRetry={handleRetry} />
-  }
+  const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-4">
-      <View className="gap-2">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center gap-2">
-            <View className="w-8 h-8 rounded-full bg-primary items-center justify-center">
-              <View className="w-2 h-2 rounded-full bg-text-inverse" />
-            </View>
-            <View className="flex-1 h-0.5 bg-primary" />
-            <View className="w-8 h-8 rounded-full bg-outline-variant items-center justify-center">
-              <View className="w-2 h-2 rounded-full bg-text-disabled" />
-            </View>
-            <View className="flex-1 h-0.5 bg-outline-variant" />
-            <View className="w-8 h-8 rounded-full bg-outline-variant items-center justify-center">
-              <View className="w-2 h-2 rounded-full bg-text-disabled" />
-            </View>
-            <View className="flex-1 h-0.5 bg-outline-variant" />
-            <View className="w-8 h-8 rounded-full bg-outline-variant items-center justify-center">
-              <View className="w-2 h-2 rounded-full bg-text-disabled" />
-            </View>
-          </View>
-        </View>
-        <View className="flex-row justify-between mt-2">
-          <Text className="text-xs font-medium text-primary">PIX</Text>
-          <Text className="text-xs text-text-disabled">QR Code</Text>
-          <Text className="text-xs text-text-disabled">Pagamento</Text>
-          <Text className="text-xs text-text-disabled">Confirmação</Text>
-        </View>
+    <View className="gap-4">
+      <Text className="text-sm text-text-secondary">
+        Saldo atual: {formatCurrency(currentBalance)}
+      </Text>
+
+      <View className="flex-row flex-wrap gap-2">
+        {PRESET_AMOUNTS.map((amount) => {
+          const wouldExceed = currentBalance + amount > MAX_VALUE
+          return (
+            <Pressable
+              key={amount}
+              onPress={() => handlePreset(amount)}
+              disabled={disabled || wouldExceed}
+              accessibilityRole="button"
+              accessibilityLabel={`Recarregar ${formatCurrency(amount)}`}
+              accessibilityState={{
+                selected: selectedAmount === amount,
+                disabled: disabled || wouldExceed,
+              }}
+              className={`min-h-[48px] min-w-[48px] items-center justify-center rounded-xl px-4 py-3 ${
+                selectedAmount === amount ? 'bg-primary' : 'bg-surface-variant'
+              } ${wouldExceed ? 'opacity-40' : ''}`}
+            >
+              <Text
+                className={`text-sm font-semibold ${
+                  selectedAmount === amount ? 'text-text-inverse' : 'text-text-primary'
+                }`}
+              >
+                {formatCurrency(amount)}
+              </Text>
+            </Pressable>
+          )
+        })}
       </View>
 
-      {balanceData && (
-        <RechargeForm
-          currentBalance={balanceData.saldo.credito_disponivel}
-          disabled={isPending}
-          onSubmit={handleSelectAmount}
+      <View>
+        <Text className="text-sm text-text-secondary mb-1">Outro valor:</Text>
+        <TextInput
+          value={customAmount}
+          onChangeText={handleCustomChange}
+          placeholder="Ex: 25,00"
+          placeholderTextColor={themeColors.textDisabled}
+          keyboardType="numeric"
+          editable={!disabled}
+          accessibilityLabel="Valor personalizado de recarga"
+          className="border border-outline rounded-xl px-4 py-3 text-base text-text-primary"
         />
+      </View>
+
+      {exceedsLimit && (
+        <Text
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
+          className="text-sm text-status-error"
+        >
+          {validation.error}
+        </Text>
       )}
 
-      <Card className="bg-primary/10">
-        <View className="gap-1">
-          <Text className="text-sm font-semibold text-primary">⚡ Recarga instantânea via PIX</Text>
-          <Text className="text-xs text-text-secondary">
-            Escaneie o QR Code abaixo e confirme o pagamento no app do seu banco. Seu saldo será
-            atualizado em instantes.
-          </Text>
-        </View>
-      </Card>
-    </ScrollView>
+      <Pressable
+        onPress={handleSubmit}
+        disabled={!isValid || disabled}
+        accessibilityRole="button"
+        accessibilityLabel={`Pagar com PIX${activeAmount > 0 ? ` — ${formatCurrency(activeAmount)}` : ''}`}
+        accessibilityState={{ disabled: !isValid || disabled }}
+        className={`min-h-[48px] items-center justify-center rounded-xl py-4 ${
+          isValid && !disabled ? 'bg-primary' : 'bg-surface-variant'
+        }`}
+      >
+        <Text
+          className={`text-base font-bold ${
+            isValid && !disabled ? 'text-text-inverse' : 'text-text-disabled'
+          }`}
+        >
+          Pagar com PIX — {activeAmount > 0 ? formatCurrency(activeAmount) : '—'}
+        </Text>
+      </Pressable>
+    </View>
   )
 }

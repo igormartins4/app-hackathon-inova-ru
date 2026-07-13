@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, Text } from 'react-native'
+import { useThemeColors } from '@/config'
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger'
 
@@ -29,6 +30,8 @@ export function Button({
   disabled = false,
   loading = false,
 }: ButtonProps) {
+  const themeColors = useThemeColors()
+
   return (
     <Pressable
       onPress={onPress}
@@ -39,7 +42,10 @@ export function Button({
       className={`min-h-[48px] min-w-[48px] items-center justify-center rounded-xl px-6 py-3.5 ${variantStyles[variant]} ${disabled ? 'opacity-50' : ''}`}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={variant === 'secondary' ? '#191C1C' : '#FFFFFF'} />
+        <ActivityIndicator
+          size="small"
+          color={variant === 'secondary' ? themeColors.textPrimary : themeColors.textInverse}
+        />
       ) : (
         <Text className={`text-base font-semibold ${textStyles[variant]}`}>{label}</Text>
       )}

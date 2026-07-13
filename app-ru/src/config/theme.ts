@@ -1,5 +1,11 @@
 // Design tokens — InovaRU theme (Figma Material You)
-// Colors use CSS variables defined in global.css for light/dark support
+// Colors use CSS variables defined in global.css for light/dark support.
+// className-based components read those CSS vars directly via NativeWind;
+// this file is the single source for the same values where a *native* prop
+// (ActivityIndicator color, Ionicons color, tabBar*TintColor, etc.) needs a
+// literal color instead of a className, so nothing here is re-hardcoded.
+
+import { useResolvedTheme } from '@/store/themeStore'
 
 export const colors = {
   primary: '#006A6A',
@@ -83,3 +89,10 @@ export const timing = {
 export const touchTarget = {
   min: 48,
 } as const
+
+// Resolves to the light or dark token set for native props that can't take a
+// NativeWind className (icon `color`, ActivityIndicator, tabBar tint colors).
+export function useThemeColors() {
+  const resolvedTheme = useResolvedTheme()
+  return resolvedTheme === 'dark' ? darkColors : colors
+}
