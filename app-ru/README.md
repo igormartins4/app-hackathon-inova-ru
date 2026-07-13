@@ -9,7 +9,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 - **State:** TanStack Query (server state) + Zustand (client state)
 - **Styling:** NativeWind v4 (Tailwind CSS 3.4)
 - **Security:** expo-secure-store (Android Keystore)
-- **Storage:** MMKV (fast local cache)
+- **Storage:** AsyncStorage (Expo Go-compatible local cache)
 - **QR Code:** react-native-qrcode-svg
 - **Animations:** React Native Reanimated v4
 - **Build:** EAS Build
@@ -42,7 +42,7 @@ src/
 
 **Data Flow:** API → TanStack Query → Components → Zustand (UI state)
 **Security:** JWT in expo-secure-store, never in plaintext
-**Offline:** TanStack Query stale-while-revalidate + MMKV cache
+**Offline:** TanStack Query stale-while-revalidate + AsyncStorage cache
 
 ## Setup
 
@@ -50,7 +50,7 @@ src/
 
 - Node.js 18+
 - pnpm (`corepack enable` or `npm install -g pnpm`)
-- Android Studio (for emulator) or a custom development build (see note below)
+- Expo Go app (Android) or Android Studio (for emulator)
 
 ### Install
 
@@ -64,13 +64,7 @@ pnpm install
 pnpm start
 ```
 
-> **Note on Expo Go:** this project depends on native modules (e.g. `react-native-mmkv`) that are **not** bundled in the generic Expo Go client. Scanning the QR code with plain Expo Go fails with "Failed to download remote update". Build and install a development client instead:
->
-> ```bash
-> pnpm exec expo run:android
-> ```
->
-> or, without a local Android setup, `pnpm exec eas build --profile development --platform android` and install the resulting APK once.
+Scan the QR code with the Expo Go app. All native dependencies (AsyncStorage, secure-store, SVG, gesture-handler, reanimated, screens) ship with Expo Go — no custom development build needed.
 
 ### Android Emulator
 

@@ -1,6 +1,6 @@
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 import { QueryClient } from '@tanstack/react-query'
-import { mmkvStorage } from './cacheStorage'
+import { asyncCacheStorage } from './cacheStorage'
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
@@ -15,10 +15,10 @@ export const queryClient = new QueryClient({
   },
 })
 
-// Persists balance/history query results to MMKV so they survive app restarts
-// with no connectivity (BALC-04, HIST-04, OFFL-02).
-export const queryPersister = createSyncStoragePersister({
-  storage: mmkvStorage,
+// Persists balance/history query results to AsyncStorage so they survive app
+// restarts with no connectivity (BALC-04, HIST-04, OFFL-02).
+export const queryPersister = createAsyncStoragePersister({
+  storage: asyncCacheStorage,
   key: 'inova-ru-query-cache',
 })
 

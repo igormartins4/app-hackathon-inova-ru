@@ -1,28 +1,30 @@
-import { MMKV } from 'react-native-mmkv'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const mmkv = new MMKV()
+// AsyncStorage (not MMKV): react-native-mmkv is a native module that isn't bundled
+// in the generic Expo Go client and requires a custom development build.
+// AsyncStorage ships with Expo Go, so plain `pnpm start` + scan works.
 
-export function setCache<T>(key: string, value: T): void {
-  mmkv.set(key, JSON.stringify(value))
+export async function setCache<T>(key: string, value: T): Promise<void> {
+  await AsyncStorage.setItem(key, JSON.stringify(value))
 }
 
-export function getCache<T>(key: string): T | null {
-  const raw = mmkv.getString(key)
+export async function getCache<T>(key: string): Promise<T | null> {
+  const raw = await AsyncStorage.getItem(key)
   return raw ? (JSON.parse(raw) as T) : null
 }
 
-export function deleteCache(key: string): void {
-  mmkv.delete(key)
+export async function deleteCache(key: string): Promise<void> {
+  await AsyncStorage.removeItem(key)
 }
 
-export function getAllCacheKeys(): string[] {
-  return mmkv.getAllKeys()
+export async function getAllCacheKeys(): Promise<readonly string[]> {
+  return AsyncStorage.getAllKeys()
 }
 
 // Raw string storage adapter (no extra JSON layer) for TanStack Query's
-// sync storage persister — it already serializes the whole cache itself.
-export const mmkvStorage = {
-  getItem: (key: string): string | null => mmkv.getString(key) ?? null,
-  setItem: (key: string, value: string): void => mmkv.set(key, value),
-  removeItem: (key: string): void => mmkv.delete(key),
+// async storage persister — it already serializes the whole cache itself.
+export const asyncCacheStorage = {
+  getItem: (key: string) => AsyncStorage.getItem(key),
+  setItem: (key: string, value: string) => AsyncStorage.setItem(key, value),
+  removeItem: (key: string) => AsyncStorage.removeItem(key),
 }
