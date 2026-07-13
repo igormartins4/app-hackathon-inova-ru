@@ -35,17 +35,17 @@ function RechargeItem({ item }: { item: RechargeRecord }) {
     >
       <View className="flex-row justify-between items-center">
         <View>
-          <Text accessibilityRole="text" className="text-sm font-medium text-gray-900">
+          <Text accessibilityRole="text" className="text-sm font-medium text-text-primary">
             {formatCurrency(item.valor)}
           </Text>
-          <Text accessibilityRole="text" className="text-xs text-gray-500">
+          <Text accessibilityRole="text" className="text-xs text-text-secondary">
             {formatDate(item.data_hora)} · {item.metodo}
           </Text>
         </View>
         <Text
           accessibilityRole="text"
           className={`text-xs font-medium ${
-            item.status === 'aprovado' ? 'text-green-600' : 'text-gray-500'
+            item.status === 'aprovado' ? 'text-status-success' : 'text-text-secondary'
           }`}
         >
           {item.status}
@@ -63,14 +63,14 @@ function MealItem({ item }: { item: MealRecord }) {
     >
       <View className="flex-row justify-between items-center">
         <View>
-          <Text accessibilityRole="text" className="text-sm font-medium text-gray-900">
+          <Text accessibilityRole="text" className="text-sm font-medium text-text-primary">
             {item.filial.nome}
           </Text>
-          <Text accessibilityRole="text" className="text-xs text-gray-500">
+          <Text accessibilityRole="text" className="text-xs text-text-secondary">
             {formatDate(item.data_hora)} · {item.quantidade}x
           </Text>
         </View>
-        <Text accessibilityRole="text" className="text-sm font-medium text-gray-700">
+        <Text accessibilityRole="text" className="text-sm font-medium text-text-secondary">
           {item.gratuidade ? 'Gratuita' : formatCurrency(item.valor_total)}
         </Text>
       </View>
@@ -91,8 +91,8 @@ export function HistoryList({
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center py-12">
-        <ActivityIndicator size="large" color="#1a73e8" />
-        <Text accessibilityRole="text" className="text-sm text-gray-500 mt-2">
+        <ActivityIndicator size="large" color="#006A6A" />
+        <Text accessibilityRole="text" className="text-sm text-text-secondary mt-2">
           Carregando histórico
         </Text>
       </View>
@@ -102,7 +102,7 @@ export function HistoryList({
   if (data.length === 0) {
     return (
       <View className="flex-1 items-center justify-center py-12 px-4">
-        <Text accessibilityRole="alert" className="text-center text-base text-gray-500">
+        <Text accessibilityRole="alert" className="text-center text-base text-text-secondary">
           {EMPTY_MESSAGES[type]}
         </Text>
       </View>
@@ -129,7 +129,7 @@ export function HistoryList({
       ListFooterComponent={
         isFetchingNextPage ? (
           <View className="py-4">
-            <ActivityIndicator size="small" color="#1a73e8" />
+            <ActivityIndicator size="small" color="#006A6A" />
           </View>
         ) : null
       }

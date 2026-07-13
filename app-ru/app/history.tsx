@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   DateFilter,
   HistoryList,
@@ -38,7 +39,7 @@ export default function HistoryScreen() {
   }, [activeQuery])
 
   return (
-    <View accessibilityViewIsModal={true} className="flex-1 bg-gray-50">
+    <SafeAreaView edges={['top', 'bottom']} accessibilityViewIsModal={true}>
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
         <Button label="Voltar" onPress={() => router.back()} variant="secondary" />
       </View>
@@ -49,10 +50,10 @@ export default function HistoryScreen() {
           accessibilityLabel="Ver recargas"
           accessibilityState={{ selected: activeTab === 'recharges' }}
           onPress={() => setActiveTab('recharges')}
-          className={`flex-1 rounded-lg py-3 ${activeTab === 'recharges' ? 'bg-blue-600' : 'bg-gray-200'}`}
+          className={`flex-1 rounded-lg py-3 ${activeTab === 'recharges' ? 'bg-primary' : 'bg-surface-variant'}`}
         >
           <Text
-            className={`text-center text-sm font-medium ${activeTab === 'recharges' ? 'text-white' : 'text-gray-700'}`}
+            className={`text-center text-sm font-medium ${activeTab === 'recharges' ? 'text-text-inverse' : 'text-text-primary'}`}
           >
             Recargas
           </Text>
@@ -62,10 +63,10 @@ export default function HistoryScreen() {
           accessibilityLabel="Ver refeições"
           accessibilityState={{ selected: activeTab === 'meals' }}
           onPress={() => setActiveTab('meals')}
-          className={`flex-1 rounded-lg py-3 ${activeTab === 'meals' ? 'bg-blue-600' : 'bg-gray-200'}`}
+          className={`flex-1 rounded-lg py-3 ${activeTab === 'meals' ? 'bg-primary' : 'bg-surface-variant'}`}
         >
           <Text
-            className={`text-center text-sm font-medium ${activeTab === 'meals' ? 'text-white' : 'text-gray-700'}`}
+            className={`text-center text-sm font-medium ${activeTab === 'meals' ? 'text-text-inverse' : 'text-text-primary'}`}
           >
             Refeições
           </Text>
@@ -86,6 +87,6 @@ export default function HistoryScreen() {
         onRefresh={handleRefresh}
         refreshing={activeQuery.isRefetching}
       />
-    </View>
+    </SafeAreaView>
   )
 }

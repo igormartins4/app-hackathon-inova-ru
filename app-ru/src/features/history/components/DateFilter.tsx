@@ -14,7 +14,6 @@ const QUICK_OPTIONS = [
 export function DateFilter({ onFilter }: DateFilterProps) {
   const [selected, setSelected] = useState<number | null>(null)
 
-  // API expects dataInicio/dataFim as YYYY-MM-DD (see seção 7.5/7.6 do contrato).
   function toDateParam(date: Date): string {
     return date.toISOString().slice(0, 10)
   }
@@ -45,11 +44,11 @@ export function DateFilter({ onFilter }: DateFilterProps) {
           accessibilityState={{ selected: selected === opt.days }}
           onPress={() => handlePress(opt.days)}
           className={`rounded-lg px-4 py-2 ${
-            selected === opt.days ? 'bg-blue-600' : 'bg-gray-200'
+            selected === opt.days ? 'bg-primary' : 'bg-surface-variant'
           }`}
         >
           <Text
-            className={`text-sm font-medium ${selected === opt.days ? 'text-white' : 'text-gray-700'}`}
+            className={`text-sm font-medium ${selected === opt.days ? 'text-text-inverse' : 'text-text-primary'}`}
           >
             {opt.label}
           </Text>
