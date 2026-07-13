@@ -17,7 +17,7 @@ type FlowStep = 'amount' | 'polling' | 'success' | 'error'
 export default function RechargeScreen() {
   const queryClient = useQueryClient()
   const { data: balanceData } = useBalance()
-  const { isBlocked, isInactive } = useConsumerStatus()
+  const { isBlocked, isInactive, message: consumerMessage } = useConsumerStatus()
   const { isOffline } = useNetworkStatus()
 
   const [step, setStep] = useState<FlowStep>('amount')
@@ -25,6 +25,8 @@ export default function RechargeScreen() {
   const [paymentData, setPaymentData] = useState<{
     paymentId: number
     qrCode: string
+    qrCodeBase64: string
+    ticketUrl: string
     amount: number
     expiration: string
   } | null>(null)
@@ -68,6 +70,8 @@ export default function RechargeScreen() {
         setPaymentData({
           paymentId: res.payment_id,
           qrCode: res.qr_code,
+          qrCodeBase64: res.qr_code_base64,
+          ticketUrl: res.ticket_url,
           amount: valor,
           expiration: res.expiration,
         })
@@ -95,13 +99,18 @@ export default function RechargeScreen() {
   const currentBalance = balanceData?.saldo?.credito_disponivel ?? 0
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-background">
       <View className="p-6 gap-6">
         {step === 'amount' && (
           <>
+            {(isBlocked || isInactive) && (
+              <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
+                <Text className="text-center text-sm text-status-error">{consumerMessage}</Text>
+              </View>
+            )}
             {isOffline && (
-              <View accessibilityRole="alert" className="bg-red-50 rounded-lg p-3">
-                <Text className="text-center text-sm text-red-600">
+              <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
+                <Text className="text-center text-sm text-status-error">
                   Conecte-se à internet para recarregar
                 </Text>
               </View>
@@ -117,6 +126,8 @@ export default function RechargeScreen() {
         {step === 'polling' && paymentData && (
           <PaymentStatus
             qrCode={paymentData.qrCode}
+            qrCodeBase64={paymentData.qrCodeBase64}
+            ticketUrl={paymentData.ticketUrl}
             amount={paymentData.amount}
             expiration={paymentData.expiration}
             isTimedOut={false}
