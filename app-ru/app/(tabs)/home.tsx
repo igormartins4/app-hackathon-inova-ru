@@ -17,7 +17,7 @@ export default function HomeScreen() {
 
   if (isInactive) {
     return (
-      <View className="flex-1 bg-gray-50 px-4 pt-8">
+      <View className="flex-1 bg-background px-4 pt-8">
         <ErrorMessage message={message ?? 'Conta inativa. Procure a FUMP.'} />
       </View>
     )
@@ -25,33 +25,58 @@ export default function HomeScreen() {
 
   if (isError) {
     return (
-      <View className="flex-1 bg-gray-50 px-4 pt-8">
+      <View className="flex-1 bg-background px-4 pt-8">
         <ErrorMessage message={getErrorMessage(error)} onRetry={refetch} />
       </View>
     )
   }
 
   return (
-    <View className="flex-1 bg-gray-50 p-4 gap-4">
-      <Card accessibilityLabel="Boas-vindas">
-        <Text accessibilityRole="text" className="text-lg font-semibold text-gray-900">
-          Olá, {user?.nome?.split(' ')[0] ?? 'Estudante'}
-        </Text>
-      </Card>
-
-      {message && (
-        <Card accessibilityLabel="Alerta de conta" accessibilityRole="alert">
-          <Text accessibilityRole="text" className="text-center text-sm text-red-600">
-            {message}
+    <View className="flex-1 bg-background p-4 gap-4">
+      {/* Greeting */}
+      <View className="flex-row items-center justify-between">
+        <View>
+          <Text className="text-sm text-text-secondary">Bom dia,</Text>
+          <Text
+            accessibilityLabel={`Olá, ${user?.nome?.split(' ')[0] ?? 'Estudante'}`}
+            className="text-2xl font-bold text-text-primary"
+          >
+            {user?.nome?.split(' ')[0] ?? 'Estudante'} 👋
           </Text>
-        </Card>
-      )}
+        </View>
+      </View>
 
+      {/* Balance Card */}
       {data && (
         <BalanceCard
           creditoDisponivel={data.saldo.credito_disponivel}
           limiteRecarga={data.saldo.limite_recarga}
         />
+      )}
+
+      {/* Quick Actions */}
+      <View className="flex-row gap-3">
+        <Card className="flex-1 items-center py-4">
+          <Text className="text-2xl mb-2">💰</Text>
+          <Text className="text-sm font-medium text-text-primary">Saldo</Text>
+        </Card>
+        <Card className="flex-1 items-center py-4">
+          <Text className="text-2xl mb-2">🍽️</Text>
+          <Text className="text-sm font-medium text-text-primary">Cardápio</Text>
+        </Card>
+        <Card className="flex-1 items-center py-4">
+          <Text className="text-2xl mb-2">📋</Text>
+          <Text className="text-sm font-medium text-text-primary">Histórico</Text>
+        </Card>
+      </View>
+
+      {/* Alert */}
+      {message && (
+        <Card accessibilityLabel="Alerta de conta" accessibilityRole="alert">
+          <Text accessibilityRole="text" className="text-center text-sm text-status-error">
+            {message}
+          </Text>
+        </Card>
       )}
     </View>
   )

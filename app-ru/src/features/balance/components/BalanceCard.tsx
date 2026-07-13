@@ -12,29 +12,30 @@ interface BalanceCardProps {
 
 export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardProps) {
   return (
-    <Card accessibilityLabel="Cartão de saldo" accessibilityRole="summary">
+    <Card accessibilityLabel="Cartão de saldo" accessibilityRole="summary" className="bg-primary">
       <View className="gap-3">
         <Text
           accessibilityLabel={`Saldo disponível: ${formatCurrency(creditoDisponivel)}`}
           accessibilityRole="text"
-          className="text-sm text-gray-500"
+          className="text-sm font-medium text-text-inverse opacity-80"
         >
-          Saldo disponível
+          SALDO DISPONÍVEL
         </Text>
         <Text
           accessibilityLabel={formatCurrency(creditoDisponivel)}
           accessibilityRole="text"
-          className="text-3xl font-bold text-green-700"
+          className="text-balance font-bold text-text-inverse"
         >
-          {formatCurrency(creditoDisponivel)}
+          R$ {creditoDisponivel.toFixed(2).replace('.', ',')}
         </Text>
-        <Text
-          accessibilityLabel={`Limite de recarga: ${formatCurrency(limiteRecarga)}`}
-          accessibilityRole="text"
-          className="text-xs text-gray-400"
-        >
-          Limite de recarga: {formatCurrency(limiteRecarga)}
-        </Text>
+        <View className="flex-row gap-4">
+          <View className="flex-1 bg-white/20 rounded-lg p-3">
+            <Text className="text-xs text-text-inverse opacity-70">Limite de recarga</Text>
+            <Text className="text-sm font-semibold text-text-inverse">
+              {formatCurrency(limiteRecarga)}
+            </Text>
+          </View>
+        </View>
       </View>
     </Card>
   )
