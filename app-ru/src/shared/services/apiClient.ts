@@ -1,14 +1,28 @@
-import axios from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 import { ERROR_MESSAGES } from '@/config'
 import { emitUnauthorized } from './authEvents'
+import { getMockResponse } from './mockHandler'
 import { getToken, removeToken, removeUser } from './secureStorage'
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:3000'
+const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
+
+function mockAdapter(config: AxiosRequestConfig) {
+  const data = getMockResponse(config)
+  return Promise.resolve({
+    data,
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config,
+  })
+}
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
+  adapter: USE_MOCK ? mockAdapter : undefined,
 })
 
 // Attach JWT from SecureStore to every request
