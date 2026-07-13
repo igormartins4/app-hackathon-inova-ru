@@ -1,19 +1,13 @@
-import { useRouter } from 'expo-router'
 import { Text, View } from 'react-native'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function LoginScreen() {
-  const router = useRouter()
   const { login, isLoading, error } = useAuth()
 
   const handleSubmit = async (cpf: string, password: string) => {
-    try {
-      await login(cpf, password)
-      router.replace('/(tabs)')
-    } catch {
-      // Error is displayed by LoginForm via the error prop
-    }
+    await login(cpf, password)
+    // AuthGate no _layout.tsx detecta isAuthenticated e navega para (tabs)
   }
 
   return (
