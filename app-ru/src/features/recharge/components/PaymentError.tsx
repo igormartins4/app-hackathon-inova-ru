@@ -1,41 +1,35 @@
-import { Pressable, Text, View } from 'react-native'
-import type { PaymentStatusResponse } from '../types/recharge.types'
-
-const ERROR_MESSAGES: Record<string, string> = {
-  rejected: 'Pagamento não autorizado.',
-  cancelled: 'Pagamento cancelado.',
-  expired: 'Código PIX expirado.',
-  timeout: 'Tempo esgotado.',
-}
+import { Ionicons } from '@expo/vector-icons'
+import { Text, View } from 'react-native'
+import { Button, Card } from '@/shared/components/ui'
 
 interface PaymentErrorProps {
-  status: PaymentStatusResponse['status'] | 'timeout'
+  message: string
   onRetry: () => void
 }
 
-export function PaymentError({ status, onRetry }: PaymentErrorProps) {
+export function PaymentError({ message, onRetry }: PaymentErrorProps) {
   return (
-    <View
-      accessibilityRole="alert"
-      accessibilityLiveRegion="assertive"
-      className="items-center gap-6 py-8"
-    >
-      <View className="w-16 h-16 rounded-full bg-red-100 items-center justify-center">
-        <Text className="text-3xl">✕</Text>
-      </View>
-
-      <Text className="text-xl font-bold text-red-700">
-        {ERROR_MESSAGES[status] ?? 'Ocorreu um erro.'}
-      </Text>
-
-      <Pressable
-        onPress={onRetry}
-        accessibilityRole="button"
-        accessibilityLabel="Tentar novamente"
-        className="min-h-[48px] min-w-[48px] items-center justify-center bg-emerald-600 rounded-lg px-8 py-4"
+    <View className="flex-1 items-center justify-center bg-background p-4">
+      <Card
+        accessibilityLabel="Erro no pagamento"
+        accessibilityRole="alert"
+        className="w-full max-w-sm"
       >
-        <Text className="text-white font-bold">Tentar novamente</Text>
-      </Pressable>
+        <View className="items-center gap-4">
+          <View className="w-16 h-16 rounded-full bg-status-error/10 items-center justify-center">
+            <Ionicons name="close-circle" size={48} color="#EA4335" />
+          </View>
+
+          <Text className="text-2xl font-bold text-status-error">Pagamento Não Confirmado</Text>
+
+          <Text className="text-sm text-text-secondary text-center">{message}</Text>
+
+          <View className="w-full gap-3">
+            <Button label="Tentar novamente" onPress={onRetry} variant="primary" />
+            <Button label="Voltar" onPress={onRetry} variant="secondary" />
+          </View>
+        </View>
+      </Card>
     </View>
   )
 }

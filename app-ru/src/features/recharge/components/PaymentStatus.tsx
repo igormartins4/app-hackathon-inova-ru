@@ -3,20 +3,35 @@ import { QrCodeDisplay } from './QrCodeDisplay'
 
 interface PaymentStatusProps {
   qrCode: string
+  qrCodeBase64?: string
+  ticketUrl?: string
   amount: number
   expiration: string
   isTimedOut: boolean
 }
 
-export function PaymentStatus({ qrCode, amount, expiration, isTimedOut }: PaymentStatusProps) {
+export function PaymentStatus({
+  qrCode,
+  qrCodeBase64,
+  ticketUrl,
+  amount,
+  expiration,
+  isTimedOut,
+}: PaymentStatusProps) {
   return (
     <View className="gap-6 items-center">
-      <QrCodeDisplay qrCode={qrCode} amount={amount} expiration={expiration} />
+      <QrCodeDisplay
+        qrCode={qrCode}
+        qrCodeBase64={qrCodeBase64}
+        ticketUrl={ticketUrl}
+        amount={amount}
+        expiration={expiration}
+      />
 
       {!isTimedOut && (
         <View className="items-center gap-2">
-          <ActivityIndicator size="small" color="#059669" />
-          <Text className="text-sm text-gray-500">Aguardando pagamento...</Text>
+          <ActivityIndicator size="small" color="#006A6A" />
+          <Text className="text-sm text-text-secondary">Aguardando pagamento...</Text>
         </View>
       )}
 
@@ -24,7 +39,7 @@ export function PaymentStatus({ qrCode, amount, expiration, isTimedOut }: Paymen
         <Text
           accessibilityRole="alert"
           accessibilityLiveRegion="assertive"
-          className="text-sm text-red-500"
+          className="text-sm text-status-error"
         >
           Tempo esgotado. O pagamento não foi confirmado.
         </Text>
