@@ -11,15 +11,15 @@ interface ButtonProps {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-blue-600 active:bg-blue-700',
-  secondary: 'bg-gray-200 active:bg-gray-300',
-  danger: 'bg-red-600 active:bg-red-700',
+  primary: 'bg-primary active:opacity-80',
+  secondary: 'bg-surface-variant active:opacity-80',
+  danger: 'bg-status-error active:opacity-80',
 }
 
 const textStyles: Record<ButtonVariant, string> = {
-  primary: 'text-white',
-  secondary: 'text-gray-900',
-  danger: 'text-white',
+  primary: 'text-text-inverse',
+  secondary: 'text-text-primary',
+  danger: 'text-text-inverse',
 }
 
 export function Button({
@@ -36,10 +36,10 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled, busy: loading }}
-      className={`min-h-[48px] min-w-[48px] items-center justify-center rounded-lg px-6 py-3 ${variantStyles[variant]} ${disabled ? 'opacity-50' : ''}`}
+      className={`min-h-[48px] min-w-[48px] items-center justify-center rounded-xl px-6 py-3.5 ${variantStyles[variant]} ${disabled ? 'opacity-50' : ''}`}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={variant === 'secondary' ? '#111827' : '#fff'} />
+        <ActivityIndicator size="small" color={variant === 'secondary' ? '#191C1C' : '#FFFFFF'} />
       ) : (
         <Text className={`text-base font-semibold ${textStyles[variant]}`}>{label}</Text>
       )}

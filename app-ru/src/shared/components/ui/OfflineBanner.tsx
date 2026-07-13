@@ -1,19 +1,23 @@
 import { Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 interface OfflineBannerProps {
   visible: boolean
 }
 
 export function OfflineBanner({ visible }: OfflineBannerProps) {
+  const insets = useSafeAreaInsets()
+
   if (!visible) return null
 
   return (
     <View
       accessibilityRole="alert"
       accessibilityLiveRegion="assertive"
-      className="bg-red-600 px-4 py-3"
+      style={{ paddingTop: insets.top + 12 }}
+      className="bg-status-error px-4 pb-3"
     >
-      <Text className="text-center text-sm font-medium text-white">
+      <Text className="text-center text-sm font-medium text-text-inverse">
         Sem conexão. Verifique sua internet e tente novamente.
       </Text>
     </View>

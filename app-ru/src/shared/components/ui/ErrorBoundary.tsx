@@ -32,12 +32,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         <View
           accessibilityRole="alert"
           accessibilityLiveRegion="assertive"
-          className="flex-1 items-center justify-center bg-gray-50 px-6"
+          className="flex-1 items-center justify-center bg-background px-6"
         >
-          <Text accessibilityRole="text" className="text-lg font-semibold text-gray-900 mb-2">
+          <Text accessibilityRole="text" className="text-lg font-semibold text-text-primary mb-2">
             Algo deu errado
           </Text>
-          <Text accessibilityRole="text" className="text-center text-base text-gray-600 mb-6">
+          <Text accessibilityRole="text" className="text-center text-base text-text-secondary mb-6">
             {this.props.fallbackMessage ?? 'Ocorreu um erro. Tente novamente em instantes.'}
           </Text>
           <Button label="Tentar novamente" onPress={this.handleRetry} />

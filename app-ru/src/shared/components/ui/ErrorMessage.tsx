@@ -16,7 +16,7 @@ export function ErrorMessage({ message = DEFAULT_ERROR, onRetry }: ErrorMessageP
       accessibilityLiveRegion="assertive"
       className="items-center gap-4 py-8"
     >
-      <Text className="text-center text-base text-red-600">{message}</Text>
+      <Text className="text-center text-base text-status-error">{message}</Text>
       {onRetry ? <Button label="Tentar novamente" onPress={onRetry} variant="secondary" /> : null}
     </View>
   )

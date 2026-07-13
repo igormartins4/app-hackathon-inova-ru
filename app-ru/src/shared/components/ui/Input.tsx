@@ -23,22 +23,23 @@ export function Input({
 }: InputProps) {
   return (
     <View className="gap-1.5">
-      <Text className="text-sm font-medium text-gray-700">{label}</Text>
+      <Text className="text-sm font-medium text-primary">{label}</Text>
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
+        placeholderTextColor="#A0A5AD"
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         accessibilityLabel={accessibilityLabel ?? label}
         accessibilityState={{ disabled: false }}
-        className={`min-h-[48px] rounded-lg border px-4 py-3 text-base ${error ? 'border-red-500' : 'border-gray-300'}`}
+        className={`min-h-[48px] rounded-xl border px-4 py-3 text-base text-text-primary ${error ? 'border-status-error' : 'border-outline'}`}
       />
       {error ? (
         <Text
           accessibilityRole="alert"
           accessibilityLiveRegion="assertive"
-          className="text-sm text-red-600"
+          className="text-sm text-status-error"
         >
           {error}
         </Text>

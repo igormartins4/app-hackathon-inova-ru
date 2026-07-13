@@ -8,7 +8,7 @@ interface LoadingSpinnerProps {
 
 export function LoadingSpinner({
   size = 'large',
-  color = '#2563eb',
+  color = '#006A6A',
   message,
 }: LoadingSpinnerProps) {
   const label = message ? `Carregando: ${message}` : 'Carregando'
@@ -20,7 +20,7 @@ export function LoadingSpinner({
       className="flex-1 items-center justify-center gap-3 py-8"
     >
       <ActivityIndicator size={size} color={color} />
-      {message ? <Text className="text-sm text-gray-500">{message}</Text> : null}
+      {message ? <Text className="text-sm text-text-secondary">{message}</Text> : null}
     </View>
   )
 }
