@@ -4,3 +4,67 @@
 @tailwind components;
 /* biome-ignore lint/suspicious/noUnknownAtRules: NativeWind requires @tailwind directives */
 @tailwind utilities;
+
+:root {
+  /* Primary — Teal from Figma */
+  --color-primary: #006a6a;
+  --color-primary-light: #4e9e9e;
+  --color-primary-container: #d1e8e6;
+  --color-primary-dark: #004d4d;
+
+  /* Surface & Background */
+  --color-surface: #ffffff;
+  --color-surface-variant: #eff1f0;
+  --color-background: #eff1f0;
+
+  /* Outline */
+  --color-outline: #dadde4;
+  --color-outline-variant: #e8eaed;
+
+  /* Text */
+  --color-text-primary: #191c1c;
+  --color-text-secondary: #717784;
+  --color-text-disabled: #a0a5ad;
+  --color-text-inverse: #ffffff;
+
+  /* Status */
+  --color-success: #34a853;
+  --color-error: #ea4335;
+  --color-warning: #ffb800;
+
+  /* Chips */
+  --color-chip-selected: #006a6a;
+  --color-chip-unselected: #ffffff;
+}
+
+.dark {
+  /* Primary — Brighter teal for dark mode */
+  --color-primary: #2dd4a8;
+  --color-primary-light: #5eecc4;
+  --color-primary-container: #1a3d3d;
+  --color-primary-dark: #1f9e7a;
+
+  /* Surface & Background */
+  --color-surface: #1e2121;
+  --color-surface-variant: #2d3131;
+  --color-background: #191c1c;
+
+  /* Outline */
+  --color-outline: #3a3f3f;
+  --color-outline-variant: #2d3131;
+
+  /* Text */
+  --color-text-primary: #fbfaf7;
+  --color-text-secondary: #a0a5ad;
+  --color-text-disabled: #5a5f66;
+  --color-text-inverse: #191c1c;
+
+  /* Status */
+  --color-success: #4ade80;
+  --color-error: #f87171;
+  --color-warning: #fbbf24;
+
+  /* Chips */
+  --color-chip-selected: #2dd4a8;
+  --color-chip-unselected: #2d3131;
+}

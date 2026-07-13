@@ -1,28 +1,48 @@
-// Design tokens — InovaRU theme
-// Colors meet WCAG AA (4.5:1+ on white)
+// Design tokens — InovaRU theme (Figma Material You)
+// Colors use CSS variables defined in global.css for light/dark support
 
 export const colors = {
-  primary: '#1a73e8',
-  primaryDark: '#1557b0',
-  secondary: '#f1f3f4',
-  secondaryDark: '#dadce0',
-  success: '#34a853',
-  danger: '#ea4335',
-  warning: '#fbbc04',
-  white: '#ffffff',
+  primary: '#006A6A',
+  primaryLight: '#4E9E9E',
+  primaryContainer: '#D1E8E6',
+  primaryDark: '#004D4D',
+  surface: '#FFFFFF',
+  surfaceVariant: '#EFF1F0',
+  background: '#EFF1F0',
+  outline: '#DADDE4',
+  outlineVariant: '#E8EAED',
+  textPrimary: '#191C1C',
+  textSecondary: '#717784',
+  textDisabled: '#A0A5AD',
+  textInverse: '#FFFFFF',
+  success: '#34A853',
+  error: '#EA4335',
+  warning: '#FFB800',
+  chipSelected: '#006A6A',
+  chipUnselected: '#FFFFFF',
+  white: '#FFFFFF',
   black: '#000000',
-  gray: {
-    50: '#f8f9fa',
-    100: '#f1f3f4',
-    200: '#dadce0',
-    300: '#bdc1c6',
-    400: '#9aa0a6',
-    500: '#80868b',
-    600: '#5f6368',
-    700: '#3c4043',
-    800: '#202124',
-    900: '#111111',
-  },
+} as const
+
+export const darkColors = {
+  primary: '#2DD4A8',
+  primaryLight: '#5EECC4',
+  primaryContainer: '#1A3D3D',
+  primaryDark: '#1F9E7A',
+  surface: '#1E2121',
+  surfaceVariant: '#2D3131',
+  background: '#191C1C',
+  outline: '#3A3F3F',
+  outlineVariant: '#2D3131',
+  textPrimary: '#FBFAF7',
+  textSecondary: '#A0A5AD',
+  textDisabled: '#5A5F66',
+  textInverse: '#191C1C',
+  success: '#4ADE80',
+  error: '#F87171',
+  warning: '#FBBF24',
+  chipSelected: '#2DD4A8',
+  chipUnselected: '#2D3131',
 } as const
 
 export const spacing = {
@@ -39,27 +59,27 @@ export const radii = {
   md: 8,
   lg: 12,
   xl: 16,
+  '2xl': 24,
   full: 9999,
 } as const
 
 export const fontSize = {
   xs: 12,
   sm: 14,
-  md: 16,
+  base: 16,
   lg: 18,
   xl: 20,
-  xxl: 24,
-  title: 28,
+  '2xl': 24,
+  '3xl': 28,
+  balance: 40,
 } as const
 
-// Animation timing constants
 export const timing = {
   fast: 150,
   normal: 250,
   slow: 400,
 } as const
 
-// Touch target minimum (WCAG 2.5.5)
 export const touchTarget = {
   min: 48,
 } as const
