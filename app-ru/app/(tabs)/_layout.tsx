@@ -6,7 +6,7 @@ type IoniconsName = React.ComponentProps<typeof Ionicons>['name']
 const TAB_ICONS: Record<string, { focused: IoniconsName; default: IoniconsName }> = {
   home: { focused: 'home', default: 'home-outline' },
   balance: { focused: 'wallet', default: 'wallet-outline' },
-  recharge: { focused: 'card', default: 'card-outline' },
+  recharge: { focused: 'refresh-circle', default: 'refresh-circle-outline' },
   profile: { focused: 'person', default: 'person-outline' },
 }
 
@@ -14,35 +14,39 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#1a73e8',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: '#006A6A',
+        tabBarInactiveTintColor: '#717784',
         tabBarStyle: {
-          minHeight: 56,
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#DADDE4',
+          minHeight: 64,
           paddingBottom: 8,
-          paddingTop: 4,
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
         },
         headerStyle: {
-          backgroundColor: '#fff',
+          backgroundColor: '#FFFFFF',
         },
         headerTitleStyle: {
           fontWeight: '600',
+          color: '#191C1C',
         },
+        headerShadowVisible: false,
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
-          tabBarLabel: 'Home',
+          title: 'Início',
+          tabBarLabel: 'Início',
           tabBarIcon: ({ focused, color, size }) => {
             const iconName = focused ? TAB_ICONS.home.focused : TAB_ICONS.home.default
             return <Ionicons name={iconName} size={size} color={color} />
           },
-          tabBarAccessibilityLabel: 'Home',
+          tabBarAccessibilityLabel: 'Início',
         }}
       />
       <Tabs.Screen
