@@ -4,7 +4,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 
 ## Stack Tecnológica
 
-- **Runtime:** Expo SDK 54 (React Native 0.81.5, React 19.1)
+- **Runtime:** Expo SDK 55 (React Native 0.83, React 19.2)
 - **Navegação:** Expo Router 6 (file-based, React Navigation 7)
 - **Estado:** TanStack Query 5 (estado do servidor) + Zustand 5 (estado do cliente)
 - **Estilo:** NativeWind 4 (Tailwind CSS 3.4)
@@ -18,17 +18,18 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 
 Estrutura de pastas por domínio com isolamento estrito:
 
-``` html
+```
 src/
 ├── app/                    # Expo Router — rotas baseadas em arquivos
-│   ├── _layout.tsx         # Layout raiz: autenticação
+│   ├── _layout.tsx         # Layout raiz: autenticação + tema
 │   ├── (auth)/             # Rotas não autenticadas (login)
-│   └── (tabs)/             # Rotas autenticadas (home, saldo, recarga, perfil)
+│   └── (tabs)/             # Rotas autenticadas (início, saldo, recarga, cardápio, histórico, perfil)
 ├── features/
 │   ├── auth/               # Login, gerenciamento de token
 │   ├── balance/            # Exibição de saldo, dados do consumidor
 │   ├── recharge/           # Fluxo PIX, QR Code, polling
-│   ├── history/            # Histórico de recargas e refeições
+│   ├── history/            # Histórico de recargas e refeições (API real)
+│   ├── cardapio/           # Cardápio do dia (mock — não existe endpoint na spec)
 │   └── profile/            # Perfil do usuário (reutiliza dados do balance)
 ├── shared/
 │   ├── components/
@@ -59,7 +60,22 @@ src/
 pnpm install
 ```
 
-### Executar
+## Modos de execução
+
+O app tem **dois jeitos de mockar a API**, escolhidos pela variável `EXPO_PUBLIC_USE_MOCK` no `.env`. Escolha um:
+
+| | Mock em-processo (padrão) | Servidor Mockoon |
+|---|---|---|
+| **Setup** | Zero — já vem pronto | `pnpm mock` num segundo terminal |
+| **`.env`** | `EXPO_PUBLIC_USE_MOCK=true` (ou nem crie o `.env`) | `EXPO_PUBLIC_USE_MOCK=false` + `EXPO_PUBLIC_API_URL` |
+| **Roda de verdade na rede?** | Não — tudo dentro do processo JS | Sim — HTTP real em `localhost:3001` |
+| **Testa o polling de verdade?** | Não — aprova o pagamento na 1ª consulta | Sim — simula `pending` 3x antes de aprovar |
+| **Testa `network_security_config.xml`?** | Não | Sim |
+| **Quando usar** | Desenvolvimento rápido de UI | Testar fluxo de pagamento/erro de ponta a ponta |
+
+### Opção A — Mock em-processo (mais simples)
+
+Não precisa de nada além do app rodando (assumindo que já rodou `pnpm install` acima). Um único terminal:
 
 ```bash
 pnpm start
@@ -67,40 +83,39 @@ pnpm start
 
 Escaneie o QR Code com o app Expo Go. Todas as dependências nativas vêm com o Expo Go — não precisa de build customizado.
 
-### Credenciais de teste (modo mock)
+**Login:** qualquer CPF de 11 dígitos (ex.: `12345678901`) + qualquer senha (ex.: `123456`) — o mock não valida senha.
 
-Por padrão, o app roda em **modo mock** — não precisa de servidor. Use qualquer credencial para logar:
+### Opção B — Servidor Mockoon (rede real)
 
-- **CPF:** `12345678901`
-- **Senha:** qualquer valor (ex: `123456`)
+Precisa de **dois terminais rodando ao mesmo tempo** — os dois processos ficam vivos, não terminam sozinhos.
 
-O mock fornece dados fictícios de saldo, histórico de recargas e histórico de refeições.
-
-Para usar a API real da FUMP, crie um arquivo `.env`:
-
-``` json
-EXPO_PUBLIC_USE_MOCK=false
-EXPO_PUBLIC_API_URL=http://10.0.2.2:3000
-```
-
-### Mock server real (Mockoon) — testes de rede de verdade
-
-O modo mock padrão (`EXPO_PUBLIC_USE_MOCK=true`) roda **dentro do processo JS** — nunca sai pra rede, então não testa polling de verdade (o mock em memória aprova o pagamento na primeira consulta) nem exercita o `network_security_config.xml`.
-
-Pra testar contra um servidor HTTP de verdade, seguindo a recomendação da Especificação Técnica v2.0 (seção 4.1), o projeto inclui um ambiente [Mockoon](https://mockoon.com) em `mock/mockoon-environment.json` com as 6 rotas do contrato:
+**Terminal 1 — sobe o mock server e deixa ele rodando:**
 
 ```bash
+cd app-ru
 pnpm mock
 ```
 
-Sobe em `http://localhost:3001` (ou `http://10.0.2.2:3001` no emulador Android). Depois, no `.env`:
+Fica ouvindo em `http://localhost:3001`, mostrando o log de cada requisição. `Ctrl+C` pra parar.
+
+**Terminal 2 — configura o `.env` e sobe o app:**
 
 ```env
+# app-ru/.env
 EXPO_PUBLIC_USE_MOCK=false
 EXPO_PUBLIC_API_URL=http://10.0.2.2:3001
 ```
 
-O que esse mock cobre, exatamente por rota:
+```bash
+cd app-ru
+pnpm start
+```
+
+> `10.0.2.2` é o alias que o **emulador Android** usa pra falar com a máquina host — é o `localhost` de fora do emulador. Testando no navegador (`pnpm web`) ou no Expo Go de um celular físico na mesma rede Wi-Fi, troque por `http://<ip-da-sua-maquina>:3001` (ex.: `192.168.1.50`).
+
+**Login (Mockoon):** CPF `12345678901` + senha **exatamente** `senha_do_usuario` (única credencial configurada com sucesso — qualquer outra senha responde `401`, de propósito, pra testar o fluxo de erro).
+
+**O que esse mock cobre, rota por rota:**
 
 | Rota | Cenários simulados |
 |------|---------------------|
@@ -111,7 +126,7 @@ O que esse mock cobre, exatamente por rota:
 | `GET /creditos/recargas` | 200 lista paginada |
 | `GET /creditos/refeicoes` | 200 lista paginada, com códigos de filial reais (Anexo A) |
 
-Validar o arquivo sem subir o servidor: `pnpm mock:validate`.
+Validar o arquivo sem subir o servidor: `pnpm mock:validate`. Editar/adicionar rotas: abra `mock/mockoon-environment.json` direto, ou importe no [app desktop do Mockoon](https://mockoon.com/download/) pra editar visualmente e reexportar.
 
 ### Emulador Android
 
@@ -119,9 +134,7 @@ Validar o arquivo sem subir o servidor: `pnpm mock:validate`.
 pnpm android
 ```
 
-Ao usar a API real, o emulador conecta em `http://10.0.2.2:3000` (alias de localhost). Certifique-se de que o servidor mock está rodando na porta 3000.
-
-> **Nota:** O emulador deve ter `android:usesCleartextTraffic="true"` para conexões HTTP. Já está configurado em builds de debug via o plugin `withNetworkSecurityConfig`.
+> **Nota:** O emulador precisa liberar tráfego HTTP puro pra `10.0.2.2` (Android bloqueia cleartext por padrão). Já está configurado via o plugin `withNetworkSecurityConfig` (`android:usesCleartextTraffic` + `network_security_config.xml`, restrito a esse IP — não libera cleartext geral).
 
 ### EAS Build
 
@@ -146,11 +159,13 @@ Os testes unitários cobrem o algoritmo de polling, validação de CPF e lógica
 | `features/balance/` | Exibição de saldo, status do consumidor |
 | `features/recharge/` | Fluxo de pagamento PIX, QR Code, polling |
 | `features/history/` | Histórico de recargas e refeições |
+| `features/cardapio/` | Cardápio do dia (mock — sem endpoint na spec v2.0) |
 | `features/profile/` | Perfil do usuário (dados do consumidor) |
 | `shared/components/ui/` | Componentes reutilizáveis |
 | `shared/hooks/` | Hooks React customizados |
 | `shared/services/` | Cliente API, armazenamento, handler de mock |
 | `config/` | Constantes, tokens de tema, erros |
+| `mock/` | Ambiente Mockoon (`pnpm mock`) — ver seção "Modos de execução" |
 
 ## API
 

@@ -25,6 +25,7 @@ O Rangoo Universitário resolve os gargalos de fila nos RUs da UFMG ao permitir 
 | **PIX QR Code** | Exibição do QR Code PIX com código copia-e-cola, timer de expiração e botão de compartilhamento. Polling de status com backoff exponencial. |
 | **Sucesso** | Confirmação da recarga com valor adicionado, novo saldo e horário. |
 | **Histórico** | Abas de Recargas e Refeições com filtros por data. Paginação e scroll infinito. |
+| **Cardápio** | Cardápio do dia por restaurante (bônus fora do contrato v2.0 da API — dados de exemplo). |
 | **Perfil** | Dados do consumidor, tipo, centro de custo e situação da conta. |
 
 ---
@@ -73,25 +74,26 @@ O app consome a API RESTful fornecida pela FUMP. Todos os dados são extraídos 
 
 ```
 app-ru/
+├── app/                         # Expo Router — file-based routes
+│   ├── _layout.tsx              # Root layout: auth gate + tema
+│   ├── (auth)/                  # Login
+│   └── (tabs)/                  # Início, Saldo, Recarga, Cardápio, Histórico, Perfil
 ├── src/
-│   ├── app/                    # Expo Router — file-based routes
-│   │   ├── _layout.tsx         # Root layout: auth gate
-│   │   ├── (auth)/             # Login
-│   │   └── (tabs)/             # Home, Saldo, Recarga, Perfil
 │   ├── features/
-│   │   ├── auth/               # Login, JWT management
-│   │   ├── balance/            # Saldo, dados do consumidor
-│   │   ├── recharge/           # Fluxo PIX, QR Code, polling
-│   │   ├── history/            # Histórico de recargas e refeições
-│   │   └── profile/            # Perfil do usuário
+│   │   ├── auth/                # Login, JWT management
+│   │   ├── balance/             # Saldo, dados do consumidor
+│   │   ├── recharge/            # Fluxo PIX, QR Code, polling
+│   │   ├── history/             # Histórico de recargas e refeições (API real)
+│   │   ├── cardapio/            # Cardápio do dia (mock — bônus fora do contrato)
+│   │   └── profile/             # Perfil do usuário
 │   ├── shared/
-│   │   ├── components/ui/      # Button, Card, Input, ErrorMessage
-│   │   ├── hooks/              # useNetworkStatus
-│   │   ├── services/           # API client, secure storage, mock
-│   │   └── utils/              # CPF, erros, validação de recarga
-│   └── config/                 # Constantes, tema, mensagens de erro
-├── app/                        # Expo Router routes
-└── .env                        # Variáveis de ambiente (mock mode)
+│   │   ├── components/ui/       # Button, Card, Input, ErrorMessage
+│   │   ├── hooks/               # useNetworkStatus
+│   │   ├── services/            # API client, secure storage, mock
+│   │   └── utils/               # CPF, erros, validação de recarga
+│   └── config/                  # Constantes, tema, mensagens de erro
+├── mock/                        # Ambiente Mockoon (servidor mock real, ver app-ru/README.md)
+└── .env                         # Variáveis de ambiente (modo mock)
 ```
 
 ---
@@ -100,7 +102,7 @@ app-ru/
 
 | Camada | Tecnologia |
 |--------|------------|
-| Runtime | Expo SDK 54 (React Native 0.81.5, React 19.1) |
+| Runtime | Expo SDK 55 (React Native 0.83, React 19.2) |
 | Navegação | Expo Router 6 (file-based) |
 | State | TanStack Query 5 + Zustand 5 |
 | Estilo | NativeWind 4 (Tailwind CSS 3.4) |
@@ -119,9 +121,9 @@ pnpm install
 pnpm start
 ```
 
-O app roda em **mock mode** por padrão — não precisa de servidor. Use CPF `12345678901` e qualquer senha para logar.
+O app roda em **modo mock** por padrão — não precisa de servidor. Use CPF `12345678901` e qualquer senha para logar.
 
-Veja mais detalhes em [`app-ru/README.md`](app-ru/README.md).
+Pra testar o fluxo de pagamento contra rede real (polling, erros, rate limit), tem um servidor [Mockoon](https://mockoon.com) pronto — `pnpm mock` num segundo terminal. Passo a passo completo em [`app-ru/README.md`](app-ru/README.md#modos-de-execução).
 
 ---
 
@@ -131,7 +133,8 @@ Veja mais detalhes em [`app-ru/README.md`](app-ru/README.md).
 |---------|-----------|
 | [`docs/apresentacao-prototipo-hackathon.pdf`](docs/apresentacao-prototipo-hackathon.pdf) | Apresentação de slides do conceito e protótipo |
 | [`docs/Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf`](docs/Documento_Conceitual_InovaRU_03.07.2026_assinado.pdf) | Documento conceitual assinado pela equipe |
-| [`docs/Especificacao_Tecnica_API_InovaRU_v2_03.07.2026_assinado.pdf`](docs/Especificacao_Tecnica_API_InovaRU_v2_03.07.2026_assinado.pdf) | Especificação técnica da API FUMP v2.0 |
+| [`docs/Especificacao_Tecnica_API_InovaRU_v2_03.07.2026_assinado.pdf`](docs/Especificacao_Tecnica_API_InovaRU_v2_03.07.2026_assinado.pdf) | Especificação técnica da API FUMP v2.0 (PDF assinado, original) |
+| [`docs/especificacao_tecnica.md`](docs/especificacao_tecnica.md) | Mesma especificação, transcrita em markdown — fonte de verdade usada pelo código e por `AGENTS.md` |
 
 ---
 
