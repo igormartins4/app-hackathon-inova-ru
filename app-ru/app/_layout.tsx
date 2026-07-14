@@ -5,18 +5,32 @@ import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { View } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { QUERY_PERSIST_MAX_AGE, queryClient, queryPersister } from '@/shared/services'
-import { useThemeStore } from '@/store/themeStore'
+import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
-function ThemeInitializer() {
+// Theming here runs on CSS custom properties (--color-* in global.css), swapped
+// by a `.dark` class — NOT Tailwind's `dark:` variant (unused in this codebase).
+// Without this wrapper toggling the class, className-based colors (bg-background,
+// text-text-primary, etc.) never switch, while native-prop colors from
+// useThemeColors()/useGradientColors() (JS, not CSS) switch correctly — the
+// mismatch reads as "dark mode partially/incorrectly inverted".
+function ThemeProvider({ children }: { children: React.ReactNode }) {
   const initialize = useThemeStore((s) => s.initialize)
+  const resolvedTheme = useResolvedTheme()
+
   useEffect(() => {
     initialize()
   }, [initialize])
-  return null
+
+  return (
+    <View style={{ flex: 1 }} className={resolvedTheme === 'dark' ? 'dark' : ''}>
+      {children}
+    </View>
+  )
 }
 
 function AuthGate() {
@@ -57,12 +71,15 @@ function AuthGate() {
 
 export default function RootLayout() {
   return (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{ persister: queryPersister, maxAge: QUERY_PERSIST_MAX_AGE }}
-    >
-      <ThemeInitializer />
-      <AuthGate />
-    </PersistQueryClientProvider>
+    <SafeAreaProvider>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister: queryPersister, maxAge: QUERY_PERSIST_MAX_AGE }}
+      >
+        <ThemeProvider>
+          <AuthGate />
+        </ThemeProvider>
+      </PersistQueryClientProvider>
+    </SafeAreaProvider>
   )
 }
