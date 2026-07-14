@@ -6,8 +6,9 @@ type IoniconsName = React.ComponentProps<typeof Ionicons>['name']
 
 const TAB_ICONS: Record<string, { focused: IoniconsName; default: IoniconsName }> = {
   home: { focused: 'home', default: 'home-outline' },
-  balance: { focused: 'wallet', default: 'wallet-outline' },
   recharge: { focused: 'refresh-circle', default: 'refresh-circle-outline' },
+  cardapio: { focused: 'book', default: 'book-outline' },
+  historico: { focused: 'time', default: 'time-outline' },
   profile: { focused: 'person', default: 'person-outline' },
 }
 
@@ -55,13 +56,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="balance"
         options={{
+          href: null,
           title: 'Saldo',
-          tabBarLabel: 'Saldo',
-          tabBarIcon: ({ focused, color, size }) => {
-            const iconName = focused ? TAB_ICONS.balance.focused : TAB_ICONS.balance.default
-            return <Ionicons name={iconName} size={size} color={color} />
-          },
-          tabBarAccessibilityLabel: 'Saldo',
         }}
       />
       <Tabs.Screen
@@ -74,6 +70,30 @@ export default function TabLayout() {
             return <Ionicons name={iconName} size={size} color={color} />
           },
           tabBarAccessibilityLabel: 'Recarga',
+        }}
+      />
+      <Tabs.Screen
+        name="cardapio"
+        options={{
+          title: 'Cardápio',
+          tabBarLabel: 'Cardápio',
+          tabBarIcon: ({ focused, color, size }) => {
+            const iconName = focused ? TAB_ICONS.cardapio.focused : TAB_ICONS.cardapio.default
+            return <Ionicons name={iconName} size={size} color={color} />
+          },
+          tabBarAccessibilityLabel: 'Cardápio',
+        }}
+      />
+      <Tabs.Screen
+        name="historico"
+        options={{
+          title: 'Histórico',
+          tabBarLabel: 'Histórico',
+          tabBarIcon: ({ focused, color, size }) => {
+            const iconName = focused ? TAB_ICONS.historico.focused : TAB_ICONS.historico.default
+            return <Ionicons name={iconName} size={size} color={color} />
+          },
+          tabBarAccessibilityLabel: 'Histórico',
         }}
       />
       <Tabs.Screen

@@ -9,6 +9,15 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { QUERY_PERSIST_MAX_AGE, queryClient, queryPersister } from '@/shared/services'
+import { useThemeStore } from '@/store/themeStore'
+
+function ThemeInitializer() {
+  const initialize = useThemeStore((s) => s.initialize)
+  useEffect(() => {
+    initialize()
+  }, [initialize])
+  return null
+}
 
 function AuthGate() {
   const { isAuthenticated, isLoading } = useAuth()
@@ -44,7 +53,6 @@ function AuthGate() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="history" options={{ presentation: 'modal' }} />
         </Stack>
         <StatusBar style="auto" />
       </View>
@@ -58,6 +66,7 @@ export default function RootLayout() {
       client={queryClient}
       persistOptions={{ persister: queryPersister, maxAge: QUERY_PERSIST_MAX_AGE }}
     >
+      <ThemeInitializer />
       <AuthGate />
     </PersistQueryClientProvider>
   )
