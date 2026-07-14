@@ -1,15 +1,15 @@
 import type { AxiosRequestConfig } from 'axios'
 
 const MOCK_USER = {
-  nome: 'JOÃO DA SILVA',
-  email: 'joao@ufmg.br',
+  nome: 'GERSON SANTOS',
+  email: 'gerson@ufmg.br',
   isAluno: 1,
   isColaborador: 0,
 }
 
 const MOCK_BALANCE = {
   consumidor: {
-    nome: 'JOÃO DA SILVA',
+    nome: 'GERSON SANTOS',
     tipo_consumidor: { codigo: '01', descricao: 'ESTUDANTE REGULAR' },
     centro_custo: { tipo: 'Graduação', descricao: 'CIENCIA DA COMPUTACAO' },
     situacao: 'A',
@@ -47,11 +47,12 @@ const MOCK_RECHARGES = {
   pagination: { total: 3, currentPage: 1, perPage: 10, lastPage: 1 },
 }
 
+// Códigos e nomes de filial per Anexo A (Especificação Técnica API InovaRU v2.0).
 const MOCK_MEALS = {
   data: [
     {
       data_hora: '2026-07-12T12:30:00-03:00',
-      filial: { codigo: '01', nome: 'RU Central' },
+      filial: { codigo: '0003', nome: 'RU Setorial 1' },
       quantidade: 1,
       valor_total: 3.2,
       gratuidade: false,
@@ -59,7 +60,7 @@ const MOCK_MEALS = {
     },
     {
       data_hora: '2026-07-12T19:00:00-03:00',
-      filial: { codigo: '01', nome: 'RU Central' },
+      filial: { codigo: '0003', nome: 'RU Setorial 1' },
       quantidade: 1,
       valor_total: 3.2,
       gratuidade: false,
@@ -67,7 +68,7 @@ const MOCK_MEALS = {
     },
     {
       data_hora: '2026-07-11T12:15:00-03:00',
-      filial: { codigo: '02', nome: 'RU Pampulha' },
+      filial: { codigo: '0002', nome: 'RU Setorial 2' },
       quantidade: 1,
       valor_total: 3.2,
       gratuidade: false,
@@ -84,9 +85,12 @@ export function getMockResponse(config: AxiosRequestConfig): unknown | null {
   const method = (config.method ?? 'get').toLowerCase()
 
   if (url.includes('/usuarios/login') && method === 'post') {
+    // Especificação Técnica API InovaRU v2.0, seção 7.1: o token vem dentro de `usuario`.
     return {
-      token: 'mock-jwt-token-fake-expo-ru-2026',
-      usuario: MOCK_USER,
+      usuario: {
+        token: 'mock-jwt-token-fake-expo-ru-2026',
+        ...MOCK_USER,
+      },
     }
   }
 
@@ -95,7 +99,12 @@ export function getMockResponse(config: AxiosRequestConfig): unknown | null {
   }
 
   if (url.includes('/creditos/pagamento') && url.includes('/status')) {
-    return { payment_id: mockPaymentId, status: 'approved', creditado: true }
+    return {
+      payment_id: mockPaymentId,
+      status: 'approved',
+      status_detail: 'accredited',
+      creditado: true,
+    }
   }
 
   if (url.includes('/creditos/pagamento') && method === 'post') {
