@@ -5,9 +5,11 @@ export {
   colors,
   darkColors,
   fontSize,
+  gradientColors,
   radii,
   spacing,
   timing,
   touchTarget,
+  useGradientColors,
   useThemeColors,
 } from './theme'

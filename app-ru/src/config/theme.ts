@@ -8,48 +8,77 @@
 import { useResolvedTheme } from '@/store/themeStore'
 
 export const colors = {
-  primary: '#006A6A',
-  primaryLight: '#4E9E9E',
-  primaryContainer: '#D1E8E6',
-  primaryDark: '#004D4D',
-  surface: '#FFFFFF',
-  surfaceVariant: '#EFF1F0',
-  background: '#EFF1F0',
-  outline: '#DADDE4',
-  outlineVariant: '#E8EAED',
-  textPrimary: '#191C1C',
-  textSecondary: '#717784',
-  textDisabled: '#A0A5AD',
-  textInverse: '#FFFFFF',
-  success: '#34A853',
-  error: '#EA4335',
-  warning: '#FFB800',
-  chipSelected: '#006A6A',
-  chipUnselected: '#FFFFFF',
-  white: '#FFFFFF',
+  primary: '#1a5c4a',
+  primaryLight: '#4e9e9e',
+  primaryContainer: '#d1e8e6',
+  primaryDark: '#0f3d31',
+  surface: '#ffffff',
+  surfaceVariant: '#f0faf6',
+  background: '#f0faf6',
+  outline: '#d4e8df',
+  outlineVariant: '#e2f0e9',
+  textPrimary: '#1a2e28',
+  textSecondary: '#5f7a70',
+  textDisabled: '#a0b5aa',
+  textInverse: '#ffffff',
+  success: '#2e7d4f',
+  error: '#c62828',
+  warning: '#f9a825',
+  chipSelected: '#1a5c4a',
+  chipUnselected: '#ffffff',
+  white: '#ffffff',
   black: '#000000',
 } as const
 
 export const darkColors = {
-  primary: '#2DD4A8',
-  primaryLight: '#5EECC4',
-  primaryContainer: '#1A3D3D',
-  primaryDark: '#1F9E7A',
-  surface: '#1E2121',
-  surfaceVariant: '#2D3131',
-  background: '#191C1C',
-  outline: '#3A3F3F',
-  outlineVariant: '#2D3131',
-  textPrimary: '#FBFAF7',
-  textSecondary: '#A0A5AD',
-  textDisabled: '#5A5F66',
-  textInverse: '#191C1C',
-  success: '#4ADE80',
-  error: '#F87171',
-  warning: '#FBBF24',
-  chipSelected: '#2DD4A8',
-  chipUnselected: '#2D3131',
+  primary: '#34d399',
+  primaryLight: '#6ee7b7',
+  primaryContainer: '#0f3d31',
+  primaryDark: '#059669',
+  surface: '#1a2e28',
+  surfaceVariant: '#1f3830',
+  background: '#0f1f1a',
+  outline: '#2d4a3e',
+  outlineVariant: '#1f3830',
+  textPrimary: '#f0faf6',
+  textSecondary: '#8fb5a5',
+  textDisabled: '#4a6b5e',
+  textInverse: '#0f1f1a',
+  success: '#4ade80',
+  error: '#f87171',
+  warning: '#fbbf24',
+  chipSelected: '#34d399',
+  chipUnselected: '#1f3830',
 } as const
+
+export const gradientColors = {
+  light: {
+    loginHeader: ['#b8e6d9', '#d4f0e7', '#e8f7f0'] as const,
+    balanceCard: ['#1a5c4a', '#2d7a64', '#1a5c4a'] as const,
+    balanceDetail: ['#e0f2f1', '#b2dfdb'] as const,
+    profileCard: ['#e0f2f1', '#b2dfdb', '#e8f7f0'] as const,
+    infoBanner: ['#d4f0e7', '#e8f7f0'] as const,
+    hackathonBadge: ['#dbeafe', '#e0e7ff'] as const,
+    ruBanner: ['#d4f0e7', '#e8f7f0'] as const,
+    quickActionSaldo: '#dcfce7',
+    quickActionCardapio: '#dbeafe',
+    quickActionHistorico: '#fef9c3',
+  },
+  dark: {
+    loginHeader: ['#0f3d31', '#1a5c4a', '#0f3d31'] as const,
+    balanceCard: ['#059669', '#10b981', '#059669'] as const,
+    balanceDetail: ['#1a3a34', '#0f2e28'] as const,
+    profileCard: ['#1a3a34', '#0f2e28', '#1a3a34'] as const,
+    infoBanner: ['#1a3a34', '#0f2e28'] as const,
+    hackathonBadge: ['#1e3a5f', '#1e1b4b'] as const,
+    ruBanner: ['#1a3a34', '#0f2e28'] as const,
+    quickActionSaldo: '#064e3b',
+    quickActionCardapio: '#1e3a5f',
+    quickActionHistorico: '#713f12',
+  },
+} as const
+
+export type GradientColors = typeof gradientColors.light
 
 export const spacing = {
   xs: 4,
@@ -95,4 +124,10 @@ export const touchTarget = {
 export function useThemeColors() {
   const resolvedTheme = useResolvedTheme()
   return resolvedTheme === 'dark' ? darkColors : colors
+}
+
+// Returns gradient colors for the current theme
+export function useGradientColors() {
+  const resolvedTheme = useResolvedTheme()
+  return resolvedTheme === 'dark' ? gradientColors.dark : gradientColors.light
 }
