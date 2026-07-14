@@ -1,3 +1,4 @@
+export { MenuCalendar } from './components/MenuCalendar'
 export { useCardapio } from './hooks/useCardapio'
 export type {
   CardapioParams,

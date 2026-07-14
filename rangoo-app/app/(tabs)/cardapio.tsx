@@ -3,16 +3,19 @@ import { useCallback, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import type { MenuSection } from '@/features/cardapio'
+import { MenuCalendar } from '@/features/cardapio'
 import { Card, LoadingSpinner } from '@/shared/components/ui'
 
-type Restaurante = 'setorial1' | 'setorial2' | 'saude' | 'direito'
+// Códigos de filial conforme Anexo A da especificação técnica — nunca inventar código/nome de RU.
+type Restaurante = '0001' | '0002' | '0003' | '0004' | '0005'
 type TipoRefeicao = 'almoco' | 'jantar'
 
 const RESTAURANTES: { key: Restaurante; label: string }[] = [
-  { key: 'setorial1', label: 'Setorial I' },
-  { key: 'setorial2', label: 'Setorial II' },
-  { key: 'saude', label: 'Saúde' },
-  { key: 'direito', label: 'Direito' },
+  { key: '0003', label: 'Setorial 1' },
+  { key: '0002', label: 'Setorial 2' },
+  { key: '0001', label: 'Saúde/Direito' },
+  { key: '0004', label: 'ICA' },
+  { key: '0005', label: 'HRTN' },
 ]
 
 const MEALS: { key: TipoRefeicao; label: string; icon: string }[] = [
@@ -22,7 +25,7 @@ const MEALS: { key: TipoRefeicao; label: string; icon: string }[] = [
 
 // Mock data — replace with useCardapio hook when API is available
 const MOCK_MENU: Record<Restaurante, Record<TipoRefeicao, MenuSection[]>> = {
-  setorial1: {
+  '0003': {
     almoco: [
       {
         titulo: 'Entrada',
@@ -73,7 +76,7 @@ const MOCK_MENU: Record<Restaurante, Record<TipoRefeicao, MenuSection[]>> = {
       },
     ],
   },
-  setorial2: {
+  '0002': {
     almoco: [
       {
         titulo: 'Entrada',
@@ -106,7 +109,7 @@ const MOCK_MENU: Record<Restaurante, Record<TipoRefeicao, MenuSection[]>> = {
       },
     ],
   },
-  saude: {
+  '0001': {
     almoco: [
       {
         titulo: 'Entrada',
@@ -139,7 +142,7 @@ const MOCK_MENU: Record<Restaurante, Record<TipoRefeicao, MenuSection[]>> = {
       },
     ],
   },
-  direito: {
+  '0004': {
     almoco: [
       {
         titulo: 'Entrada',
@@ -165,6 +168,30 @@ const MOCK_MENU: Record<Restaurante, Record<TipoRefeicao, MenuSection[]>> = {
           { nome: 'Arroz', vegano: true },
           { nome: 'Feijão', vegano: true },
           { nome: 'Sardinha', vegano: false },
+        ],
+      },
+    ],
+  },
+  '0005': {
+    almoco: [
+      {
+        titulo: 'Prato Principal',
+        icon: 'restaurant',
+        itens: [
+          { nome: 'Arroz', vegano: true },
+          { nome: 'Feijão', vegano: true },
+          { nome: 'Frango Assado', vegano: false },
+        ],
+      },
+    ],
+    jantar: [
+      {
+        titulo: 'Prato Principal',
+        icon: 'restaurant',
+        itens: [
+          { nome: 'Arroz', vegano: true },
+          { nome: 'Feijão', vegano: true },
+          { nome: 'Sopa de Legumes', vegano: true },
         ],
       },
     ],
@@ -200,15 +227,16 @@ function formatDate(date: Date): string {
 
 export default function CardapioScreen() {
   const themeColors = useThemeColors()
-  const [restaurante, setRestaurante] = useState<Restaurante>('setorial1')
+  const [restaurante, setRestaurante] = useState<Restaurante>('0003')
   const [tipoRefeicao, setTipoRefeicao] = useState<TipoRefeicao>('almoco')
+  const [selectedDate, setSelectedDate] = useState(new Date())
   const [isLoading] = useState(false)
 
   // To use real API, replace MOCK_MENU with:
-  // const { data } = useCardapio({ restaurante, tipoRefeicao })
+  // const { data } = useCardapio({ restaurante, tipoRefeicao, data: selectedDate })
   // const secoes = data?.secoes ?? []
   const secoes = MOCK_MENU[restaurante][tipoRefeicao]
-  const today = new Date()
+  const isToday = selectedDate.toDateString() === new Date().toDateString()
 
   const getIconColor = useCallback(
     (icon: string) => {
@@ -272,16 +300,11 @@ export default function CardapioScreen() {
 
       <View className="gap-2">
         <Text className="text-xs font-bold text-primary uppercase tracking-wider">Data</Text>
-        <Card className="flex-row items-center gap-3">
-          <View className="w-10 h-10 rounded-lg bg-status-error/10 items-center justify-center">
-            <Ionicons name="calendar" size={20} color={themeColors.error} />
-          </View>
-          <View className="flex-1">
-            <Text className="text-sm font-bold text-text-primary">{formatDate(today)}</Text>
-            <Text className="text-xs text-success font-medium">Hoje</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
-        </Card>
+        <MenuCalendar selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+        <Text className="text-sm font-medium text-text-primary">
+          {formatDate(selectedDate)}
+          {isToday && <Text className="text-success"> · Hoje</Text>}
+        </Text>
       </View>
 
       <View className="gap-2">
