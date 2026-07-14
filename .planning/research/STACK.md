@@ -1,6 +1,6 @@
 # Technology Stack
 
-**Project:** InovaRU — App de Créditos para Restaurantes Universitários
+**Project:** Rangoo Universitário — App de Créditos para Restaurantes Universitários
 **Researched:** 2026-07-12
 **Context:** Hackathon with 1-week timeline, Android-only, team of 2-3
 
@@ -159,8 +159,8 @@ await SecureStore.deleteItemAsync('auth_token');
 
 ```bash
 # Create project
-npx create-expo-app@latest inova-ru --template blank-typescript
-cd inova-ru
+npx create-expo-app@latest rangoo-universitario --template blank-typescript
+cd rangoo-universitario
 
 # Core dependencies
 npx expo install expo-secure-store

@@ -26,7 +26,7 @@ export default function LoginScreen() {
             <View className="w-20 h-20 rounded-2xl bg-primary items-center justify-center mb-3 shadow-lg">
               <Text className="text-3xl font-bold text-text-inverse">ψq</Text>
             </View>
-            <Text className="text-2xl font-bold text-primary-dark">InovaRU</Text>
+            <Text className="text-2xl font-bold text-primary-dark">Rangoo</Text>
           </View>
         </LinearGradient>
 
@@ -43,7 +43,7 @@ export default function LoginScreen() {
           <View className="bg-surface rounded-2xl p-6 shadow-lg">
             <View className="gap-5">
               <View className="gap-1">
-                <Text accessibilityLabel="InovaRU" className="text-2xl font-bold text-text-primary">
+                <Text accessibilityLabel="Rangoo" className="text-2xl font-bold text-text-primary">
                   Bem-vindo de volta
                 </Text>
                 <Text className="text-sm text-text-secondary">Entre com seus dados da FUMP</Text>

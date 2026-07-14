@@ -47,7 +47,7 @@ export function QrCodeDisplay({
   const handleShare = useCallback(async () => {
     try {
       await Share.share({
-        message: `PIX para recarga no InovaRU: ${qrCode}`,
+        message: `PIX para recarga no Rangoo: ${qrCode}`,
       })
     } catch {}
   }, [qrCode])

@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "InovaRU",
-    "slug": "inova-ru",
+    "name": "Rangoo Universitário",
+    "slug": "rangoo-universitario",
     "version": "1.0.0",
     "sdkVersion": "55.0.0",
-    "scheme": "inova-ru",
+    "scheme": "rangoo",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -18,7 +18,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.inovaru.app"
+      "package": "com.rangoo.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",

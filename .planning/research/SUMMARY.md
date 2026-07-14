@@ -1,6 +1,6 @@
 # Project Research Summary
 
-**Project:** InovaRU — App de Créditos para Restaurantes Universitários
+**Project:** Rangoo Universitário — App de Créditos para Restaurantes Universitários
 **Domain:** Mobile payment app for university meal plans (Brazilian context)
 **Researched:** 2026-07-12
 **Confidence:** HIGH

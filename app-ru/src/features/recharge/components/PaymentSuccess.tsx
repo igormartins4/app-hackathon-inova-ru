@@ -24,7 +24,7 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
   const handleShare = useCallback(async () => {
     try {
       await Share.share({
-        message: `Recarga de ${formatCurrency(amount)} no InovaRU confirmada! Novo saldo: ${formatCurrency(newBalance)}`,
+        message: `Recarga de ${formatCurrency(amount)} no Rangoo confirmada! Novo saldo: ${formatCurrency(newBalance)}`,
       })
     } catch {}
   }, [amount, newBalance])

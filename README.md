@@ -1,4 +1,4 @@
-# InovaRU
+# Rangoo Universitário
 
 **Hackathon InovaRU 2026/01 — UFMG**
 
@@ -8,7 +8,7 @@ App mobile para recarga de créditos e gestão de uso nos Restaurantes Universit
 
 ## Visão Geral
 
-O InovaRU resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes recarreguem créditos, consultem saldos e acompanhem refeições diretamente pelo celular. A autenticação utiliza CPF + senha do sistema institucional da FUMP, sem necessidade de criar contas.
+O Rangoo Universitário resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes recarreguem créditos, consultem saldos e acompanhem refeições diretamente pelo celular. A autenticação utiliza CPF + senha do sistema institucional da FUMP, sem necessidade de criar contas.
 
 ---
 

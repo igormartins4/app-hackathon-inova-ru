@@ -1,4 +1,4 @@
-# Domain Pitfalls: InovaRU Payment App
+# Domain Pitfalls: Rangoo Universitário Payment App
 
 **Domain:** React Native (Expo) mobile payment app for university restaurants with PIX integration
 **Researched:** 2026-07-12
@@ -400,7 +400,7 @@ Mistakes that cause annoyances, tech debt, or missed optimization opportunities.
 
 ### Pitfall 19: Deep Link Validation Missing
 
-**What goes wrong:** The app registers a URL scheme for deep linking (e.g., `inovaru://payment/confirm`). An attacker crafts a malicious deep link that triggers unintended actions or redirects to a phishing page.
+**What goes wrong:** The app registers a URL scheme for deep linking (e.g., `rangoo://payment/confirm`). An attacker crafts a malicious deep link that triggers unintended actions or redirects to a phishing page.
 
 **Why it happens:** Deep links are often added for convenience without security review. OWASP Mobile Top 10 M4 (Insufficient Input/Output Validation) specifically calls this out.
 

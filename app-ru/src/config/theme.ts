@@ -1,4 +1,4 @@
-// Design tokens — InovaRU theme (Figma Material You)
+// Design tokens — Rangoo theme (Figma Material You)
 // Colors use CSS variables defined in global.css for light/dark support.
 // className-based components read those CSS vars directly via NativeWind;
 // this file is the single source for the same values where a *native* prop

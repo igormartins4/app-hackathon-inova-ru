@@ -1,4 +1,4 @@
-# InovaRU — App de Créditos para Restaurantes Universitários
+# Rangoo Universitário — App de Créditos para Restaurantes Universitários
 
 ## What This Is
 

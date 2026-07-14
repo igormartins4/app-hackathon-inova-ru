@@ -1,4 +1,4 @@
-# Feature Landscape — InovaRU
+# Feature Landscape — Rangoo Universitário
 
 **Domain:** Mobile payment app for university meal plans (Brazilian context)
 **Researched:** 2026-07-12
@@ -25,7 +25,7 @@ Features users expect in a university RU payment app. Missing any = product feel
 
 ## Differentiators
 
-Features that set InovaRU apart. Not expected from a hackathon project, but create competitive advantage and impress judges.
+Features that set Rangoo Universitário apart. Not expected from a hackathon project, but create competitive advantage and impress judges.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
@@ -128,7 +128,7 @@ Error Handling ← All network operations (cross-cutting concern)
 - Balance check as core feature
 - QR Code for payment and/or access
 - Offline limitations acknowledged but rarely solved well
-- Accessibility rarely mentioned as a feature (opportunity for InovaRU)
+- Accessibility rarely mentioned as a feature (opportunity for Rangoo Universitário)
 
 ### Payment App Industry Trends (2025-2026)
 

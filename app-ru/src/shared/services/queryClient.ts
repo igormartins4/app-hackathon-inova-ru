@@ -19,7 +19,7 @@ export const queryClient = new QueryClient({
 // restarts with no connectivity (BALC-04, HIST-04, OFFL-02).
 export const queryPersister = createAsyncStoragePersister({
   storage: asyncCacheStorage,
-  key: 'inova-ru-query-cache',
+  key: 'rangoo-query-cache',
 })
 
 export const QUERY_PERSIST_MAX_AGE = ONE_DAY_MS

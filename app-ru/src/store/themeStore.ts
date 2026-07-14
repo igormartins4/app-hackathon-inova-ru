@@ -11,8 +11,8 @@ const FONT_SCALE: Record<FontSize, number> = {
   g: 1.15,
 }
 
-const STORAGE_KEY_THEME = '@inovaru_theme'
-const STORAGE_KEY_FONT_SIZE = '@inovaru_font_size'
+const STORAGE_KEY_THEME = '@rangoo_theme'
+const STORAGE_KEY_FONT_SIZE = '@rangoo_font_size'
 
 interface ThemeStoreState {
   theme: Theme

@@ -1,8 +1,8 @@
-# Roadmap: InovaRU
+# Roadmap: Rangoo Universitário
 
 ## Overview
 
-InovaRU is an Android app for UFMG students to check meal balances and recharge RU credits via PIX in under 30 seconds. The roadmap follows a foundation→features→polish trajectory across 10 phases, designed for a 2-3 person team working 1 week (12/07–18/07). Each phase delivers a complete, verifiable capability. Accessibility is woven throughout from Phase 1 (not bolted on), and offline resilience is built incrementally. The critical path is: Setup → Auth → Balance → PIX Payment → Polish → Ship.
+Rangoo Universitário is an Android app for UFMG students to check meal balances and recharge RU credits via PIX in under 30 seconds. The roadmap follows a foundation→features→polish trajectory across 10 phases, designed for a 2-3 person team working 1 week (12/07–18/07). Each phase delivers a complete, verifiable capability. Accessibility is woven throughout from Phase 1 (not bolted on), and offline resilience is built incrementally. The critical path is: Setup → Auth → Balance → PIX Payment → Polish → Ship.
 
 ## Phases
 
