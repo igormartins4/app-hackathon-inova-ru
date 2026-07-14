@@ -3,6 +3,7 @@
     "name": "InovaRU",
     "slug": "inova-ru",
     "version": "1.0.0",
+    "sdkVersion": "55.0.0",
     "scheme": "inova-ru",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
