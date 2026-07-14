@@ -3,7 +3,7 @@
     "name": "Rangoo Universitário",
     "slug": "rangoo-universitario",
     "version": "1.0.0",
-    "sdkVersion": "55.0.0",
+    "sdkVersion": "57.0.0",
     "scheme": "rangoo",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

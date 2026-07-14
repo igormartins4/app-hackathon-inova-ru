@@ -4,7 +4,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 
 ## Stack Tecnológica
 
-- **Runtime:** Expo SDK 55 (React Native 0.83, React 19.2)
+- **Runtime:** Expo SDK 57 (React Native 0.86, React 19.2)
 - **Navegação:** Expo Router 6 (file-based, React Navigation 7)
 - **Estado:** TanStack Query 5 (estado do servidor) + Zustand 5 (estado do cliente)
 - **Estilo:** NativeWind 4 (Tailwind CSS 3.4)
