@@ -25,10 +25,10 @@
 ### 02-02: Auth API integration (POST to FUMP endpoint) + token handling
 - Create `src/features/auth/services/authApi.ts`
 - POST /usuarios/login with { user: "11_digitos", password: "..." }
-- Response: { token: "...", usuario: { nome, email, isAluno, isColaborador } }
-- Token is at ROOT level, NOT inside usuario
+- Response (Especificação Técnica API InovaRU v2.0, seção 7.1): { usuario: { token: "...", nome, email, isAluno, isColaborador } }
+- Token is INSIDE usuario, not at root — destructure `token` out before storing the profile
 - Store token in expo-secure-store via shared/services/secureStorage
-- Store user data in secureStorage
+- Store user data (without token) in secureStorage
 
 ### 02-03: Secure token storage (expo-secure-store) + auto-refresh logic
 - Use existing secureStorage service from Phase 1

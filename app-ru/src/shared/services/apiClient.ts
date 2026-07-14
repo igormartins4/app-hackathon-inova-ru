@@ -40,9 +40,19 @@ apiClient.interceptors.response.use(
   (res) => res,
   (error) => {
     const status = error.response?.status as number | undefined
-    const userMessage = status
+    let userMessage: string = status
       ? (ERROR_MESSAGES[status as keyof typeof ERROR_MESSAGES] ?? ERROR_MESSAGES[500])
       : ERROR_MESSAGES.NETWORK
+
+    // Spec §10.2: on 429 the API returns `Retry-After` (seconds) — surface the
+    // exact wait time instead of a generic message.
+    if (status === 429) {
+      const retryAfterSeconds = Number(error.response?.headers?.['retry-after'])
+      error.retryAfterSeconds = Number.isFinite(retryAfterSeconds) ? retryAfterSeconds : undefined
+      if (error.retryAfterSeconds) {
+        userMessage = `Muitas tentativas. Aguarde ${error.retryAfterSeconds}s e tente de novo.`
+      }
+    }
 
     error.userMessage = userMessage
 

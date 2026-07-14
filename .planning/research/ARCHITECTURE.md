@@ -18,7 +18,7 @@ The architecture follows three non-negotiable principles:
 ### High-Level Structure
 
 ```
-inova-ru/
+rangoo-universitario/
 ├── app/                          # Expo Router — file-based routes
 │   ├── _layout.tsx               # Root layout: auth gate + providers
 │   ├── (auth)/                   # Unauthenticated routes
@@ -151,7 +151,7 @@ import { useAuth } from '@/features/auth';  // FROM features/balance
 User enters CPF + password
   → useAuth().login() mutation
     → authApi.login() calls FUMP API
-      → Response: { token, usuario }
+      → Response: { usuario: { token, nome, email, isAluno, isColaborador } } (token dentro de usuario, v2.0 §7.1)
         → useTokenStorage().saveToken() → expo-secure-store (Keystore)
         → useAuth().setUser() → Zustand store
         → TanStack Query cache invalidated

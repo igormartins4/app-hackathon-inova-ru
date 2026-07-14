@@ -1,4 +1,4 @@
-# Requirements: InovaRU
+# Requirements: Rangoo Universitário
 
 **Defined:** 2026-07-12
 **Core Value:** O estudante consegue recarregar créditos no RU em menos de 30 segundos, de forma acessível e segura, mesmo com conectividade limitada.
@@ -7,7 +7,7 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can log in with CPF (11 digits) + password via FUMP API. Payload: `{ "user": "11_digitos", "password": "..." }`. Response: `{ "token": "...", "usuario": { "nome": "...", "email": "...", "isAluno": 1, "isColaborador": 0 } }`. O `token` está na raiz, NÃO dentro de `usuario`.
+- [ ] **AUTH-01**: User can log in with CPF (11 digits) + password via FUMP API. Payload: `{ "user": "11_digitos", "password": "..." }`. Response (Especificação Técnica API InovaRU v2.0, seção 7.1): `{ "usuario": { "token": "...", "nome": "...", "email": "...", "isAluno": 1, "isColaborador": 0 } }`. O `token` vem DENTRO de `usuario`, não na raiz.
 - [ ] **AUTH-02**: JWT token is stored securely in expo-secure-store (Android Keystore)
 - [ ] **AUTH-03**: App redirects to login when token expires (HTTP 401)
 - [ ] **AUTH-04**: App shows friendly message on HTTP 429 (rate limit exceeded)
@@ -180,4 +180,4 @@
 
 ---
 *Requirements defined: 2026-07-12*
-*Last updated: 2026-07-12 — FUMP API v2.0 contract integration*
+*Last updated: 2026-07-14 — corrigido AUTH-01: token vem dentro de `usuario`, não na raiz (fonte de verdade: docs/especificacao_tecnica.md, seção 7.1)*

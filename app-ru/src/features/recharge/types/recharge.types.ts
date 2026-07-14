@@ -14,5 +14,6 @@ export interface PaymentResponse {
 export interface PaymentStatusResponse {
   payment_id: number
   status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'expired'
+  status_detail?: string
   creditado?: boolean
 }

@@ -76,9 +76,10 @@ export function useAuth(): UseAuthReturn {
       store.setError(null)
       store.setLoading(true)
       const response = await loginApi({ user: cpf, password })
-      await setToken(response.token)
-      await setUser(response.usuario)
-      useAuthStore.getState().setAuthenticated(response.usuario)
+      const { token, ...profile } = response.usuario
+      await setToken(token)
+      await setUser(profile)
+      useAuthStore.getState().setAuthenticated(profile)
     } catch (err: unknown) {
       useAuthStore.getState().setError(getErrorMessage(err))
       throw err
