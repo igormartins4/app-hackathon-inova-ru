@@ -35,25 +35,20 @@ function AuthGate() {
     } else if (isAuthenticated && inAuthGroup) {
       router.replace('/(tabs)/home')
     }
-  }, [isAuthenticated, isLoading, segments, router.replace])
-
-  if (isLoading) {
-    return (
-      <>
-        <LoadingSpinner message="Carregando" />
-        <StatusBar style="auto" />
-      </>
-    )
-  }
+  }, [isAuthenticated, isLoading, segments, router])
 
   return (
     <ErrorBoundary>
       <View className="flex-1">
         <OfflineBanner visible={isOffline} />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(tabs)" />
-        </Stack>
+        {isLoading ? (
+          <LoadingSpinner message="Carregando" />
+        ) : (
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        )}
         <StatusBar style="auto" />
       </View>
     </ErrorBoundary>
