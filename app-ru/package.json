@@ -2,7 +2,7 @@
   "name": "inova-ru",
   "version": "1.0.0",
   "main": "expo-router/entry",
-  "packageManager": "pnpm@11.12.0",
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
