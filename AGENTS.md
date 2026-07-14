@@ -245,6 +245,17 @@ Em `429`, a API retorna header `Retry-After` (segundos) — **leia esse header**
 
 Todas as datas são ISO 8601 com offset `-03:00` (Brasília). `new Date(iso)` do JS já respeita o offset embutido na string e `toLocaleDateString`/`toLocaleTimeString` já convertem pro fuso local do dispositivo automaticamente — não escreva lógica manual de conversão de fuso.
 
+### 2.9 Cardápio — integração não-oficial, fora do contrato v2.0
+
+`docs/especificacao_tecnica.md` **não define nenhum endpoint de cardápio/menu**. A tela `app/(tabs)/cardapio.tsx` consome `https://fump.ufmg.br:3003/cardapios/cardapio`, um endpoint público (sem autenticação, GET, dado público) descoberto via inspeção de rede do site oficial (`fump.ufmg.br/cardapio-do-dia`) — **não é parte do contrato assinado**, pode mudar de forma ou sair do ar sem aviso.
+
+Implementado em `src/features/cardapio/services/cardapioApi.ts`. Regras:
+
+- Mapeamento de código de filial (Anexo A, 2.6) para o `id` numérico dessa API está em `FILIAL_TO_FUMP_ID` — RU HRTN (`0005`) não tem cardápio publicado nessa API.
+- Usa um cliente axios próprio (`fumpMenuClient`), separado do `apiClient` do contrato v2.0 — nunca misture os dois, nunca passe esse endpoint pelo `mockAdapter`/`EXPO_PUBLIC_USE_MOCK`.
+- Qualquer falha (endpoint fora do ar, filial sem dado, mudança de shape) **deve degradar para um estado vazio/erro explícito na UI** (`isError`/lista vazia em `cardapio.tsx`) — nunca cair de volta pra dado inventado ou mock silenciosamente misturado com dado real.
+- Se esse endpoint parar de funcionar em algum momento futuro, isso não é uma regressão de contrato — é a natureza de depender de uma API não documentada de terceiro.
+
 ---
 
 ## ⚡ 3. Algoritmo de Polling e Máquina de Estados (PIX)
