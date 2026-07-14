@@ -92,7 +92,7 @@ Precisa de **dois terminais rodando ao mesmo tempo** — os dois processos ficam
 **Terminal 1 — sobe o mock server e deixa ele rodando:**
 
 ```bash
-cd app-ru
+cd rangoo-app
 pnpm mock
 ```
 
@@ -101,13 +101,13 @@ Fica ouvindo em `http://localhost:3001`, mostrando o log de cada requisição. `
 **Terminal 2 — configura o `.env` e sobe o app:**
 
 ```env
-# app-ru/.env
+# rangoo-app/.env
 EXPO_PUBLIC_USE_MOCK=false
 EXPO_PUBLIC_API_URL=http://10.0.2.2:3001
 ```
 
 ```bash
-cd app-ru
+cd rangoo-app
 pnpm start
 ```
 

@@ -73,7 +73,7 @@ O app consome a API RESTful fornecida pela FUMP. Todos os dados são extraídos 
 ## Estrutura do Projeto
 
 ```
-app-ru/
+rangoo-app/
 ├── app/                         # Expo Router — file-based routes
 │   ├── _layout.tsx              # Root layout: auth gate + tema
 │   ├── (auth)/                  # Login
@@ -92,7 +92,7 @@ app-ru/
 │   │   ├── services/            # API client, secure storage, mock
 │   │   └── utils/               # CPF, erros, validação de recarga
 │   └── config/                  # Constantes, tema, mensagens de erro
-├── mock/                        # Ambiente Mockoon (servidor mock real, ver app-ru/README.md)
+├── mock/                        # Ambiente Mockoon (servidor mock real, ver rangoo-app/README.md)
 └── .env                         # Variáveis de ambiente (modo mock)
 ```
 
@@ -116,14 +116,14 @@ app-ru/
 ## Como Testar
 
 ```bash
-cd app-ru
+cd rangoo-app
 pnpm install
 pnpm start
 ```
 
 O app roda em **modo mock** por padrão — não precisa de servidor. Use CPF `12345678901` e qualquer senha para logar.
 
-Pra testar o fluxo de pagamento contra rede real (polling, erros, rate limit), tem um servidor [Mockoon](https://mockoon.com) pronto — `pnpm mock` num segundo terminal. Passo a passo completo em [`app-ru/README.md`](app-ru/README.md#modos-de-execução).
+Pra testar o fluxo de pagamento contra rede real (polling, erros, rate limit), tem um servidor [Mockoon](https://mockoon.com) pronto — `pnpm mock` num segundo terminal. Passo a passo completo em [`rangoo-app/README.md`](rangoo-app/README.md#modos-de-execução).
 
 ---
 
