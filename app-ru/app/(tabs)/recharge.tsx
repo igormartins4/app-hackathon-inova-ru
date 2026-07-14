@@ -99,45 +99,49 @@ export default function RechargeScreen() {
   const currentBalance = balanceData?.saldo?.credito_disponivel ?? 0
 
   return (
-    <ScrollView className="flex-1 bg-background">
-      <View className="p-6 gap-6">
-        {step === 'amount' && (
-          <>
-            {(isBlocked || isInactive) && (
-              <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
-                <Text className="text-center text-sm text-status-error">{consumerMessage}</Text>
-              </View>
-            )}
-            {isOffline && (
-              <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
-                <Text className="text-center text-sm text-status-error">
-                  Conecte-se à internet para recarregar
-                </Text>
-              </View>
-            )}
-            <RechargeForm
-              currentBalance={currentBalance}
-              disabled={consumerDisabled || isSubmitting}
-              onSubmit={handleSubmit}
-            />
-          </>
-        )}
-
-        {step === 'polling' && paymentData && (
-          <PaymentStatus
-            qrCode={paymentData.qrCode}
-            qrCodeBase64={paymentData.qrCodeBase64}
-            ticketUrl={paymentData.ticketUrl}
-            amount={paymentData.amount}
-            expiration={paymentData.expiration}
-            isTimedOut={false}
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5">
+      {step === 'amount' && (
+        <>
+          {(isBlocked || isInactive) && (
+            <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
+              <Text className="text-center text-sm text-status-error">{consumerMessage}</Text>
+            </View>
+          )}
+          {isOffline && (
+            <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
+              <Text className="text-center text-sm text-status-error">
+                Conecte-se à internet para recarregar
+              </Text>
+            </View>
+          )}
+          <RechargeForm
+            currentBalance={currentBalance}
+            disabled={consumerDisabled || isSubmitting}
+            onSubmit={handleSubmit}
           />
-        )}
+        </>
+      )}
 
-        {step === 'success' && <PaymentSuccess newBalance={newBalance} onBack={handleBack} />}
+      {step === 'polling' && paymentData && (
+        <PaymentStatus
+          qrCode={paymentData.qrCode}
+          qrCodeBase64={paymentData.qrCodeBase64}
+          ticketUrl={paymentData.ticketUrl}
+          amount={paymentData.amount}
+          expiration={paymentData.expiration}
+          isTimedOut={false}
+        />
+      )}
 
-        {step === 'error' && <PaymentError status={errorStatus} onRetry={handleRetry} />}
-      </View>
+      {step === 'success' && (
+        <PaymentSuccess
+          newBalance={newBalance}
+          amount={paymentData?.amount ?? 0}
+          onBack={handleBack}
+        />
+      )}
+
+      {step === 'error' && <PaymentError status={errorStatus} onRetry={handleRetry} />}
     </ScrollView>
   )
 }

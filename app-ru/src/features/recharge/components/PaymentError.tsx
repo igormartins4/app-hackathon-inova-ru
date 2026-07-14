@@ -21,23 +21,22 @@ export function PaymentError({ status, onRetry }: PaymentErrorProps) {
   const message = STATUS_MESSAGES[status] ?? 'Ocorreu um erro.'
 
   return (
-    <View className="flex-1 items-center justify-center bg-background p-4">
-      <Card
-        accessibilityLabel="Erro no pagamento"
-        accessibilityRole="alert"
-        className="w-full max-w-sm"
-      >
+    <View className="flex-1 items-center justify-center bg-background p-4 gap-5">
+      <View className="items-center gap-3">
+        <View className="w-20 h-20 rounded-full bg-status-error/15 items-center justify-center">
+          <Ionicons name="close-circle" size={56} color={themeColors.error} />
+        </View>
+        <Text className="text-2xl font-bold text-text-primary text-center">
+          Pagamento Não Confirmado
+        </Text>
+        <Text className="text-sm text-text-secondary text-center">{message}</Text>
+      </View>
+
+      <Card className="w-full max-w-sm">
         <View className="items-center gap-4">
-          <View className="w-16 h-16 rounded-full bg-status-error/10 items-center justify-center">
-            <Ionicons name="close-circle" size={48} color={themeColors.error} />
-          </View>
-
-          <Text className="text-2xl font-bold text-status-error">Pagamento Não Confirmado</Text>
-
-          <Text className="text-sm text-text-secondary text-center">{message}</Text>
-
           <View className="w-full gap-3">
             <Button label="Tentar novamente" onPress={onRetry} variant="primary" />
+            <Button label="Voltar ao início" onPress={onRetry} variant="secondary" />
           </View>
         </View>
       </Card>

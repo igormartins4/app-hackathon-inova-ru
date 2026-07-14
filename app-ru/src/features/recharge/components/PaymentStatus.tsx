@@ -1,4 +1,5 @@
-import { ActivityIndicator, Text, View } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { Text, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { QrCodeDisplay } from './QrCodeDisplay'
 
@@ -22,7 +23,14 @@ export function PaymentStatus({
   const themeColors = useThemeColors()
 
   return (
-    <View className="gap-6 items-center">
+    <View className="gap-5">
+      <View>
+        <Text className="text-2xl font-bold text-text-primary">Pagar via PIX</Text>
+        <Text className="text-sm text-text-secondary mt-1">
+          Escanear o QR Code ou copie o código
+        </Text>
+      </View>
+
       <QrCodeDisplay
         qrCode={qrCode}
         qrCodeBase64={qrCodeBase64}
@@ -31,21 +39,17 @@ export function PaymentStatus({
         expiration={expiration}
       />
 
-      {!isTimedOut && (
-        <View className="items-center gap-2">
-          <ActivityIndicator size="small" color={themeColors.primary} />
-          <Text className="text-sm text-text-secondary">Aguardando pagamento...</Text>
-        </View>
-      )}
-
       {isTimedOut && (
-        <Text
+        <View
           accessibilityRole="alert"
           accessibilityLiveRegion="assertive"
-          className="text-sm text-status-error"
+          className="flex-row items-center gap-3 bg-status-error/10 rounded-xl p-4"
         >
-          Tempo esgotado. O pagamento não foi confirmado.
-        </Text>
+          <Ionicons name="warning" size={20} color={themeColors.error} />
+          <Text className="text-sm text-status-error flex-1">
+            Tempo esgotado. O pagamento não foi confirmado.
+          </Text>
+        </View>
       )}
     </View>
   )

@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons'
 import * as Clipboard from 'expo-clipboard'
 import { useCallback, useEffect, useState } from 'react'
-import { Image, Linking, Pressable, Text, View } from 'react-native'
+import { Image, Linking, Pressable, Share, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { useThemeColors } from '@/config'
 
@@ -14,16 +15,12 @@ interface QrCodeDisplayProps {
 
 function getTimeLeft(expiration: string): string {
   const diff = new Date(expiration).getTime() - Date.now()
-  if (diff <= 0) return 'Expirado'
+  if (diff <= 0) return '00:00'
   const min = Math.floor(diff / 60000)
   const sec = Math.floor((diff % 60000) / 1000)
   return `${min}:${sec.toString().padStart(2, '0')}`
 }
 
-// PAY-03 / FUMP contract: the server-provided qr_code_base64 PNG is the
-// authoritative image — never generate the QR client-side. ticket_url is the
-// documented fallback. The react-native-qrcode-svg render only kicks in if
-// both server assets are unavailable (e.g. local mock without base64).
 export function QrCodeDisplay({
   qrCode,
   qrCodeBase64,
@@ -47,56 +44,95 @@ export function QrCodeDisplay({
     setTimeout(() => setCopied(false), 2000)
   }, [qrCode])
 
+  const handleShare = useCallback(async () => {
+    try {
+      await Share.share({
+        message: `PIX para recarga no InovaRU: ${qrCode}`,
+      })
+    } catch {}
+  }, [qrCode])
+
   const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
 
   const hasServerImage = !!qrCodeBase64 && !base64Failed
 
   return (
-    <View className="items-center gap-4">
-      <Text className="text-lg font-bold text-text-primary">Valor: {formatCurrency(amount)}</Text>
-
-      <View className="bg-surface p-4 rounded-xl">
-        {hasServerImage ? (
-          <Image
-            source={{ uri: `data:image/png;base64,${qrCodeBase64}` }}
-            accessibilityLabel={`QR Code PIX para pagamento de ${formatCurrency(amount)}`}
-            style={{ width: 200, height: 200 }}
-            onError={() => setBase64Failed(true)}
-          />
-        ) : ticketUrl ? (
-          <Pressable
-            onPress={() => Linking.openURL(ticketUrl)}
-            accessibilityRole="link"
-            accessibilityLabel="Abrir cobrança PIX no MercadoPago"
-            className="min-h-[48px] items-center justify-center px-4"
-          >
-            <Text className="text-sm font-semibold text-primary underline">
-              Abrir cobrança no MercadoPago
-            </Text>
-          </Pressable>
-        ) : (
-          <QRCode
-            value={qrCode}
-            size={200}
-            color={themeColors.textPrimary}
-            backgroundColor={themeColors.surface}
-          />
-        )}
+    <View className="gap-4">
+      <View className="flex-row items-center gap-3 bg-status-error/10 rounded-xl px-4 py-3">
+        <Ionicons name="time" size={20} color={themeColors.error} />
+        <Text className="text-sm text-text-secondary flex-1">Expira em</Text>
+        <Text className="text-lg font-bold text-text-primary">{timeLeft}</Text>
       </View>
 
-      <Text className="text-sm text-text-secondary">
-        Expira em: <Text className="font-bold text-status-warning">{timeLeft}</Text>
-      </Text>
+      <View className="bg-surface rounded-2xl p-6 items-center gap-4">
+        <Text className="text-sm text-text-secondary">Valor a pagar</Text>
+        <Text className="text-3xl font-bold text-text-primary">{formatCurrency(amount)}</Text>
+
+        <View className="bg-surface p-4 rounded-xl">
+          {hasServerImage ? (
+            <Image
+              source={{ uri: `data:image/png;base64,${qrCodeBase64}` }}
+              accessibilityLabel={`QR Code PIX para pagamento de ${formatCurrency(amount)}`}
+              style={{ width: 220, height: 220 }}
+              onError={() => setBase64Failed(true)}
+            />
+          ) : ticketUrl ? (
+            <Pressable
+              onPress={() => Linking.openURL(ticketUrl)}
+              accessibilityRole="link"
+              accessibilityLabel="Abrir cobrança PIX no MercadoPago"
+              className="min-h-[48px] items-center justify-center px-4"
+            >
+              <Text className="text-sm font-semibold text-primary underline">
+                Abrir cobrança no MercadoPago
+              </Text>
+            </Pressable>
+          ) : (
+            <QRCode
+              value={qrCode}
+              size={220}
+              color={themeColors.textPrimary}
+              backgroundColor={themeColors.surface}
+            />
+          )}
+        </View>
+
+        <View className="flex-row items-center gap-2">
+          <Ionicons name="time-outline" size={16} color={themeColors.textSecondary} />
+          <Text className="text-sm text-text-secondary">Aguardando pagamento...</Text>
+        </View>
+      </View>
+
+      <View className="gap-2">
+        <Text className="text-xs font-bold text-primary uppercase tracking-wider">
+          PIX Copia e Cola
+        </Text>
+        <View className="flex-row items-center gap-2 bg-surface rounded-xl p-3">
+          <Text className="flex-1 text-xs text-text-secondary font-mono" numberOfLines={2}>
+            {qrCode}
+          </Text>
+          <Pressable
+            onPress={handleCopy}
+            accessibilityRole="button"
+            accessibilityLabel={copied ? 'Código copiado' : 'Copiar código PIX'}
+            className="flex-row items-center gap-1.5 bg-primary/10 rounded-lg px-3 py-2 min-h-[40px]"
+          >
+            <Ionicons name={copied ? 'checkmark' : 'copy'} size={16} color={themeColors.primary} />
+            <Text className="text-xs font-semibold text-primary">
+              {copied ? 'Copiado!' : 'Copiar'}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
 
       <Pressable
-        onPress={handleCopy}
+        onPress={handleShare}
         accessibilityRole="button"
-        accessibilityLabel={copied ? 'Código copiado' : 'Copiar código PIX'}
-        className="min-h-[48px] min-w-[48px] items-center justify-center bg-surface-variant rounded-xl px-6 py-3 w-full"
+        accessibilityLabel="Compartilhar código"
+        className="flex-row items-center justify-center gap-2 bg-surface border border-outline rounded-xl py-3.5 min-h-[48px]"
       >
-        <Text className="text-sm font-semibold text-text-primary">
-          {copied ? '✓ Código copiado!' : 'Copiar código'}
-        </Text>
+        <Ionicons name="share-outline" size={20} color={themeColors.primary} />
+        <Text className="text-sm font-semibold text-primary">Compartilhar código</Text>
       </Pressable>
     </View>
   )
