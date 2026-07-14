@@ -1,4 +1,4 @@
-# InovaRU — App de Créditos para Restaurantes Universitários
+# Rangoo Universitário — App de Créditos para Restaurantes Universitários
 
 App Android para estudantes da UFMG que permite consultar saldo e recarregar créditos para uso nos Restaurantes Universitários (RUs) via PIX. Desenvolvido para o Hackathon InovaRU 2026/01.
 
@@ -82,6 +82,36 @@ Para usar a API real da FUMP, crie um arquivo `.env`:
 EXPO_PUBLIC_USE_MOCK=false
 EXPO_PUBLIC_API_URL=http://10.0.2.2:3000
 ```
+
+### Mock server real (Mockoon) — testes de rede de verdade
+
+O modo mock padrão (`EXPO_PUBLIC_USE_MOCK=true`) roda **dentro do processo JS** — nunca sai pra rede, então não testa polling de verdade (o mock em memória aprova o pagamento na primeira consulta) nem exercita o `network_security_config.xml`.
+
+Pra testar contra um servidor HTTP de verdade, seguindo a recomendação da Especificação Técnica v2.0 (seção 4.1), o projeto inclui um ambiente [Mockoon](https://mockoon.com) em `mock/mockoon-environment.json` com as 6 rotas do contrato:
+
+```bash
+pnpm mock
+```
+
+Sobe em `http://localhost:3001` (ou `http://10.0.2.2:3001` no emulador Android). Depois, no `.env`:
+
+```env
+EXPO_PUBLIC_USE_MOCK=false
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3001
+```
+
+O que esse mock cobre, exatamente por rota:
+
+| Rota | Cenários simulados |
+|------|---------------------|
+| `POST /usuarios/login` | 200 com `password=senha_do_usuario`; 401 (default) qualquer outra senha |
+| `GET /creditos/saldo` | 200 ativo (default); `?situacao=B` → bloqueado; `?situacao=1` → 404 inativo |
+| `POST /creditos/pagamento` | 201 (default, com `expiration` real +30min); 422 se `valor` fora de R\$5–500; `?force=429` → 429 com header `Retry-After: 30` |
+| `GET /creditos/pagamento/:id/status` | **Sequencial**: 1ª–3ª consulta `pending`, 4ª+ `approved`+`creditado:true`, depois reinicia o ciclo — testa o polling/backoff de verdade |
+| `GET /creditos/recargas` | 200 lista paginada |
+| `GET /creditos/refeicoes` | 200 lista paginada, com códigos de filial reais (Anexo A) |
+
+Validar o arquivo sem subir o servidor: `pnpm mock:validate`.
 
 ### Emulador Android
 

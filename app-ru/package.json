@@ -1,5 +1,5 @@
 {
-  "name": "inova-ru",
+  "name": "rangoo-universitario",
   "version": "1.0.0",
   "main": "expo-router/entry",
   "packageManager": "pnpm@9.15.4",
@@ -9,7 +9,10 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "test": "jest",
+    "mock": "mockoon-cli start --data mock/mockoon-environment.json --port 3001",
+    "mock:validate": "mockoon-cli validate --data mock/mockoon-environment.json"
   },
   "dependencies": {
     "@expo/metro-runtime": "^55.0.11",
@@ -49,6 +52,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.3",
     "@expo/ngrok": "4.1.3",
+    "@mockoon/cli": "^9.7.0",
     "@react-native/jest-preset": "0.86.0",
     "@types/jest": "29.5.14",
     "@types/react": "19.2.17",
