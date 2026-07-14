@@ -6,11 +6,17 @@ import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
+import { useRechargeHistory } from '@/features/history'
 import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
 import { getErrorMessage } from '@/shared/utils'
 
 function formatCurrency(value: number): string {
   return `R$ ${value.toFixed(2).replace('.', ',')}`
+}
+
+function formatDateTime(iso: string): string {
+  const d = new Date(iso)
+  return `${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}, ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
 }
 
 const QUICK_ACTIONS = [
@@ -19,19 +25,15 @@ const QUICK_ACTIONS = [
   { key: 'historico', label: 'Histórico', icon: 'time' as const },
 ]
 
-const MOCK_RECARGAS = [
-  { id: 1, valor: 20, data: 'Hoje, 07:30', status: 'aprovado' },
-  { id: 2, valor: 15, data: 'Ontem, 13:15', status: 'aprovado' },
-  { id: 3, valor: 30, data: '22/06, 09:00', status: 'aprovado' },
-]
-
 export default function HomeScreen() {
   const router = useRouter()
   const { user } = useAuth()
   const { data, isLoading, isError, error, refetch } = useBalance()
   const { isInactive, message } = useConsumerStatus()
+  const { data: rechargeHistory } = useRechargeHistory()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
+  const recentRecharges = rechargeHistory?.pages[0]?.data.slice(0, 3) ?? []
 
   if (isLoading) {
     return <LoadingSpinner message="Carregando" />
@@ -157,29 +159,39 @@ export default function HomeScreen() {
         </View>
 
         <Card className="p-0 overflow-hidden">
-          {MOCK_RECARGAS.map((recarga, idx) => (
-            <Pressable
-              key={recarga.id}
-              onPress={() => router.push('/(tabs)/historico')}
-              className={`flex-row items-center gap-3 px-4 py-3 ${
-                idx < MOCK_RECARGAS.length - 1 ? 'border-b border-outline-variant' : ''
-              }`}
-            >
-              <View className="w-10 h-10 rounded-full bg-success/10 items-center justify-center">
-                <Ionicons name="card" size={20} color={themeColors.success} />
-              </View>
-              <View className="flex-1">
-                <Text className="text-sm font-semibold text-text-primary">Recarga PIX</Text>
-                <Text className="text-xs text-text-secondary">{recarga.data}</Text>
-              </View>
-              <View className="items-end">
-                <Text className="text-sm font-bold text-text-primary">
-                  +{formatCurrency(recarga.valor)}
-                </Text>
-                <Text className="text-xs font-medium text-success">Aprovado</Text>
-              </View>
-            </Pressable>
-          ))}
+          {recentRecharges.length === 0 ? (
+            <Text className="text-sm text-text-secondary text-center py-4">
+              Você ainda não fez recargas no período.
+            </Text>
+          ) : (
+            recentRecharges.map((recarga, idx) => (
+              <Pressable
+                key={recarga.id}
+                onPress={() => router.push('/(tabs)/historico')}
+                className={`flex-row items-center gap-3 px-4 py-3 ${
+                  idx < recentRecharges.length - 1 ? 'border-b border-outline-variant' : ''
+                }`}
+              >
+                <View className="w-10 h-10 rounded-full bg-success/10 items-center justify-center">
+                  <Ionicons name="card" size={20} color={themeColors.success} />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm font-semibold text-text-primary">Recarga PIX</Text>
+                  <Text className="text-xs text-text-secondary">
+                    {formatDateTime(recarga.data_hora)}
+                  </Text>
+                </View>
+                <View className="items-end">
+                  <Text className="text-sm font-bold text-text-primary">
+                    +{formatCurrency(recarga.valor)}
+                  </Text>
+                  <Text className="text-xs font-medium text-success">
+                    {recarga.status === 'aprovado' ? 'Aprovado' : recarga.status}
+                  </Text>
+                </View>
+              </Pressable>
+            ))
+          )}
         </Card>
       </View>
 
