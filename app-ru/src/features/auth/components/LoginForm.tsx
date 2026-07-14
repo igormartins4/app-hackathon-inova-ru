@@ -1,6 +1,8 @@
+import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
-import { View } from 'react-native'
-import { Button, ErrorMessage, Input } from '@/shared/components/ui'
+import { Pressable, Text, TextInput, View } from 'react-native'
+import { useThemeColors } from '@/config'
+import { Button, ErrorMessage } from '@/shared/components/ui'
 import { cleanCpf, formatCpf } from '@/shared/utils'
 
 interface LoginFormProps {
@@ -14,6 +16,8 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   const [password, setPassword] = useState('')
   const [cpfError, setCpfError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const themeColors = useThemeColors()
 
   const handleCpfChange = (text: string) => {
     setCpf(formatCpf(text))
@@ -46,25 +50,60 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
 
   return (
     <View className="gap-4">
-      <Input
-        label="CPF"
-        value={cpf}
-        onChangeText={handleCpfChange}
-        placeholder="000.000.000-00"
-        keyboardType="numeric"
-        error={cpfError}
-        accessibilityLabel="Campo de CPF"
-      />
-      <Input
-        label="SENHA"
-        value={password}
-        onChangeText={handlePasswordChange}
-        placeholder="minhaSenha"
-        secureTextEntry
-        error={passwordError}
-        accessibilityLabel="Campo de senha"
-      />
+      <View className="gap-1.5">
+        <Text className="text-xs font-bold text-primary uppercase tracking-wider">CPF</Text>
+        <TextInput
+          value={cpf}
+          onChangeText={handleCpfChange}
+          placeholder="000.000.000-00"
+          placeholderTextColor={themeColors.textDisabled}
+          keyboardType="numeric"
+          editable={!isLoading}
+          accessibilityLabel="Campo de CPF"
+          className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
+        />
+        {cpfError ? (
+          <Text accessibilityRole="alert" className="text-xs text-status-error">
+            {cpfError}
+          </Text>
+        ) : null}
+      </View>
+
+      <View className="gap-1.5">
+        <Text className="text-xs font-bold text-primary uppercase tracking-wider">Senha</Text>
+        <View className="relative">
+          <TextInput
+            value={password}
+            onChangeText={handlePasswordChange}
+            placeholder="minhaSenha"
+            placeholderTextColor={themeColors.textDisabled}
+            secureTextEntry={!showPassword}
+            editable={!isLoading}
+            accessibilityLabel="Campo de senha"
+            className="bg-white border border-outline rounded-xl px-4 py-3.5 pr-12 text-base text-text-primary min-h-[48px]"
+          />
+          <Pressable
+            onPress={() => setShowPassword(!showPassword)}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            className="absolute right-3 top-3.5 w-8 h-8 items-center justify-center"
+          >
+            <Ionicons
+              name={showPassword ? 'eye-off' : 'eye'}
+              size={20}
+              color={themeColors.textSecondary}
+            />
+          </Pressable>
+        </View>
+        {passwordError ? (
+          <Text accessibilityRole="alert" className="text-xs text-status-error">
+            {passwordError}
+          </Text>
+        ) : null}
+      </View>
+
       {error ? <ErrorMessage message={error} /> : null}
+
       <Button label="Entrar" onPress={handleSubmit} loading={isLoading} disabled={isLoading} />
     </View>
   )
