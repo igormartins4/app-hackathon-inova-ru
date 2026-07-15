@@ -30,7 +30,9 @@ function withNetworkSecurityConfigManifest(config) {
   return withAndroidManifest(config, (config) => {
     const mainApplication = AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults)
     mainApplication.$['android:networkSecurityConfig'] = '@xml/network_security_config'
-    mainApplication.$['android:usesCleartextTraffic'] = 'true'
+    // ponytail: removed global usesCleartextTraffic="true" — cleartext is
+    // already permitted per-domain via network_security_config.xml for 10.0.2.2.
+    // Global flag would allow cleartext to ANY host in production.
     return config
   })
 }
