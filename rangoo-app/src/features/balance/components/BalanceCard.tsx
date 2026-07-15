@@ -1,9 +1,6 @@
 import { Text, View } from 'react-native'
 import { Card } from '@/shared/components/ui'
-
-function formatCurrency(value: number): string {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
+import { formatCurrency } from '@/shared/utils'
 
 interface BalanceCardProps {
   creditoDisponivel: number
@@ -26,7 +23,7 @@ export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardPro
           accessibilityRole="text"
           className="text-balance font-bold text-text-inverse"
         >
-          R$ {creditoDisponivel.toFixed(2).replace('.', ',')}
+          {formatCurrency(creditoDisponivel)}
         </Text>
         <View className="flex-row gap-4">
           <View className="flex-1 bg-text-inverse/20 rounded-lg p-3">

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { toDateParam } from '@/shared/utils'
 
 interface DateFilterProps {
   onFilter: (start: string | null, end: string | null) => void
@@ -13,10 +14,6 @@ const QUICK_OPTIONS = [
 
 export function DateFilter({ onFilter }: DateFilterProps) {
   const [selected, setSelected] = useState<number | null>(null)
-
-  function toDateParam(date: Date): string {
-    return date.toISOString().slice(0, 10)
-  }
 
   const handlePress = (days: number | null) => {
     setSelected(days)
@@ -43,7 +40,7 @@ export function DateFilter({ onFilter }: DateFilterProps) {
           accessibilityLabel={`Filtrar por ${opt.label}`}
           accessibilityState={{ selected: selected === opt.days }}
           onPress={() => handlePress(opt.days)}
-          className={`rounded-lg px-4 py-2 ${
+          className={`rounded-lg px-4 py-2.5 min-h-[48px] items-center justify-center ${
             selected === opt.days ? 'bg-primary' : 'bg-surface-variant'
           }`}
         >

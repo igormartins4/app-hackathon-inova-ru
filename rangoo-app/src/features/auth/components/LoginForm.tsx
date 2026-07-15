@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, ErrorMessage } from '@/shared/components/ui'
-import { cleanCpf, formatCpf } from '@/shared/utils'
+import { isValidCpf, maskCpf, unmask } from '@/shared/utils'
 
 interface LoginFormProps {
   onSubmit: (cpf: string, password: string) => void
@@ -20,7 +20,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   const themeColors = useThemeColors()
 
   const handleCpfChange = (text: string) => {
-    setCpf(formatCpf(text))
+    setCpf(maskCpf(text))
     if (cpfError) setCpfError('')
   }
 
@@ -30,11 +30,11 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   }
 
   const handleSubmit = () => {
-    const clean = cleanCpf(cpf)
+    const clean = unmask(cpf)
     let hasError = false
 
-    if (clean.length !== 11) {
-      setCpfError('CPF deve conter 11 dígitos.')
+    if (!isValidCpf(cpf)) {
+      setCpfError('CPF inválido.')
       hasError = true
     }
 
@@ -80,13 +80,13 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
             secureTextEntry={!showPassword}
             editable={!isLoading}
             accessibilityLabel="Campo de senha"
-            className="bg-white border border-outline rounded-xl px-4 py-3.5 pr-12 text-base text-text-primary min-h-[48px]"
+            className="bg-surface border border-outline rounded-xl px-4 py-3.5 pr-12 text-base text-text-primary min-h-[48px]"
           />
           <Pressable
             onPress={() => setShowPassword(!showPassword)}
             accessibilityRole="button"
             accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-            className="absolute right-3 top-3.5 w-8 h-8 items-center justify-center"
+            className="absolute right-2 top-2 w-10 h-10 items-center justify-center"
           >
             <Ionicons
               name={showPassword ? 'eye-off' : 'eye'}

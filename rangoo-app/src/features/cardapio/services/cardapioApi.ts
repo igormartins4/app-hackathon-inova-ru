@@ -1,4 +1,5 @@
-import axios from 'axios'
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import { toDateParam } from '@/shared/utils'
 import type {
   CardapioParams,
   CardapioResponse,
@@ -14,6 +15,8 @@ import type {
 // estado vazio explicito na UI, nunca para dado inventado.
 const FUMP_MENU_BASE_URL = 'https://fump.ufmg.br:3003'
 
+const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
+
 // Mapeamento entre o codigo de filial oficial (Anexo A) e o id numerico dessa
 // API nao-oficial. RU HRTN (0005) nao tem cardapio publicado nessa API.
 const FILIAL_TO_FUMP_ID: Partial<Record<FilialCode, number>> = {
@@ -28,13 +31,81 @@ const fumpMenuClient = axios.create({
   timeout: 8000,
 })
 
+// --- Mock data for cardapio (when EXPO_PUBLIC_USE_MOCK=true) ---
+const MOCK_FUMP_CARDAPIO: FumpCardapioRawResponse = {
+  id: 6,
+  nome: 'RU Setorial 1',
+  cardapios: [
+    {
+      data: toDateParam(new Date()),
+      refeicoes: [
+        {
+          tipoRefeicao: 'Almoço',
+          tipo: 1,
+          pratos: [
+            { tipoPrato: 'Prato Principal', descricaoPrato: 'Frango grelhado com arroz e feijão' },
+            { tipoPrato: 'Entrada', descricaoPrato: 'Salada verde' },
+            { tipoPrato: 'Sobremesa', descricaoPrato: 'Pudim de leite' },
+            { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+            { tipoPrato: 'Guarnição', descricaoPrato: 'Vinagrete' },
+            { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de laranja' },
+          ],
+        },
+        {
+          tipoRefeicao: 'Jantar',
+          tipo: 2,
+          pratos: [
+            { tipoPrato: 'Prato Principal', descricaoPrato: 'Peixe frito com purê' },
+            { tipoPrato: 'Entrada', descricaoPrato: 'Legumes refogados' },
+            { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
+            { tipoPrato: 'Acompanhamento', descricaoPrato: 'Purê de batata' },
+            { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de maracujá' },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
+function mockCardapioAdapter(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
+  const params = config.params as { id?: number; dataInicio?: string } | undefined
+  const fumpId = params?.id ?? 6
+  const dataInicio = params?.dataInicio ?? toDateParam(new Date())
+
+  const nomeMap: Record<number, string> = {
+    6: 'RU Setorial 1',
+    1: 'RU Setorial 2',
+    2: 'RU Saúde/Direito',
+    5: 'RU ICA',
+  }
+
+  const mockData: FumpCardapioRawResponse = {
+    id: fumpId,
+    nome: nomeMap[fumpId] ?? 'RU Desconhecido',
+    cardapios: [
+      {
+        data: dataInicio,
+        refeicoes: MOCK_FUMP_CARDAPIO.cardapios[0].refeicoes,
+      },
+    ],
+  }
+
+  return Promise.resolve({
+    data: mockData,
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config,
+  })
+}
+
+if (USE_MOCK) {
+  fumpMenuClient.defaults.adapter = mockCardapioAdapter as never
+}
+
 const TIPO_REFEICAO_MAP: Record<CardapioParams['tipoRefeicao'], string> = {
   almoco: 'Almoço',
   jantar: 'Jantar',
-}
-
-function toDateParam(date: Date): string {
-  return date.toISOString().slice(0, 10)
 }
 
 function groupPratosIntoSections(pratos: Array<{ tipoPrato: string; descricaoPrato: string }>) {
@@ -47,7 +118,21 @@ function groupPratosIntoSections(pratos: Array<{ tipoPrato: string; descricaoPra
     sections.set(titulo, section)
   }
 
-  return Array.from(sections.values())
+  const SECTION_ORDER = [
+    'Prato Principal',
+    'Sobremesa',
+    'Entrada',
+    'Acompanhamento',
+    'Guarnição',
+    'Bebida',
+    'Outros',
+  ]
+
+  return Array.from(sections.values()).sort((a, b) => {
+    const ai = SECTION_ORDER.indexOf(a.titulo)
+    const bi = SECTION_ORDER.indexOf(b.titulo)
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
+  })
 }
 
 function classifyTipoPrato(tipoPrato: string): { titulo: string; icon: string } {

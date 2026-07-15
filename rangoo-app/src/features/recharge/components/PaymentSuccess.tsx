@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import { Share, Text, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, Card } from '@/shared/components/ui'
+import { formatCurrency, formatTime, formatToLocalDate } from '@/shared/utils'
 
 interface PaymentSuccessProps {
   newBalance: number
@@ -10,21 +11,25 @@ interface PaymentSuccessProps {
   onBack: () => void
 }
 
-function formatCurrency(v: number): string {
-  return `R$ ${v.toFixed(2).replace('.', ',')}`
-}
-
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-}
-
 export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessProps) {
   const themeColors = useThemeColors()
 
   const handleShare = useCallback(async () => {
+    const now = new Date()
+    const dateStr = formatToLocalDate(now.toISOString())
+    const timeStr = formatTime(now)
     try {
       await Share.share({
-        message: `Recarga de ${formatCurrency(amount)} no Rangoo confirmada! Novo saldo: ${formatCurrency(newBalance)}`,
+        message: [
+          `Comprovante de Recarga — Rangoo`,
+          ``,
+          `Valor: ${formatCurrency(amount)}`,
+          `Data: ${dateStr} às ${timeStr}`,
+          `Método: PIX`,
+          `Novo saldo: ${formatCurrency(newBalance)}`,
+          ``,
+          `Rangoo Universitário — Hackathon InovaRU 2026`,
+        ].join('\n'),
       })
     } catch {}
   }, [amount, newBalance])
@@ -66,6 +71,10 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
               <Text className="text-sm font-bold text-text-primary">
                 Hoje, {formatTime(new Date())}
               </Text>
+            </View>
+            <View className="flex-row justify-between items-center">
+              <Text className="text-sm text-text-secondary">Método</Text>
+              <Text className="text-sm font-bold text-text-primary">PIX</Text>
             </View>
           </View>
         </View>

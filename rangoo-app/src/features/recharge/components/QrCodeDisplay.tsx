@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
 import * as Clipboard from 'expo-clipboard'
-import { useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 import { Image, Linking, Pressable, Share, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { useThemeColors } from '@/config'
+import { formatCurrency, getTimeLeft } from '@/shared/utils'
 
 interface QrCodeDisplayProps {
   qrCode: string
@@ -13,13 +14,39 @@ interface QrCodeDisplayProps {
   expiration: string
 }
 
-function getTimeLeft(expiration: string): string {
-  const diff = new Date(expiration).getTime() - Date.now()
-  if (diff <= 0) return '00:00'
-  const min = Math.floor(diff / 60000)
-  const sec = Math.floor((diff % 60000) / 1000)
-  return `${min}:${sec.toString().padStart(2, '0')}`
+// ponytail: isolated countdown so its 1s ticker doesn't re-render the parent
+// (and the expensive QR SVG) on every tick.
+function CountdownText({ expiration }: { expiration: string }) {
+  const themeColors = useThemeColors()
+  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(expiration))
+
+  useEffect(() => {
+    const timer = setInterval(() => setTimeLeft(getTimeLeft(expiration)), 1000)
+    return () => clearInterval(timer)
+  }, [expiration])
+
+  return (
+    <View className="flex-row items-center gap-3 bg-status-error/10 rounded-xl px-4 py-3">
+      <Ionicons name="time" size={20} color={themeColors.error} />
+      <Text className="text-sm text-text-secondary flex-1">Expira em</Text>
+      <Text className="text-lg font-bold text-text-primary">{timeLeft}</Text>
+    </View>
+  )
 }
+
+const MemoizedQrCode = memo(function QrCodeImage({
+  value,
+  size,
+  color,
+  backgroundColor,
+}: {
+  value: string
+  size: number
+  color: string
+  backgroundColor: string
+}) {
+  return <QRCode value={value} size={size} color={color} backgroundColor={backgroundColor} />
+})
 
 export function QrCodeDisplay({
   qrCode,
@@ -30,13 +57,7 @@ export function QrCodeDisplay({
 }: QrCodeDisplayProps) {
   const themeColors = useThemeColors()
   const [copied, setCopied] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(expiration))
   const [base64Failed, setBase64Failed] = useState(false)
-
-  useEffect(() => {
-    const timer = setInterval(() => setTimeLeft(getTimeLeft(expiration)), 1000)
-    return () => clearInterval(timer)
-  }, [expiration])
 
   const handleCopy = useCallback(async () => {
     await Clipboard.setStringAsync(qrCode)
@@ -52,17 +73,11 @@ export function QrCodeDisplay({
     } catch {}
   }, [qrCode])
 
-  const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`
-
   const hasServerImage = !!qrCodeBase64 && !base64Failed
 
   return (
     <View className="gap-4">
-      <View className="flex-row items-center gap-3 bg-status-error/10 rounded-xl px-4 py-3">
-        <Ionicons name="time" size={20} color={themeColors.error} />
-        <Text className="text-sm text-text-secondary flex-1">Expira em</Text>
-        <Text className="text-lg font-bold text-text-primary">{timeLeft}</Text>
-      </View>
+      <CountdownText expiration={expiration} />
 
       <View className="bg-surface rounded-2xl p-6 items-center gap-4">
         <Text className="text-sm text-text-secondary">Valor a pagar</Text>
@@ -88,7 +103,7 @@ export function QrCodeDisplay({
               </Text>
             </Pressable>
           ) : (
-            <QRCode
+            <MemoizedQrCode
               value={qrCode}
               size={220}
               color={themeColors.textPrimary}
