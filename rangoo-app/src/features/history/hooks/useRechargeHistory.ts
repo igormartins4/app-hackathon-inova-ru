@@ -4,7 +4,10 @@ import type { HistoryParams } from '../types/history.types'
 
 const PAGE_SIZE = 20
 
-export function useRechargeHistory(extraParams: Omit<HistoryParams, 'page' | 'perPage'> = {}) {
+export function useRechargeHistory(
+  extraParams: Omit<HistoryParams, 'page' | 'perPage'> = {},
+  options: { enabled?: boolean } = {},
+) {
   return useInfiniteQuery({
     queryKey: ['history', 'recharges', extraParams],
     queryFn: ({ pageParam = 1 }) =>
@@ -15,5 +18,6 @@ export function useRechargeHistory(extraParams: Omit<HistoryParams, 'page' | 'pe
         : undefined,
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
+    enabled: options.enabled ?? true,
   })
 }

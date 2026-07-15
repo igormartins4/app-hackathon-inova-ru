@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useLocalSearchParams } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import {
@@ -36,12 +36,14 @@ export default function HistoricoScreen() {
     dataFim: dateRange.end ?? undefined,
   }
 
-  const rechargeQuery = useRechargeHistory(dateParams)
-  const mealQuery = useMealHistory(dateParams)
+  const rechargeQuery = useRechargeHistory(dateParams, { enabled: activeTab === 'recargas' })
+  const mealQuery = useMealHistory(dateParams, { enabled: activeTab === 'refeicoes' })
 
   const activeQuery = activeTab === 'recargas' ? rechargeQuery : mealQuery
-  const items: (RechargeRecord | MealRecord)[] =
-    activeQuery.data?.pages.flatMap((p) => p.data as (RechargeRecord | MealRecord)[]) ?? []
+  const items: (RechargeRecord | MealRecord)[] = useMemo(
+    () => activeQuery.data?.pages.flatMap((p) => p.data as (RechargeRecord | MealRecord)[]) ?? [],
+    [activeQuery.data],
+  )
 
   const handleRefresh = useCallback(() => {
     activeQuery.refetch()

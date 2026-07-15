@@ -4,7 +4,10 @@ import type { MealHistoryParams } from '../types/history.types'
 
 const PAGE_SIZE = 20
 
-export function useMealHistory(extraParams: Omit<MealHistoryParams, 'page' | 'perPage'> = {}) {
+export function useMealHistory(
+  extraParams: Omit<MealHistoryParams, 'page' | 'perPage'> = {},
+  options: { enabled?: boolean } = {},
+) {
   return useInfiniteQuery({
     queryKey: ['history', 'meals', extraParams],
     queryFn: ({ pageParam = 1 }) =>
@@ -15,5 +18,6 @@ export function useMealHistory(extraParams: Omit<MealHistoryParams, 'page' | 'pe
         : undefined,
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
+    enabled: options.enabled ?? true,
   })
 }
