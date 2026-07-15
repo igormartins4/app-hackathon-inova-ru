@@ -39,6 +39,7 @@ export default function TabLayout() {
           color: themeColors.textPrimary,
         },
         headerShadowVisible: false,
+        animation: 'fade',
       }}
     >
       <Tabs.Screen

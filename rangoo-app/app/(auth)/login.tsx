@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { Text, View } from 'react-native'
+import { Linking, Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useGradientColors } from '@/config'
 import { LoginForm } from '@/features/auth/components/LoginForm'
@@ -24,7 +24,7 @@ export default function LoginScreen() {
         >
           <View className="items-center justify-center pt-12 pb-20">
             <View className="w-20 h-20 rounded-2xl bg-primary items-center justify-center mb-3 shadow-lg">
-              <Text className="text-3xl font-bold text-text-inverse">ψq</Text>
+              <Text className="text-3xl font-bold text-text-inverse">R</Text>
             </View>
             <Text className="text-2xl font-bold text-primary-dark">Rangoo</Text>
           </View>
@@ -52,9 +52,34 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          <Text className="text-center text-xs text-text-secondary mt-6">
-            FUMP · Fundação Universitária Mendes Pimentel
-          </Text>
+          <View className="gap-3 mt-6">
+            <Pressable
+              onPress={() => Linking.openURL('https://fump.ufmg.br')}
+              accessibilityRole="link"
+              accessibilityLabel="Cadastre-se na FUMP"
+              className="items-center py-2"
+            >
+              <Text className="text-sm text-primary">
+                Não tem cadastro? <Text className="font-bold">Cadastre-se na FUMP</Text>
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => Linking.openURL('https://fump.ufmg.br')}
+              accessibilityRole="link"
+              accessibilityLabel="Esqueceu a senha? Acesse o site da FUMP"
+              className="items-center py-2"
+            >
+              <Text className="text-sm text-text-secondary">
+                Esqueceu a senha?{' '}
+                <Text className="font-bold text-primary">Acesse o site da FUMP</Text>
+              </Text>
+            </Pressable>
+
+            <Text className="text-center text-xs text-text-secondary mt-2">
+              FUMP · Fundação Universitária Mendes Pimentel
+            </Text>
+          </View>
         </View>
       </View>
     </SafeAreaView>

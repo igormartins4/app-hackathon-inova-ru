@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
+import { useCallback, useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -8,22 +9,19 @@ import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
 import { useRechargeHistory } from '@/features/history'
 import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
-import { getErrorMessage } from '@/shared/utils'
-
-function formatCurrency(value: number): string {
-  return `R$ ${value.toFixed(2).replace('.', ',')}`
-}
-
-function formatDateTime(iso: string): string {
-  const d = new Date(iso)
-  return `${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}, ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
-}
+import { formatCurrency, formatToLocalDateTime, getErrorMessage, getGreeting } from '@/shared/utils'
 
 const QUICK_ACTIONS = [
   { key: 'saldo', label: 'Saldo', icon: 'wallet' as const },
   { key: 'cardapio', label: 'Cardápio', icon: 'book' as const },
   { key: 'historico', label: 'Histórico', icon: 'time' as const },
 ]
+
+const GREETING_PHRASES = ['Bora rangar', 'Manda ver', 'Hora de comer']
+
+function getGreetingPhrase(): string {
+  return GREETING_PHRASES[Math.floor(Math.random() * GREETING_PHRASES.length)]
+}
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -33,7 +31,27 @@ export default function HomeScreen() {
   const { data: rechargeHistory } = useRechargeHistory()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
-  const recentRecharges = rechargeHistory?.pages[0]?.data.slice(0, 3) ?? []
+  const recentRecharges = useMemo(
+    () => rechargeHistory?.pages[0]?.data.slice(0, 3) ?? [],
+    [rechargeHistory],
+  )
+
+  const handleQuickAction = useCallback(
+    (key: string) => {
+      switch (key) {
+        case 'saldo':
+          router.push('/(tabs)/balance')
+          break
+        case 'cardapio':
+          router.push('/(tabs)/cardapio')
+          break
+        case 'historico':
+          router.push('/(tabs)/historico')
+          break
+      }
+    },
+    [router],
+  )
 
   if (isLoading) {
     return <LoadingSpinner message="Carregando" />
@@ -57,46 +75,33 @@ export default function HomeScreen() {
 
   const saldo = data?.saldo?.credito_disponivel ?? 0
 
-  const handleQuickAction = (key: string) => {
-    switch (key) {
-      case 'saldo':
-        router.push('/(tabs)/balance')
-        break
-      case 'cardapio':
-        router.push('/(tabs)/cardapio')
-        break
-      case 'historico':
-        router.push('/(tabs)/historico')
-        break
-    }
-  }
-
   const QUICK_ACTION_COLORS = [
     gradients.quickActionSaldo,
     gradients.quickActionCardapio,
     gradients.quickActionHistorico,
   ]
 
+  const firstName = user?.nome?.split(' ')[0] ?? 'Estudante'
+  const greeting = getGreeting()
+  const phrase = getGreetingPhrase()
+
   return (
     <View className="flex-1 bg-background">
       <View className="px-4 pt-4 pb-2">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-sm text-text-secondary">Bom dia,</Text>
+            <Text className="text-sm text-text-secondary">{greeting},</Text>
             <Text
-              accessibilityLabel={`Olá, ${user?.nome?.split(' ')[0] ?? 'Estudante'}`}
+              accessibilityLabel={`${greeting}, ${firstName}`}
               className="text-2xl font-bold text-text-primary"
             >
-              {user?.nome?.split(' ')[0] ?? 'Estudante'} 👋
+              {firstName} 👋
             </Text>
+            <Text className="text-xs text-text-secondary mt-0.5">{phrase}!</Text>
           </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Notificações"
-            className="w-10 h-10 rounded-full bg-surface items-center justify-center"
-          >
-            <Ionicons name="notifications-outline" size={22} color={themeColors.primary} />
-          </Pressable>
+          <View className="w-12 h-12 rounded-full bg-surface items-center justify-center opacity-40">
+            <Ionicons name="notifications-outline" size={22} color={themeColors.textSecondary} />
+          </View>
         </View>
       </View>
 
@@ -108,12 +113,12 @@ export default function HomeScreen() {
           style={{ borderRadius: 16 }}
         >
           <View className="p-5">
-            <Text className="text-xs font-medium text-white/70 uppercase tracking-wider">
+            <Text className="text-xs font-medium text-text-inverse/70 uppercase tracking-wider">
               Saldo Disponível
             </Text>
             <Text
               accessibilityLabel={`Saldo disponível: ${formatCurrency(saldo)}`}
-              className="text-4xl font-bold text-white mt-2"
+              className="text-4xl font-bold text-text-inverse mt-2"
             >
               {formatCurrency(saldo)}
             </Text>
@@ -121,10 +126,10 @@ export default function HomeScreen() {
               onPress={() => router.push('/(tabs)/recharge')}
               accessibilityRole="button"
               accessibilityLabel="Recarregar via PIX"
-              className="flex-row items-center gap-2 bg-white/20 rounded-full px-4 py-2.5 mt-4 self-start min-h-[44px]"
+              className="flex-row items-center gap-2 bg-text-inverse/20 rounded-full px-4 py-2.5 mt-4 self-start min-h-[48px]"
             >
-              <Ionicons name="add" size={18} color="white" />
-              <Text className="text-sm font-semibold text-white">Recarregar via PIX</Text>
+              <Ionicons name="add" size={18} color={themeColors.textInverse} />
+              <Text className="text-sm font-semibold text-text-inverse">Recarregar via PIX</Text>
             </Pressable>
           </View>
         </LinearGradient>
@@ -150,7 +155,7 @@ export default function HomeScreen() {
         <View className="flex-row items-center justify-between mb-3">
           <Text className="text-sm font-bold text-text-primary">Últimas recargas</Text>
           <Pressable
-            onPress={() => router.push('/(tabs)/historico')}
+            onPress={() => router.push('/(tabs)/historico?tab=recargas')}
             accessibilityRole="button"
             accessibilityLabel="Ver todo o histórico"
           >
@@ -167,7 +172,7 @@ export default function HomeScreen() {
             recentRecharges.map((recarga, idx) => (
               <Pressable
                 key={recarga.id}
-                onPress={() => router.push('/(tabs)/historico')}
+                onPress={() => router.push('/(tabs)/historico?tab=recargas')}
                 className={`flex-row items-center gap-3 px-4 py-3 ${
                   idx < recentRecharges.length - 1 ? 'border-b border-outline-variant' : ''
                 }`}
@@ -178,7 +183,7 @@ export default function HomeScreen() {
                 <View className="flex-1">
                   <Text className="text-sm font-semibold text-text-primary">Recarga PIX</Text>
                   <Text className="text-xs text-text-secondary">
-                    {formatDateTime(recarga.data_hora)}
+                    {formatToLocalDateTime(recarga.data_hora)}
                   </Text>
                 </View>
                 <View className="items-end">
@@ -206,7 +211,12 @@ export default function HomeScreen() {
         </Card>
       )}
 
-      <View className="px-4 mb-4">
+      <Pressable
+        onPress={() => router.push('/(tabs)/cardapio')}
+        accessibilityRole="button"
+        accessibilityLabel="Ver cardápio do RU Pampulha"
+        className="mx-4 mb-4"
+      >
         <LinearGradient
           colors={gradients.ruBanner}
           start={{ x: 0, y: 0 }}
@@ -219,11 +229,11 @@ export default function HomeScreen() {
             </View>
             <View className="flex-1">
               <Text className="text-sm font-bold text-text-primary">RU Pampulha</Text>
-              <Text className="text-xs text-success font-medium">Aberto agora</Text>
+              <Text className="text-xs text-success font-medium">Ver cardápio →</Text>
             </View>
           </View>
         </LinearGradient>
-      </View>
+      </Pressable>
 
       <View className="h-4" />
     </View>

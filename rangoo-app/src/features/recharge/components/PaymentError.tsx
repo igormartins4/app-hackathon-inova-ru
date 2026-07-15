@@ -5,9 +5,9 @@ import { Button, Card } from '@/shared/components/ui'
 import type { PaymentStatusResponse } from '../types/recharge.types'
 
 const STATUS_MESSAGES: Record<string, string> = {
-  rejected: 'Pagamento não autorizado.',
+  rejected: 'Pagamento não autorizado pelo banco.',
   cancelled: 'Pagamento cancelado.',
-  expired: 'Código PIX expirado.',
+  expired: 'Código PIX expirou. Gere um novo QR Code.',
   timeout: 'Tempo esgotado. O pagamento não foi confirmado.',
 }
 

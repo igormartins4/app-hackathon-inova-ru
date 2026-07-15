@@ -10,17 +10,12 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { QUERY_PERSIST_MAX_AGE, queryClient, queryPersister } from '@/shared/services'
-import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
+import { useFontScale, useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
-// Theming here runs on CSS custom properties (--color-* in global.css), swapped
-// by a `.dark` class — NOT Tailwind's `dark:` variant (unused in this codebase).
-// Without this wrapper toggling the class, className-based colors (bg-background,
-// text-text-primary, etc.) never switch, while native-prop colors from
-// useThemeColors()/useGradientColors() (JS, not CSS) switch correctly — the
-// mismatch reads as "dark mode partially/incorrectly inverted".
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const initialize = useThemeStore((s) => s.initialize)
   const resolvedTheme = useResolvedTheme()
+  const _fontScale = useFontScale()
 
   useEffect(() => {
     initialize()
@@ -36,6 +31,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 function AuthGate() {
   const { isAuthenticated, isLoading } = useAuth()
   const { isOffline } = useNetworkStatus()
+  const resolvedTheme = useResolvedTheme()
   const segments = useSegments()
   const router = useRouter()
 
@@ -58,12 +54,12 @@ function AuthGate() {
         {isLoading ? (
           <LoadingSpinner message="Carregando" />
         ) : (
-          <Stack screenOptions={{ headerShown: false }}>
+          <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
           </Stack>
         )}
-        <StatusBar style="auto" />
+        <StatusBar style={resolvedTheme === 'dark' ? 'light' : 'dark'} />
       </View>
     </ErrorBoundary>
   )

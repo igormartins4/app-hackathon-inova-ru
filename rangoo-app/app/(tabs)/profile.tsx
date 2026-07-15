@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { Linking, Pressable, ScrollView, Text, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
+import { useMealHistory } from '@/features/history'
 import { Button, Card, LoadingSpinner } from '@/shared/components/ui'
+import { formatCurrency } from '@/shared/utils'
 import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
 const FONT_SIZES = [
@@ -16,6 +18,7 @@ const FONT_SIZES = [
 export default function ProfileScreen() {
   const { user, logout } = useAuth()
   const { data: balanceData, isLoading: isBalanceLoading } = useBalance()
+  const { data: mealHistory } = useMealHistory()
   const { setTheme, fontSize, setFontSize } = useThemeStore()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
@@ -34,14 +37,26 @@ export default function ProfileScreen() {
     setTheme(isDark ? 'light' : 'dark')
   }
 
+  const totalGastoMes = (() => {
+    if (!mealHistory?.pages) return 0
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+    return mealHistory.pages
+      .flatMap((p) => p.data)
+      .filter((item) => {
+        const d = new Date(item.data_hora)
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear && !item.gratuidade
+      })
+      .reduce((sum, item) => sum + item.valor_total, 0)
+  })()
+
   if (isBalanceLoading) {
     return <LoadingSpinner message="Carregando perfil" />
   }
 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-4">
-      <Text className="text-2xl font-bold text-text-primary">Perfil</Text>
-
       <LinearGradient
         colors={gradients.profileCard}
         start={{ x: 0, y: 0 }}
@@ -54,18 +69,42 @@ export default function ProfileScreen() {
           </View>
           <View className="flex-1">
             <Text className="text-lg font-bold text-text-primary">{user?.nome ?? 'Estudante'}</Text>
-            <Text className="text-sm text-text-secondary mt-0.5">
-              {balanceData?.consumidor?.tipo_consumidor?.descricao ?? 'Estudante'}
+            <Text className="text-sm text-text-secondary mt-0.5">{user?.email ?? ''}</Text>
+            <Text className="text-xs text-text-secondary mt-0.5">
+              {balanceData?.consumidor?.tipo_consumidor?.descricao ?? 'Estudante'} ·{' '}
+              {balanceData?.consumidor?.centro_custo?.descricao ?? ''}
             </Text>
             <View className="flex-row items-center gap-1.5 mt-1">
-              <View className="w-2 h-2 rounded-full bg-success" />
-              <Text className="text-xs font-medium text-success">
-                {balanceData?.consumidor?.situacao === 'A' ? 'Ativo' : 'Inativo'}
+              <View
+                className={`w-2 h-2 rounded-full ${balanceData?.consumidor?.situacao === 'A' ? 'bg-success' : 'bg-status-error'}`}
+              />
+              <Text
+                className={`text-xs font-bold uppercase ${balanceData?.consumidor?.situacao === 'A' ? 'text-success' : 'text-status-error'}`}
+              >
+                {balanceData?.consumidor?.situacao === 'A'
+                  ? 'ATIVO'
+                  : balanceData?.consumidor?.situacao === 'B'
+                    ? 'BLOQUEADO'
+                    : 'INATIVO'}
               </Text>
             </View>
           </View>
         </View>
       </LinearGradient>
+
+      {totalGastoMes > 0 && (
+        <Card>
+          <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+            Gastos do Mês
+          </Text>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-sm text-text-secondary">Total em refeições</Text>
+            <Text className="text-lg font-bold text-text-primary">
+              {formatCurrency(totalGastoMes)}
+            </Text>
+          </View>
+        </Card>
+      )}
 
       <Card>
         <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
@@ -89,7 +128,9 @@ export default function ProfileScreen() {
             </View>
           </View>
           <View className={`w-12 h-7 rounded-full p-0.5 ${isDark ? 'bg-primary' : 'bg-outline'}`}>
-            <View className={`w-6 h-6 rounded-full bg-white shadow ${isDark ? 'ml-5' : 'ml-0'}`} />
+            <View
+              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${isDark ? 'ml-5' : 'ml-0'}`}
+            />
           </View>
         </Pressable>
 
@@ -100,7 +141,9 @@ export default function ProfileScreen() {
             </View>
             <View>
               <Text className="text-sm font-medium text-text-primary">Tamanho da fonte</Text>
-              <Text className="text-xs text-text-secondary">Override do sistema</Text>
+              <Text className="text-xs text-text-secondary">
+                {fontSize === 'p' ? 'Pequena' : fontSize === 'm' ? 'Média' : 'Grande'}
+              </Text>
             </View>
           </View>
           <View className="flex-row gap-2 ml-[52px]">
@@ -111,7 +154,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={`Tamanho ${fs.label}`}
                 accessibilityState={{ selected: fontSize === fs.key }}
-                className={`w-10 h-10 rounded-lg items-center justify-center ${
+                className={`w-12 h-12 rounded-lg items-center justify-center ${
                   fontSize === fs.key ? 'bg-primary' : 'bg-surface-variant border border-outline'
                 }`}
               >
@@ -136,50 +179,54 @@ export default function ProfileScreen() {
         <View className="gap-0">
           <View className="flex-row items-center justify-between py-3 border-b border-outline-variant">
             <Text className="text-sm text-text-primary">Versão</Text>
-            <View className="flex-row items-center gap-2">
-              <Text className="text-sm text-text-secondary">1.0.0</Text>
-              <Ionicons name="chevron-forward" size={16} color={themeColors.textSecondary} />
-            </View>
+            <Text className="text-sm text-text-secondary">1.0.0</Text>
           </View>
 
           <Pressable
-            accessibilityRole="button"
+            onPress={() => Linking.openURL('https://fump.ufmg.br')}
+            accessibilityRole="link"
             accessibilityLabel="Política de privacidade"
             className="flex-row items-center justify-between py-3 border-b border-outline-variant"
           >
-            <Text className="text-sm text-text-primary">Política de privacidade</Text>
-            <Ionicons name="chevron-forward" size={16} color={themeColors.textSecondary} />
+            <Text className="text-sm text-primary">Política de privacidade</Text>
+            <Ionicons name="open-outline" size={16} color={themeColors.primary} />
           </Pressable>
 
           <Pressable
-            accessibilityRole="button"
+            onPress={() => Linking.openURL('https://opensource.org/licenses/MIT')}
+            accessibilityRole="link"
             accessibilityLabel="Licença open source"
             className="flex-row items-center justify-between py-3"
           >
-            <Text className="text-sm text-text-primary">Licença open source (MIT)</Text>
-            <Ionicons name="chevron-forward" size={16} color={themeColors.textSecondary} />
+            <Text className="text-sm text-primary">Licença open source (MIT)</Text>
+            <Ionicons name="open-outline" size={16} color={themeColors.primary} />
           </Pressable>
         </View>
       </Card>
 
-      <LinearGradient
-        colors={gradients.hackathonBadge}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={{ borderRadius: 12 }}
+      <Pressable
+        onPress={() => Linking.openURL('https://github.com/seu-usuario/rangoo-app')}
+        accessibilityRole="link"
+        accessibilityLabel="Ver repositório no GitHub"
       >
-        <View className="flex-row items-center gap-3 p-4">
-          <View className="w-10 h-10 rounded-full bg-primary items-center justify-center">
-            <Text className="text-sm font-bold text-text-inverse">F</Text>
+        <LinearGradient
+          colors={gradients.hackathonBadge}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{ borderRadius: 12 }}
+        >
+          <View className="flex-row items-center gap-3 p-4">
+            <View className="w-10 h-10 rounded-full bg-primary items-center justify-center">
+              <Text className="text-sm font-bold text-text-inverse">R</Text>
+            </View>
+            <View className="flex-1">
+              <Text className="text-sm font-bold text-text-primary">Rangoo Universitário</Text>
+              <Text className="text-xs text-text-secondary">Hackathon InovaRU 2026/01 · FUMP</Text>
+            </View>
+            <Ionicons name="logo-github" size={18} color={themeColors.textSecondary} />
           </View>
-          <View className="flex-1">
-            <Text className="text-sm font-bold text-text-primary">Hackathon InovaRU 2026/01</Text>
-            <Text className="text-xs text-text-secondary">
-              FUMP - Fundação Universitária Mendes Pimentel
-            </Text>
-          </View>
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+      </Pressable>
 
       <Button label="Sair" onPress={logout} variant="secondary" />
 

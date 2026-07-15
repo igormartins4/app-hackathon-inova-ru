@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useCallback, useState } from 'react'
+import { useLocalSearchParams } from 'expo-router'
+import { useCallback, useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import {
@@ -14,13 +15,21 @@ import {
 type Tab = 'recargas' | 'refeicoes'
 
 export default function HistoricoScreen() {
+  const params = useLocalSearchParams<{ tab?: string }>()
   const themeColors = useThemeColors()
-  const [activeTab, setActiveTab] = useState<Tab>('recargas')
+  const [activeTab, setActiveTab] = useState<Tab>(
+    params.tab === 'refeicoes' ? 'refeicoes' : 'recargas',
+  )
   const [showFilter, setShowFilter] = useState(false)
   const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
     start: null,
     end: null,
   })
+
+  useEffect(() => {
+    if (params.tab === 'refeicoes') setActiveTab('refeicoes')
+    else if (params.tab === 'recargas') setActiveTab('recargas')
+  }, [params.tab])
 
   const dateParams = {
     dataInicio: dateRange.start ?? undefined,
@@ -41,7 +50,12 @@ export default function HistoricoScreen() {
   return (
     <View className="flex-1 bg-background">
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
-        <Text className="text-2xl font-bold text-text-primary">Histórico</Text>
+        <View>
+          <Text className="text-2xl font-bold text-text-primary">Histórico</Text>
+          <Text className="text-xs text-text-secondary mt-0.5">
+            Suas recargas e refeições nos RUs
+          </Text>
+        </View>
         <Pressable
           onPress={() => setShowFilter((v) => !v)}
           accessibilityRole="button"

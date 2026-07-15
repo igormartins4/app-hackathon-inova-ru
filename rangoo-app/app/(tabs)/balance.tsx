@@ -58,7 +58,9 @@ export default function BalanceScreen() {
           className="mx-4"
         >
           <Text accessibilityRole="text" className="text-center text-xs text-warning">
-            {isOffline ? 'Sem conexão — dados podem estar desatualizados' : 'Dados aproximados'}
+            {isOffline
+              ? 'Sem conexão — dados podem estar desatualizados'
+              : 'Saldo estimado — puxe para atualizar'}
           </Text>
         </Card>
       )}
@@ -97,13 +99,13 @@ export default function BalanceScreen() {
             <View className="flex-row justify-between py-2">
               <Text className="text-sm text-text-secondary">Situação</Text>
               <Text
-                className={`text-sm font-medium ${data.consumidor.situacao === 'A' ? 'text-success' : 'text-status-error'}`}
+                className={`text-sm font-bold uppercase ${data.consumidor.situacao === 'A' ? 'text-success' : 'text-status-error'}`}
               >
                 {data.consumidor.situacao === 'A'
-                  ? 'Ativo ✓'
+                  ? 'ATIVO'
                   : data.consumidor.situacao === 'B'
-                    ? 'Bloqueado'
-                    : 'Inativo'}
+                    ? 'BLOQUEADO'
+                    : 'INATIVO'}
               </Text>
             </View>
           </View>
