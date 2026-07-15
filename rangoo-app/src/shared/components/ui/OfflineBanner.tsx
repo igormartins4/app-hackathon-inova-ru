@@ -1,5 +1,6 @@
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ScaledText as Text } from './ScaledText'
 
 interface OfflineBannerProps {
   visible: boolean

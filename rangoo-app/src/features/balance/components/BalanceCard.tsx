@@ -1,5 +1,5 @@
-import { Text, View } from 'react-native'
-import { Card } from '@/shared/components/ui'
+import { View } from 'react-native'
+import { Card, Text } from '@/shared/components/ui'
 import { formatCurrency } from '@/shared/utils'
 
 interface BalanceCardProps {

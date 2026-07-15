@@ -1,5 +1,6 @@
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 import { useThemeColors } from '@/config'
+import { ScaledText as Text } from './ScaledText'
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large'

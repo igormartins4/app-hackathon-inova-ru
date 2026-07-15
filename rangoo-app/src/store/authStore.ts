@@ -7,11 +7,16 @@ interface AuthStoreState {
   isInitialized: boolean
   user: User | null
   error: string | null
+  // Set when a valid JWT+user already sit in SecureStore from a previous
+  // session, but restoring it still requires biometric confirmation (or a
+  // fresh manual login) — see useBiometricAuth. Never holds a password.
+  pendingUser: User | null
 }
 
 interface AuthStoreActions {
   setAuthenticated: (user: User) => void
   setUnauthenticated: () => void
+  setPendingUser: (user: User | null) => void
   setLoading: (loading: boolean) => void
   setInitialized: () => void
   setError: (error: string | null) => void
@@ -26,8 +31,10 @@ export const useAuthStore = create<AuthStoreState & AuthStoreActions>((set) => (
   isInitialized: false,
   user: null,
   error: null,
-  setAuthenticated: (user) => set({ isAuthenticated: true, user, error: null }),
+  pendingUser: null,
+  setAuthenticated: (user) => set({ isAuthenticated: true, user, error: null, pendingUser: null }),
   setUnauthenticated: () => set({ isAuthenticated: false, user: null }),
+  setPendingUser: (pendingUser) => set({ pendingUser }),
   setLoading: (isLoading) => set({ isLoading }),
   setInitialized: () => set({ isInitialized: true }),
   setError: (error) => set({ error }),

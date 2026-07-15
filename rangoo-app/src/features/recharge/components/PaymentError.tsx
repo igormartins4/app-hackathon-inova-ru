@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Button, Card } from '@/shared/components/ui'
+import { Button, Card, Text } from '@/shared/components/ui'
 import type { PaymentStatusResponse } from '../types/recharge.types'
 
 const STATUS_MESSAGES: Record<string, string> = {

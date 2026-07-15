@@ -1,4 +1,5 @@
 export { DateFilter } from './components/DateFilter'
+export { FilialFilter } from './components/FilialFilter'
 export { HistoryList } from './components/HistoryList'
 export { useMealHistory } from './hooks/useMealHistory'
 export { useRechargeHistory } from './hooks/useRechargeHistory'

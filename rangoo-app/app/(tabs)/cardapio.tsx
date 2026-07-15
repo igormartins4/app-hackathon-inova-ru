@@ -1,22 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useCallback, useEffect, useState } from 'react'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import type { FilialCode } from '@/features/cardapio'
-import { MenuCalendar, useCardapio } from '@/features/cardapio'
-import { Card, LoadingSpinner } from '@/shared/components/ui'
+import { MenuCalendar, RESTAURANTES_CARDAPIO, useCardapio } from '@/features/cardapio'
+import { Card, LoadingSpinner, Text } from '@/shared/components/ui'
 import { isToday } from '@/shared/utils'
 
 type TipoRefeicao = 'almoco' | 'jantar'
-
-const RESTAURANTES: { key: FilialCode; label: string; hasDinner: boolean }[] = [
-  { key: '0003', label: 'Setorial 1', hasDinner: true },
-  { key: '0002', label: 'Setorial 2', hasDinner: false },
-  { key: '0001', label: 'Saúde/Direito', hasDinner: true },
-  { key: '0004', label: 'ICA', hasDinner: true },
-  { key: '0005', label: 'HRTN', hasDinner: false },
-]
 
 const MEALS: { key: TipoRefeicao; label: string; icon: string }[] = [
   { key: 'almoco', label: 'Almoço', icon: 'sunny' },
@@ -85,8 +77,8 @@ export default function CardapioScreen() {
   )
 
   const visibleRestaurantes = showAll
-    ? RESTAURANTES
-    : RESTAURANTES.filter((r) => favorites.includes(r.key))
+    ? RESTAURANTES_CARDAPIO
+    : RESTAURANTES_CARDAPIO.filter((r) => favorites.includes(r.key))
 
   const { data, isLoading, isError } = useCardapio({
     restaurante,
@@ -96,7 +88,7 @@ export default function CardapioScreen() {
   const secoes = data?.secoes ?? []
   const today = isToday(selectedDate)
 
-  const selectedRU = RESTAURANTES.find((r) => r.key === restaurante)
+  const selectedRU = RESTAURANTES_CARDAPIO.find((r) => r.key === restaurante)
   const ruWithoutDinner = selectedRU && !selectedRU.hasDinner && tipoRefeicao === 'jantar'
 
   const getIconColor = useCallback(
@@ -122,7 +114,10 @@ export default function CardapioScreen() {
   return (
     <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-5">
       <View>
-        <Text className="text-xs text-text-secondary">Consulte o menu do dia nos RUs da UFMG</Text>
+        <Text className="text-2xl font-bold text-text-primary">Cardápio</Text>
+        <Text className="text-xs text-text-secondary mt-0.5">
+          Consulte o menu do dia nos RUs da UFMG
+        </Text>
       </View>
 
       <View className="gap-2">
@@ -216,7 +211,7 @@ export default function CardapioScreen() {
           {MEALS.map((m) => {
             const disabled =
               !showAll &&
-              !RESTAURANTES.find((r) => r.key === restaurante)?.hasDinner &&
+              !RESTAURANTES_CARDAPIO.find((r) => r.key === restaurante)?.hasDinner &&
               m.key === 'jantar'
             return (
               <Pressable

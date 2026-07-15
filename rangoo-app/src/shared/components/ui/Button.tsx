@@ -1,5 +1,6 @@
-import { ActivityIndicator, Pressable, Text } from 'react-native'
+import { ActivityIndicator, Pressable } from 'react-native'
 import { useThemeColors } from '@/config'
+import { ScaledText as Text } from './ScaledText'
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger'
 

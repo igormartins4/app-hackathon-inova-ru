@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
-import { Linking, Pressable, ScrollView, Text, View } from 'react-native'
+import { Linking, Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useMealHistory } from '@/features/history'
-import { Button, Card, LoadingSpinner } from '@/shared/components/ui'
+import { Button, Card, LoadingSpinner, StatusBadge, Text } from '@/shared/components/ui'
 import { formatCurrency } from '@/shared/utils'
 import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
@@ -57,6 +57,13 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-4">
+      <View>
+        <Text className="text-2xl font-bold text-text-primary">Perfil</Text>
+        <Text className="text-xs text-text-secondary mt-0.5">
+          Seus dados, preferências e sobre o app
+        </Text>
+      </View>
+
       <LinearGradient
         colors={gradients.profileCard}
         start={{ x: 0, y: 0 }}
@@ -74,23 +81,46 @@ export default function ProfileScreen() {
               {balanceData?.consumidor?.tipo_consumidor?.descricao ?? 'Estudante'} ·{' '}
               {balanceData?.consumidor?.centro_custo?.descricao ?? ''}
             </Text>
-            <View className="flex-row items-center gap-1.5 mt-1">
-              <View
-                className={`w-2 h-2 rounded-full ${balanceData?.consumidor?.situacao === 'A' ? 'bg-success' : 'bg-status-error'}`}
-              />
-              <Text
-                className={`text-xs font-bold uppercase ${balanceData?.consumidor?.situacao === 'A' ? 'text-success' : 'text-status-error'}`}
-              >
-                {balanceData?.consumidor?.situacao === 'A'
-                  ? 'ATIVO'
-                  : balanceData?.consumidor?.situacao === 'B'
-                    ? 'BLOQUEADO'
-                    : 'INATIVO'}
-              </Text>
-            </View>
+            {balanceData?.consumidor?.situacao && (
+              <View className="mt-1">
+                <StatusBadge situacao={balanceData.consumidor.situacao} />
+              </View>
+            )}
           </View>
         </View>
       </LinearGradient>
+
+      {balanceData?.consumidor && (
+        <Card accessibilityLabel="Dados do consumidor" accessibilityRole="summary">
+          <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+            Dados do Consumidor
+          </Text>
+          <View className="gap-2">
+            <View className="flex-row justify-between py-2 border-b border-outline-variant">
+              <Text className="text-sm text-text-secondary">Nome completo</Text>
+              <Text className="text-sm font-medium text-text-primary">
+                {balanceData.consumidor.nome}
+              </Text>
+            </View>
+            <View className="flex-row justify-between py-2 border-b border-outline-variant">
+              <Text className="text-sm text-text-secondary">Tipo</Text>
+              <Text className="text-sm font-medium text-text-primary">
+                {balanceData.consumidor.tipo_consumidor.descricao}
+              </Text>
+            </View>
+            <View className="flex-row justify-between py-2 border-b border-outline-variant">
+              <Text className="text-sm text-text-secondary">Centro de Custo</Text>
+              <Text className="text-sm font-medium text-text-primary">
+                {balanceData.consumidor.centro_custo.descricao}
+              </Text>
+            </View>
+            <View className="flex-row justify-between py-2">
+              <Text className="text-sm text-text-secondary">Situação</Text>
+              <StatusBadge situacao={balanceData.consumidor.situacao} size="text-sm" />
+            </View>
+          </View>
+        </Card>
+      )}
 
       {totalGastoMes > 0 && (
         <Card>
@@ -205,7 +235,7 @@ export default function ProfileScreen() {
       </Card>
 
       <Pressable
-        onPress={() => Linking.openURL('https://github.com/seu-usuario/rangoo-app')}
+        onPress={() => Linking.openURL('https://github.com/igormartins4/app-hackathon-inova-ru')}
         accessibilityRole="link"
         accessibilityLabel="Ver repositório no GitHub"
       >

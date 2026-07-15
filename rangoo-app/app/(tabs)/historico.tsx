@@ -1,16 +1,18 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import {
   DateFilter,
+  FilialFilter,
   HistoryList,
   type MealRecord,
   type RechargeRecord,
   useMealHistory,
   useRechargeHistory,
 } from '@/features/history'
+import { Text } from '@/shared/components/ui'
 
 type Tab = 'recargas' | 'refeicoes'
 
@@ -25,6 +27,7 @@ export default function HistoricoScreen() {
     start: null,
     end: null,
   })
+  const [filial, setFilial] = useState<string | null>(null)
 
   useEffect(() => {
     if (params.tab === 'refeicoes') setActiveTab('refeicoes')
@@ -37,7 +40,10 @@ export default function HistoricoScreen() {
   }
 
   const rechargeQuery = useRechargeHistory(dateParams, { enabled: activeTab === 'recargas' })
-  const mealQuery = useMealHistory(dateParams, { enabled: activeTab === 'refeicoes' })
+  const mealQuery = useMealHistory(
+    { ...dateParams, filial: filial ?? undefined },
+    { enabled: activeTab === 'refeicoes' },
+  )
 
   const activeQuery = activeTab === 'recargas' ? rechargeQuery : mealQuery
   const items: (RechargeRecord | MealRecord)[] = useMemo(
@@ -98,8 +104,9 @@ export default function HistoricoScreen() {
       </View>
 
       {showFilter && (
-        <View className="px-4 mb-2">
+        <View className="px-4 mb-2 gap-2">
           <DateFilter onFilter={(start, end) => setDateRange({ start, end })} />
+          {activeTab === 'refeicoes' && <FilialFilter onFilter={setFilial} />}
         </View>
       )}
 

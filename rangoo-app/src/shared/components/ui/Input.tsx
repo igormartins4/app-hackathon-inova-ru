@@ -1,5 +1,6 @@
-import { Text, TextInput, View } from 'react-native'
+import { TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
+import { ScaledText as Text } from './ScaledText'
 
 interface InputProps {
   label: string

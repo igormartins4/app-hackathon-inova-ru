@@ -31,14 +31,9 @@ export default function TabLayout() {
           fontSize: 12,
           fontWeight: '500',
         },
-        headerStyle: {
-          backgroundColor: themeColors.surface,
-        },
-        headerTitleStyle: {
-          fontWeight: '600',
-          color: themeColors.textPrimary,
-        },
-        headerShadowVisible: false,
+        // Cada tela já renderiza seu próprio título estilizado no conteúdo —
+        // o header nativo do Expo Router duplicava esse título (Ponto 10 do QA).
+        headerShown: false,
         animation: 'fade',
       }}
     >

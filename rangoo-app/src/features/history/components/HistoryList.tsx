@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react'
-import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from 'react-native'
+import { ActivityIndicator, Alert, FlatList, Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Card } from '@/shared/components/ui'
+import { Card, Text } from '@/shared/components/ui'
 import { formatCurrency, formatToLocalDate, formatToLocalTime } from '@/shared/utils'
 import type { MealRecord, RechargeRecord } from '../types/history.types'
 

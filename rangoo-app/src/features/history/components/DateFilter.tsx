@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, View } from 'react-native'
+import { Text } from '@/shared/components/ui'
 import { toDateParam } from '@/shared/utils'
 
 interface DateFilterProps {

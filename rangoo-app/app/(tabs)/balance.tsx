@@ -1,18 +1,18 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { BalanceCard } from '@/features/balance/components/BalanceCard'
 import { useBalance } from '@/features/balance/hooks/useBalance'
-import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
+import { Card, ErrorMessage, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { getErrorMessage } from '@/shared/utils'
 
 export default function BalanceScreen() {
   const router = useRouter()
   const themeColors = useThemeColors()
-  const { data, isLoading, isError, error, refetch, isStale } = useBalance()
+  const { data, isLoading, isError, error, refetch, isStale, dataUpdatedAt } = useBalance()
   const { isOffline } = useNetworkStatus()
   const [refreshing, setRefreshing] = useState(false)
 
@@ -54,13 +54,13 @@ export default function BalanceScreen() {
 
       {(isStale || isOffline) && (
         <Card
-          accessibilityLabel={isOffline ? 'Sem conexão' : 'Aviso de dados aproximados'}
+          accessibilityLabel={isOffline ? 'Sem conexão' : 'Aviso de saldo em cache'}
           className="mx-4"
         >
           <Text accessibilityRole="text" className="text-center text-xs text-warning">
             {isOffline
-              ? 'Sem conexão — dados podem estar desatualizados'
-              : 'Saldo estimado — puxe para atualizar'}
+              ? 'Sem conexão — exibindo o último saldo salvo no aparelho'
+              : `Exibindo saldo salvo em ${new Date(dataUpdatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} — puxe para atualizar`}
           </Text>
         </Card>
       )}
@@ -72,44 +72,6 @@ export default function BalanceScreen() {
             limiteRecarga={data.saldo.limite_recarga}
           />
         </View>
-      )}
-
-      {data && (
-        <Card accessibilityLabel="Dados do consumidor" accessibilityRole="summary" className="mx-4">
-          <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            Dados do Consumidor
-          </Text>
-          <View className="gap-2">
-            <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">Nome completo</Text>
-              <Text className="text-sm font-medium text-text-primary">{data.consumidor.nome}</Text>
-            </View>
-            <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">Tipo</Text>
-              <Text className="text-sm font-medium text-text-primary">
-                {data.consumidor.tipo_consumidor.descricao}
-              </Text>
-            </View>
-            <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">Centro de Custo</Text>
-              <Text className="text-sm font-medium text-text-primary">
-                {data.consumidor.centro_custo.descricao}
-              </Text>
-            </View>
-            <View className="flex-row justify-between py-2">
-              <Text className="text-sm text-text-secondary">Situação</Text>
-              <Text
-                className={`text-sm font-bold uppercase ${data.consumidor.situacao === 'A' ? 'text-success' : 'text-status-error'}`}
-              >
-                {data.consumidor.situacao === 'A'
-                  ? 'ATIVO'
-                  : data.consumidor.situacao === 'B'
-                    ? 'BLOQUEADO'
-                    : 'INATIVO'}
-              </Text>
-            </View>
-          </View>
-        </Card>
       )}
 
       <Pressable

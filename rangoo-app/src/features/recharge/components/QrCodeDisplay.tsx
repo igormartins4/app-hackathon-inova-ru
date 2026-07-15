@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
 import * as Clipboard from 'expo-clipboard'
 import { memo, useCallback, useEffect, useState } from 'react'
-import { Image, Linking, Pressable, Share, Text, View } from 'react-native'
+import { Image, Linking, Pressable, Share, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { useThemeColors } from '@/config'
+import { Text } from '@/shared/components/ui'
 import { formatCurrency, getTimeLeft } from '@/shared/utils'
 
 interface QrCodeDisplayProps {

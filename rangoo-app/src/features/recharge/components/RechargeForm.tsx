@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
-import { Pressable, Text, TextInput, View } from 'react-native'
+import { Pressable, TextInput, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
-import { Button, ErrorMessage } from '@/shared/components/ui'
+import { Button, ErrorMessage, Text } from '@/shared/components/ui'
 import {
   formatCurrency,
   MAX_VALUE,
@@ -20,6 +20,8 @@ interface RechargeFormProps {
   limiteRecarga?: number
   disabled?: boolean
   onSubmit: (valor: number) => void
+  /** Erro 422 vindo da API ao criar o pagamento — renderizado inline, abaixo do input. */
+  serverError?: string | null
 }
 
 export function RechargeForm({
@@ -27,6 +29,7 @@ export function RechargeForm({
   limiteRecarga,
   disabled,
   onSubmit,
+  serverError,
 }: RechargeFormProps) {
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
@@ -117,6 +120,7 @@ export function RechargeForm({
         </View>
 
         {exceedsLimit && <ErrorMessage message={validation.error ?? 'Valor fora do limite.'} />}
+        {!exceedsLimit && serverError && <ErrorMessage message={serverError} />}
       </View>
 
       <LinearGradient

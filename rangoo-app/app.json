@@ -28,7 +28,14 @@
       "expo-router",
       "expo-secure-store",
       "expo-font",
-      "./plugins/withNetworkSecurityConfig"
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Permitir que o Rangoo Universitário use Face ID para entrar."
+        }
+      ],
+      "./plugins/withNetworkSecurityConfig",
+      "./plugins/withForceDarkDisabled"
     ],
     "extra": {
       "router": {},

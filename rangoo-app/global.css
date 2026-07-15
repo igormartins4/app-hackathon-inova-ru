@@ -57,7 +57,8 @@
   /* Text */
   --color-text-primary: #f0faf6;
   --color-text-secondary: #8fb5a5;
-  --color-text-disabled: #4a6b5e;
+  /* Contraste elevado (era #4a6b5e, ~2.9:1) — placeholders ilegíveis em Android 13/MIUI (Ponto 31) */
+  --color-text-disabled: #6f9384;
   --color-text-inverse: #0f1f1a;
 
   /* Status */

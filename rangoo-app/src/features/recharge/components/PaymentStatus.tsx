@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { useThemeColors } from '@/config'
+import { Text } from '@/shared/components/ui'
 import { QrCodeDisplay } from './QrCodeDisplay'
 
 interface PaymentStatusProps {

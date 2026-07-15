@@ -2,17 +2,22 @@ import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import { useCallback, useMemo } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
 import { useRechargeHistory } from '@/features/history'
-import { Card, ErrorMessage, LoadingSpinner } from '@/shared/components/ui'
-import { formatCurrency, formatToLocalDateTime, getErrorMessage, getGreeting } from '@/shared/utils'
+import { Card, ErrorMessage, LoadingSpinner, Text } from '@/shared/components/ui'
+import {
+  formatCurrency,
+  formatToLocalDateTime,
+  getErrorMessage,
+  getGreeting,
+  toTitleCase,
+} from '@/shared/utils'
 
 const QUICK_ACTIONS = [
-  { key: 'saldo', label: 'Saldo', icon: 'wallet' as const },
   { key: 'cardapio', label: 'Cardápio', icon: 'book' as const },
   { key: 'historico', label: 'Histórico', icon: 'time' as const },
 ]
@@ -39,9 +44,6 @@ export default function HomeScreen() {
   const handleQuickAction = useCallback(
     (key: string) => {
       switch (key) {
-        case 'saldo':
-          router.push('/(tabs)/balance')
-          break
         case 'cardapio':
           router.push('/(tabs)/cardapio')
           break
@@ -75,34 +77,23 @@ export default function HomeScreen() {
 
   const saldo = data?.saldo?.credito_disponivel ?? 0
 
-  const QUICK_ACTION_COLORS = [
-    gradients.quickActionSaldo,
-    gradients.quickActionCardapio,
-    gradients.quickActionHistorico,
-  ]
+  const QUICK_ACTION_COLORS = [gradients.quickActionCardapio, gradients.quickActionHistorico]
 
-  const firstName = user?.nome?.split(' ')[0] ?? 'Estudante'
+  const firstName = user?.nome ? toTitleCase(user.nome).split(' ')[0] : 'Estudante'
   const greeting = getGreeting()
   const phrase = getGreetingPhrase()
 
   return (
     <View className="flex-1 bg-background">
       <View className="px-4 pt-4 pb-2">
-        <View className="flex-row items-center justify-between">
-          <View>
-            <Text className="text-sm text-text-secondary">{greeting},</Text>
-            <Text
-              accessibilityLabel={`${greeting}, ${firstName}`}
-              className="text-2xl font-bold text-text-primary"
-            >
-              {firstName} 👋
-            </Text>
-            <Text className="text-xs text-text-secondary mt-0.5">{phrase}!</Text>
-          </View>
-          <View className="w-12 h-12 rounded-full bg-surface items-center justify-center opacity-40">
-            <Ionicons name="notifications-outline" size={22} color={themeColors.textSecondary} />
-          </View>
-        </View>
+        <Text className="text-sm text-text-secondary">{greeting},</Text>
+        <Text
+          accessibilityLabel={`${greeting}, ${firstName}`}
+          className="text-2xl font-bold text-text-primary"
+        >
+          {firstName} 👋
+        </Text>
+        <Text className="text-xs text-text-secondary mt-0.5">{phrase}!</Text>
       </View>
 
       <View className="px-4 mb-4">
@@ -214,7 +205,7 @@ export default function HomeScreen() {
       <Pressable
         onPress={() => router.push('/(tabs)/cardapio')}
         accessibilityRole="button"
-        accessibilityLabel="Ver cardápio do RU Pampulha"
+        accessibilityLabel="Ver cardápio dos RUs"
         className="mx-4 mb-4"
       >
         <LinearGradient
@@ -228,8 +219,8 @@ export default function HomeScreen() {
               <Ionicons name="restaurant" size={20} color={themeColors.primary} />
             </View>
             <View className="flex-1">
-              <Text className="text-sm font-bold text-text-primary">RU Pampulha</Text>
-              <Text className="text-xs text-success font-medium">Ver cardápio →</Text>
+              <Text className="text-sm font-bold text-text-primary">Cardápio do dia</Text>
+              <Text className="text-xs text-success font-medium">Ver cardápio dos RUs →</Text>
             </View>
           </View>
         </LinearGradient>

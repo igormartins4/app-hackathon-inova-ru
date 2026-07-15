@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import { Button } from './Button'
+import { ScaledText as Text } from './ScaledText'
 
 interface ErrorBoundaryProps {
   children: ReactNode

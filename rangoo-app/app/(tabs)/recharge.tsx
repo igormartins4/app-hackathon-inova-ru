@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import type { BalanceResponse } from '@/features/balance'
 import { useBalance, useConsumerStatus } from '@/features/balance'
 import { PaymentError } from '@/features/recharge/components/PaymentError'
@@ -10,7 +10,9 @@ import { RechargeForm } from '@/features/recharge/components/RechargeForm'
 import { usePolling } from '@/features/recharge/hooks/usePolling'
 import { createPayment } from '@/features/recharge/services/rechargeApi'
 import type { PaymentStatusResponse } from '@/features/recharge/types/recharge.types'
+import { Text } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
+import { getErrorMessage } from '@/shared/utils'
 
 type FlowStep = 'amount' | 'polling' | 'success' | 'error'
 
@@ -34,6 +36,7 @@ export default function RechargeScreen() {
     'timeout',
   )
   const [newBalance, setNewBalance] = useState(0)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleApproved = useCallback(async () => {
     await queryClient.refetchQueries({ queryKey: ['balance'] })
@@ -65,6 +68,7 @@ export default function RechargeScreen() {
     async (valor: number) => {
       if (isSubmitting) return // No idempotency — never retry POST
       setIsSubmitting(true)
+      setSubmitError(null)
       try {
         const res = await createPayment({ valor })
         setPaymentData({
@@ -76,9 +80,16 @@ export default function RechargeScreen() {
           expiration: res.expiration,
         })
         setStep('polling')
-      } catch {
-        setErrorStatus('timeout')
-        setStep('error')
+      } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } })?.response?.status
+        if (status === 422) {
+          // Validação de valor (422) fica inline, ao lado do input — não é um
+          // estado terminal de pagamento, então não navega para PaymentError.
+          setSubmitError(getErrorMessage(err))
+        } else {
+          setErrorStatus('timeout')
+          setStep('error')
+        }
       } finally {
         setIsSubmitting(false)
       }
@@ -124,6 +135,7 @@ export default function RechargeScreen() {
               limiteRecarga={limiteRecarga}
               disabled={consumerDisabled || isSubmitting}
               onSubmit={handleSubmit}
+              serverError={submitError}
             />
           </>
         )}

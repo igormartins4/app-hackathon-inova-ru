@@ -1,16 +1,35 @@
+import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
-import { Linking, Pressable, Text, View } from 'react-native'
+import { useState } from 'react'
+import { Linking, Pressable, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useGradientColors } from '@/config'
+import { useGradientColors, useThemeColors } from '@/config'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { useAuth } from '@/features/auth/hooks/useAuth'
+import { useBiometricAuth } from '@/features/auth/hooks/useBiometricAuth'
+import { Text } from '@/shared/components/ui'
 
 export default function LoginScreen() {
   const { login, isLoading, error } = useAuth()
+  const { hasPendingSession, pendingUserName, authenticateWithBiometrics } = useBiometricAuth()
   const gradients = useGradientColors()
+  const themeColors = useThemeColors()
+  const [biometricError, setBiometricError] = useState('')
 
   const handleSubmit = async (cpf: string, password: string) => {
     await login(cpf, password)
+  }
+
+  const handleBiometricLogin = async () => {
+    setBiometricError('')
+    const result = await authenticateWithBiometrics()
+    if (!result.success) {
+      setBiometricError(
+        result.reason === 'unavailable'
+          ? 'Biometria não configurada neste aparelho.'
+          : 'Não foi possível confirmar sua identidade.',
+      )
+    }
   }
 
   return (
@@ -48,6 +67,37 @@ export default function LoginScreen() {
                 </Text>
                 <Text className="text-sm text-text-secondary">Entre com seus dados da FUMP</Text>
               </View>
+
+              {hasPendingSession && (
+                <View className="gap-2">
+                  <Pressable
+                    onPress={handleBiometricLogin}
+                    accessibilityRole="button"
+                    accessibilityLabel="Entrar com biometria"
+                    className="flex-row items-center justify-center gap-2 bg-surface-variant border border-outline rounded-xl py-3.5 min-h-[48px]"
+                  >
+                    <Ionicons name="finger-print" size={20} color={themeColors.primary} />
+                    <Text className="text-sm font-semibold text-primary">
+                      Entrar com biometria
+                      {pendingUserName ? ` (${pendingUserName.split(' ')[0]})` : ''}
+                    </Text>
+                  </Pressable>
+                  {biometricError ? (
+                    <Text
+                      accessibilityRole="alert"
+                      className="text-xs text-status-error text-center"
+                    >
+                      {biometricError}
+                    </Text>
+                  ) : null}
+                  <View className="flex-row items-center gap-2">
+                    <View className="flex-1 h-px bg-outline-variant" />
+                    <Text className="text-xs text-text-secondary">ou entre com CPF e senha</Text>
+                    <View className="flex-1 h-px bg-outline-variant" />
+                  </View>
+                </View>
+              )}
+
               <LoginForm onSubmit={handleSubmit} isLoading={isLoading} error={error} />
             </View>
           </View>
@@ -79,6 +129,19 @@ export default function LoginScreen() {
             <Text className="text-center text-xs text-text-secondary mt-2">
               FUMP · Fundação Universitária Mendes Pimentel
             </Text>
+
+            <Pressable
+              onPress={() =>
+                Linking.openURL('https://github.com/igormartins4/app-hackathon-inova-ru')
+              }
+              accessibilityRole="link"
+              accessibilityLabel="Sobre o Hackathon InovaRU"
+              className="items-center py-2"
+            >
+              <Text className="text-center text-xs text-text-secondary">
+                Hackathon InovaRU 2026/01 · Ver repositório do projeto
+              </Text>
+            </Pressable>
           </View>
         </View>
       </View>

@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useMemo } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
+import { Text } from '@/shared/components/ui'
 
 interface MenuCalendarProps {
   selectedDate: Date

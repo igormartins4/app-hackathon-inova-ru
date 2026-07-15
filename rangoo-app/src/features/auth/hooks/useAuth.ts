@@ -20,10 +20,14 @@ interface UseAuthReturn {
   isLoading: boolean
   user: User | null
   error: string | null
+  // A user restored from SecureStore whose session still needs biometric
+  // confirmation (or a fresh manual login) before becoming active.
+  pendingUser: User | null
   login: (cpf: string, password: string) => Promise<void>
   logout: () => Promise<void>
   clearError: () => void
   checkAuth: () => Promise<void>
+  confirmPendingSession: () => void
 }
 
 export function useAuth(): UseAuthReturn {
@@ -32,6 +36,7 @@ export function useAuth(): UseAuthReturn {
   const isInitialized = useAuthStore((s) => s.isInitialized)
   const user = useAuthStore((s) => s.user)
   const error = useAuthStore((s) => s.error)
+  const pendingUser = useAuthStore((s) => s.pendingUser)
   const queryClient = useQueryClient()
 
   const checkAuth = useCallback(async () => {
@@ -41,7 +46,9 @@ export function useAuth(): UseAuthReturn {
       const token = await getToken()
       if (token) {
         const storedUser = await getUser<User>()
-        if (storedUser) store.setAuthenticated(storedUser)
+        // Session exists in SecureStore, but is only restored after the user
+        // confirms it's them (biometria) or logs in again — never auto-trusted.
+        if (storedUser) store.setPendingUser(storedUser)
       }
     } catch {
       // Token invalid or missing — treat as not authenticated
@@ -49,6 +56,14 @@ export function useAuth(): UseAuthReturn {
       useAuthStore.getState().setLoading(false)
       useAuthStore.getState().setInitialized()
     }
+  }, [])
+
+  // Called after a successful biometric prompt — promotes the pending session
+  // (already validated JWT sitting in SecureStore) to fully authenticated.
+  // Never touches or needs the password.
+  const confirmPendingSession = useCallback(() => {
+    const store = useAuthStore.getState()
+    if (store.pendingUser) store.setAuthenticated(store.pendingUser)
   }, [])
 
   // Runs once per app session (guarded by isInitialized in the shared store),
@@ -102,9 +117,11 @@ export function useAuth(): UseAuthReturn {
     isLoading,
     user,
     error,
+    pendingUser,
     login,
     logout,
     clearError,
     checkAuth,
+    confirmPendingSession,
   }
 }

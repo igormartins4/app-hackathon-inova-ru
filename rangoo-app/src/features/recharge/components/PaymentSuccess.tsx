@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useCallback } from 'react'
-import { Share, Text, View } from 'react-native'
+import * as Sharing from 'expo-sharing'
+import { useCallback, useRef } from 'react'
+import { Share, View } from 'react-native'
+import { captureRef } from 'react-native-view-shot'
 import { useThemeColors } from '@/config'
-import { Button, Card } from '@/shared/components/ui'
+import { Button, Card, Text } from '@/shared/components/ui'
 import { formatCurrency, formatTime, formatToLocalDate } from '@/shared/utils'
 
 interface PaymentSuccessProps {
@@ -13,8 +15,9 @@ interface PaymentSuccessProps {
 
 export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessProps) {
   const themeColors = useThemeColors()
+  const receiptRef = useRef<View>(null)
 
-  const handleShare = useCallback(async () => {
+  const shareAsText = useCallback(async () => {
     const now = new Date()
     const dateStr = formatToLocalDate(now.toISOString())
     const timeStr = formatTime(now)
@@ -34,6 +37,23 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
     } catch {}
   }, [amount, newBalance])
 
+  const handleShare = useCallback(async () => {
+    try {
+      const uri = await captureRef(receiptRef, { format: 'png', quality: 1, result: 'tmpfile' })
+      const canShare = await Sharing.isAvailableAsync()
+      if (canShare) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'image/png',
+          dialogTitle: 'Comprovante Rangoo Universitário',
+        })
+      } else {
+        await shareAsText()
+      }
+    } catch {
+      await shareAsText()
+    }
+  }, [shareAsText])
+
   return (
     <View className="flex-1 items-center justify-center bg-background p-4 gap-5">
       <View className="items-center gap-3">
@@ -48,37 +68,39 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
         </Text>
       </View>
 
-      <Card className="w-full max-w-sm">
-        <View className="items-center gap-4">
-          <View>
-            <Text className="text-xs text-text-secondary text-center">Valor recarregado</Text>
-            <Text className="text-4xl font-bold text-success text-center mt-1">
-              +{formatCurrency(amount)}
-            </Text>
-          </View>
-
-          <View className="w-full h-px bg-outline-variant" />
-
-          <View className="w-full gap-3">
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-text-secondary">Novo saldo</Text>
-              <Text className="text-sm font-bold text-text-primary">
-                {formatCurrency(newBalance)}
+      <View ref={receiptRef} collapsable={false} className="w-full max-w-sm">
+        <Card className="bg-background">
+          <View className="items-center gap-4">
+            <View>
+              <Text className="text-xs text-text-secondary text-center">Valor recarregado</Text>
+              <Text className="text-4xl font-bold text-success text-center mt-1">
+                +{formatCurrency(amount)}
               </Text>
             </View>
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-text-secondary">Horário</Text>
-              <Text className="text-sm font-bold text-text-primary">
-                Hoje, {formatTime(new Date())}
-              </Text>
-            </View>
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-text-secondary">Método</Text>
-              <Text className="text-sm font-bold text-text-primary">PIX</Text>
+
+            <View className="w-full h-px bg-outline-variant" />
+
+            <View className="w-full gap-3">
+              <View className="flex-row justify-between items-center">
+                <Text className="text-sm text-text-secondary">Novo saldo</Text>
+                <Text className="text-sm font-bold text-text-primary">
+                  {formatCurrency(newBalance)}
+                </Text>
+              </View>
+              <View className="flex-row justify-between items-center">
+                <Text className="text-sm text-text-secondary">Horário</Text>
+                <Text className="text-sm font-bold text-text-primary">
+                  Hoje, {formatTime(new Date())}
+                </Text>
+              </View>
+              <View className="flex-row justify-between items-center">
+                <Text className="text-sm text-text-secondary">Método</Text>
+                <Text className="text-sm font-bold text-text-primary">PIX</Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Card>
+        </Card>
+      </View>
 
       <View className="w-full max-w-sm gap-3">
         <Button label="Compartilhar comprovante" onPress={handleShare} variant="secondary" />

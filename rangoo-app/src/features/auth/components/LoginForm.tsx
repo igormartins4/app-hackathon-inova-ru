@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
-import { Pressable, Text, TextInput, View } from 'react-native'
+import { Pressable, TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Button, ErrorMessage } from '@/shared/components/ui'
+import { Button, ErrorMessage, Text } from '@/shared/components/ui'
 import { isValidCpf, maskCpf, unmask } from '@/shared/utils'
 
 interface LoginFormProps {
