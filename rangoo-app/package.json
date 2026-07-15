@@ -11,7 +11,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "test": "jest",
-    "mock": "mockoon-cli start --data mock/mockoon-environment.json --port 3001",
+    "mock": "mockoon-cli start --data mock/mockoon-environment.json --port 3002",
     "mock:validate": "mockoon-cli validate --data mock/mockoon-environment.json"
   },
   "dependencies": {
@@ -61,6 +61,6 @@
     "jest-expo": "~57.0.1",
     "tailwindcss": "3.4.19",
     "ts-jest": "29.4.11",
-    "typescript": "5.9.3"
+    "typescript": "6.0.3"
   }
 }

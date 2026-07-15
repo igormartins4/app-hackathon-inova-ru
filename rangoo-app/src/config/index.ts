@@ -1,4 +1,4 @@
-export { API, POLLING, RECHARGE, STORAGE_KEYS } from './constants'
+export { POLLING, STORAGE_KEYS } from './constants'
 export type { ErrorCode } from './errors'
 export { ERROR_MESSAGES } from './errors'
 export {
