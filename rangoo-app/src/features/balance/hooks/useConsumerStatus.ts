@@ -1,3 +1,4 @@
+import { ERROR_MESSAGES } from '@/config/errors'
 import { useBalance } from './useBalance'
 
 interface ConsumerStatus {
@@ -22,9 +23,9 @@ export function useConsumerStatus(): ConsumerStatus {
 
   let message: string | null = null
   if (isBlocked) {
-    message = 'Recarga indisponível: sua conta está bloqueada. Procure a FUMP.'
+    message = ERROR_MESSAGES.BLOCKED_ACCOUNT
   } else if (isInactive) {
-    message = 'Conta inativa. Procure a FUMP para regularizar sua situação.'
+    message = ERROR_MESSAGES.INACTIVE_ACCOUNT
   }
 
   return { isBlocked, isInactive, isActive, message }
