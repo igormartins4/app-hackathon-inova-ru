@@ -78,7 +78,10 @@ const MOCK_MEALS = {
   pagination: { total: 3, currentPage: 1, perPage: 10, lastPage: 1 },
 }
 
+// Payment mock: tracks per-payment poll count to simulate pending→approved flow.
+// Spec §8: polling should receive pending 2-3 times before approved+creditado.
 let mockPaymentId = 1000
+const mockPaymentPollCount = new Map<number, number>()
 
 export function getMockResponse(config: AxiosRequestConfig): unknown | null {
   const url = config.url ?? ''
@@ -99,8 +102,24 @@ export function getMockResponse(config: AxiosRequestConfig): unknown | null {
   }
 
   if (url.includes('/creditos/pagamento') && url.includes('/status')) {
+    // Extract paymentId from URL: /creditos/pagamento/:id/status
+    const match = url.match(/\/creditos\/pagamento\/(\d+)\/status/)
+    const paymentId = match ? Number(match[1]) : mockPaymentId
+
+    const count = mockPaymentPollCount.get(paymentId) ?? 0
+    mockPaymentPollCount.set(paymentId, count + 1)
+
+    // Simulate 2-3 pending polls before approved (spec §8 + §11.2)
+    if (count < 2) {
+      return {
+        payment_id: paymentId,
+        status: 'pending',
+        creditado: false,
+      }
+    }
+
     return {
-      payment_id: mockPaymentId,
+      payment_id: paymentId,
       status: 'approved',
       status_detail: 'accredited',
       creditado: true,
@@ -112,7 +131,7 @@ export function getMockResponse(config: AxiosRequestConfig): unknown | null {
     return {
       payment_id: mockPaymentId,
       status: 'pending',
-      qr_code: '00020126580014br.gov.bcb.pix...',
+      qr_code: '00020126580014br.gov.bcb.pix.mock.rangoo.2026',
       qr_code_base64: '',
       ticket_url: '',
       expiration: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
