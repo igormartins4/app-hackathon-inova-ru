@@ -25,7 +25,7 @@ O Rangoo Universitário resolve os gargalos de fila nos RUs da UFMG ao permitir 
 | **PIX QR Code** | Exibição do QR Code PIX com código copia-e-cola, timer de expiração e botão de compartilhamento. Polling de status com backoff exponencial. |
 | **Sucesso** | Confirmação da recarga com valor adicionado, novo saldo e horário. |
 | **Histórico** | Abas de Recargas e Refeições com filtros por data. Paginação e scroll infinito. |
-| **Cardápio** | Cardápio do dia por restaurante (bônus fora do contrato v2.0 da API — dados de exemplo). |
+| **Cardápio** | Cardápio do dia por restaurante, com calendário semanal (bônus fora do contrato v2.0 — integração não-oficial com a API pública da FUMP, ver AGENTS.md). |
 | **Perfil** | Dados do consumidor, tipo, centro de custo e situação da conta. |
 
 ---
@@ -84,7 +84,7 @@ rangoo-app/
 │   │   ├── balance/             # Saldo, dados do consumidor
 │   │   ├── recharge/            # Fluxo PIX, QR Code, polling
 │   │   ├── history/             # Histórico de recargas e refeições (API real)
-│   │   ├── cardapio/            # Cardápio do dia (mock — bônus fora do contrato)
+│   │   ├── cardapio/            # Cardápio do dia (integração não-oficial, fora do contrato v2.0)
 │   │   └── profile/             # Perfil do usuário
 │   ├── shared/
 │   │   ├── components/ui/       # Button, Card, Input, ErrorMessage
@@ -102,7 +102,7 @@ rangoo-app/
 
 | Camada | Tecnologia |
 |--------|------------|
-| Runtime | Expo SDK 55 (React Native 0.83, React 19.2) |
+| Runtime | Expo SDK 57 (React Native 0.86, React 19.2) |
 | Navegação | Expo Router 6 (file-based) |
 | State | TanStack Query 5 + Zustand 5 |
 | Estilo | NativeWind 4 (Tailwind CSS 3.4) |

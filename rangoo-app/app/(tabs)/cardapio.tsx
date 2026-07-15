@@ -2,174 +2,25 @@ import { Ionicons } from '@expo/vector-icons'
 import { useCallback, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import type { MenuSection } from '@/features/cardapio'
+import type { FilialCode } from '@/features/cardapio'
+import { MenuCalendar, useCardapio } from '@/features/cardapio'
 import { Card, LoadingSpinner } from '@/shared/components/ui'
 
-type Restaurante = 'setorial1' | 'setorial2' | 'saude' | 'direito'
 type TipoRefeicao = 'almoco' | 'jantar'
 
-const RESTAURANTES: { key: Restaurante; label: string }[] = [
-  { key: 'setorial1', label: 'Setorial I' },
-  { key: 'setorial2', label: 'Setorial II' },
-  { key: 'saude', label: 'Saúde' },
-  { key: 'direito', label: 'Direito' },
+// Códigos de filial conforme Anexo A da especificação técnica — nunca inventar código/nome de RU.
+const RESTAURANTES: { key: FilialCode; label: string }[] = [
+  { key: '0003', label: 'Setorial 1' },
+  { key: '0002', label: 'Setorial 2' },
+  { key: '0001', label: 'Saúde/Direito' },
+  { key: '0004', label: 'ICA' },
+  { key: '0005', label: 'HRTN' },
 ]
 
 const MEALS: { key: TipoRefeicao; label: string; icon: string }[] = [
   { key: 'almoco', label: 'Almoço', icon: 'sunny' },
   { key: 'jantar', label: 'Jantar', icon: 'moon' },
 ]
-
-// Mock data — replace with useCardapio hook when API is available
-const MOCK_MENU: Record<Restaurante, Record<TipoRefeicao, MenuSection[]>> = {
-  setorial1: {
-    almoco: [
-      {
-        titulo: 'Entrada',
-        icon: 'leaf',
-        itens: [
-          { nome: 'Salada de Alface', vegano: true },
-          { nome: 'Salada de Tomate', vegano: true },
-          { nome: 'Cenoura Ralada', vegano: true },
-        ],
-      },
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz Branco', vegano: true },
-          { nome: 'Feijão Carioca', vegano: true },
-          { nome: 'Frango Grelhado', vegano: false },
-          { nome: 'Macarrão ao Molho', vegano: true },
-        ],
-      },
-      {
-        titulo: 'Sobremesa',
-        icon: 'ice-cream',
-        itens: [
-          { nome: 'Pudim de Leite', vegano: false },
-          { nome: 'Fruta da Temporada', vegano: true },
-        ],
-      },
-    ],
-    jantar: [
-      {
-        titulo: 'Entrada',
-        icon: 'leaf',
-        itens: [
-          { nome: 'Sopa de Legumes', vegano: true },
-          { nome: 'Salada Verde', vegano: true },
-        ],
-      },
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz Integral', vegano: true },
-          { nome: 'Feijão Preto', vegano: true },
-          { nome: 'Carne Moída', vegano: false },
-          { nome: 'Omelete', vegano: false },
-        ],
-      },
-    ],
-  },
-  setorial2: {
-    almoco: [
-      {
-        titulo: 'Entrada',
-        icon: 'leaf',
-        itens: [
-          { nome: 'Salada de Repolho', vegano: true },
-          { nome: 'Vinagrete', vegano: true },
-        ],
-      },
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz com Açafrão', vegano: true },
-          { nome: 'Feijão Branco', vegano: true },
-          { nome: 'Peixe Grelhado', vegano: false },
-          { nome: 'Legumes Refogados', vegano: true },
-        ],
-      },
-    ],
-    jantar: [
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz', vegano: true },
-          { nome: 'Feijão', vegano: true },
-          { nome: 'Ovo Frito', vegano: false },
-        ],
-      },
-    ],
-  },
-  saude: {
-    almoco: [
-      {
-        titulo: 'Entrada',
-        icon: 'leaf',
-        itens: [
-          { nome: 'Salada Caesar', vegano: false },
-          { nome: 'Sopa Minestrone', vegano: true },
-        ],
-      },
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz Integral', vegano: true },
-          { nome: 'Feijão Carioca', vegano: true },
-          { nome: 'Lombo Grelhado', vegano: false },
-          { nome: 'Brócolis no Vapor', vegano: true },
-        ],
-      },
-    ],
-    jantar: [
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz', vegano: true },
-          { nome: 'Feijão', vegano: true },
-          { nome: 'Frango ao Molho', vegano: false },
-        ],
-      },
-    ],
-  },
-  direito: {
-    almoco: [
-      {
-        titulo: 'Entrada',
-        icon: 'leaf',
-        itens: [{ nome: 'Salada Mix', vegano: true }],
-      },
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz', vegano: true },
-          { nome: 'Feijão', vegano: true },
-          { nome: 'Carne Seca', vegano: false },
-          { nome: 'Mandioca Cozida', vegano: true },
-        ],
-      },
-    ],
-    jantar: [
-      {
-        titulo: 'Prato Principal',
-        icon: 'restaurant',
-        itens: [
-          { nome: 'Arroz', vegano: true },
-          { nome: 'Feijão', vegano: true },
-          { nome: 'Sardinha', vegano: false },
-        ],
-      },
-    ],
-  },
-}
 
 function formatDate(date: Date): string {
   const days = [
@@ -200,15 +51,17 @@ function formatDate(date: Date): string {
 
 export default function CardapioScreen() {
   const themeColors = useThemeColors()
-  const [restaurante, setRestaurante] = useState<Restaurante>('setorial1')
+  const [restaurante, setRestaurante] = useState<FilialCode>('0003')
   const [tipoRefeicao, setTipoRefeicao] = useState<TipoRefeicao>('almoco')
-  const [isLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(new Date())
 
-  // To use real API, replace MOCK_MENU with:
-  // const { data } = useCardapio({ restaurante, tipoRefeicao })
-  // const secoes = data?.secoes ?? []
-  const secoes = MOCK_MENU[restaurante][tipoRefeicao]
-  const today = new Date()
+  const { data, isLoading, isError } = useCardapio({
+    restaurante,
+    tipoRefeicao,
+    data: selectedDate,
+  })
+  const secoes = data?.secoes ?? []
+  const isToday = selectedDate.toDateString() === new Date().toDateString()
 
   const getIconColor = useCallback(
     (icon: string) => {
@@ -272,16 +125,11 @@ export default function CardapioScreen() {
 
       <View className="gap-2">
         <Text className="text-xs font-bold text-primary uppercase tracking-wider">Data</Text>
-        <Card className="flex-row items-center gap-3">
-          <View className="w-10 h-10 rounded-lg bg-status-error/10 items-center justify-center">
-            <Ionicons name="calendar" size={20} color={themeColors.error} />
-          </View>
-          <View className="flex-1">
-            <Text className="text-sm font-bold text-text-primary">{formatDate(today)}</Text>
-            <Text className="text-xs text-success font-medium">Hoje</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
-        </Card>
+        <MenuCalendar selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+        <Text className="text-sm font-medium text-text-primary">
+          {formatDate(selectedDate)}
+          {isToday && <Text className="text-success"> · Hoje</Text>}
+        </Text>
       </View>
 
       <View className="gap-2">
@@ -317,6 +165,27 @@ export default function CardapioScreen() {
           ))}
         </View>
       </View>
+
+      {isError && (
+        <Card className="items-center gap-2 py-6">
+          <Ionicons name="cloud-offline-outline" size={28} color={themeColors.textSecondary} />
+          <Text className="text-sm font-medium text-text-primary text-center">
+            Não foi possível carregar o cardápio agora
+          </Text>
+          <Text className="text-xs text-text-secondary text-center">
+            O cardápio vem direto do site da FUMP e pode estar temporariamente indisponível.
+          </Text>
+        </Card>
+      )}
+
+      {!isError && !isLoading && secoes.length === 0 && (
+        <Card className="items-center gap-2 py-6">
+          <Ionicons name="restaurant-outline" size={28} color={themeColors.textSecondary} />
+          <Text className="text-sm font-medium text-text-primary text-center">
+            Cardápio não disponível para este RU nesta data
+          </Text>
+        </Card>
+      )}
 
       {secoes.map((secao) => (
         <View key={secao.titulo} className="gap-3">

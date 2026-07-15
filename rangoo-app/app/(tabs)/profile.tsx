@@ -5,7 +5,7 @@ import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { Button, Card, LoadingSpinner } from '@/shared/components/ui'
-import { useThemeStore } from '@/store/themeStore'
+import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
 const FONT_SIZES = [
   { key: 'p' as const, label: 'P' },
@@ -16,11 +16,11 @@ const FONT_SIZES = [
 export default function ProfileScreen() {
   const { user, logout } = useAuth()
   const { data: balanceData, isLoading: isBalanceLoading } = useBalance()
-  const { theme, setTheme, fontSize, setFontSize } = useThemeStore()
+  const { setTheme, fontSize, setFontSize } = useThemeStore()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
 
-  const isDark = theme === 'dark'
+  const isDark = useResolvedTheme() === 'dark'
 
   const initials =
     user?.nome
@@ -103,7 +103,7 @@ export default function ProfileScreen() {
               <Text className="text-xs text-text-secondary">Override do sistema</Text>
             </View>
           </View>
-          <View className="flex-row gap-2 ml-13">
+          <View className="flex-row gap-2 ml-[52px]">
             {FONT_SIZES.map((fs) => (
               <Pressable
                 key={fs.key}

@@ -7,7 +7,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 
 **Core Value:** O estudante consegue recarregar créditos no RU em menos de 30 segundos, de forma acessível e segura, mesmo com conectividade limitada.
 
-**Platform:** React Native (Expo SDK 55)
+**Platform:** React Native (Expo SDK 57)
 **Architecture:** Feature-based
 **Team:** 2-3 people (Dev + Designer)
 **Timeline:** 1 week (12/07 to 18/07)
@@ -16,7 +16,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 <!-- GSD:stack-start source:STACK.md -->
 ## Technology Stack
 
-- **Runtime:** Expo SDK 55 (React Native 0.83, React 19.2)
+- **Runtime:** Expo SDK 57 (React Native 0.86, React 19.2)
 - **Navigation:** React Navigation v7
 - **State:** TanStack Query (server state) + Zustand (client state)
 - **Styling:** NativeWind v4 (Tailwind CSS 3.4)
@@ -78,6 +78,7 @@ No project skills found.
 Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
 
 Use these entry points:
+
 - `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
 - `/gsd-debug` for investigation and bug fixing
 - `/gsd-execute-phase` for planned phase work
@@ -113,6 +114,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 ### 2.1 Autenticação (`POST /usuarios/login`)
 
 **Payload de Envio:**
+
 ```json
 {
   "user": "12345678901",
@@ -121,6 +123,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 ```
 
 **Payload de Retorno (Status 200) — seção 7.1:**
+
 ```json
 {
   "usuario": {
@@ -140,6 +143,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 ### 2.2 Saldo e Contexto (`GET /creditos/saldo`)
 
 **Payload de Retorno (Status 200):**
+
 ```json
 {
   "consumidor": {
@@ -172,6 +176,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 **Payload de Envio:** `{ "valor": 50.00 }` (mínimo R$ 5,00 / máximo R$ 500,00 — validação client-side em `src/shared/utils/recharge.ts`)
 
 **Payload de Retorno (Status 201):**
+
 ```json
 {
   "payment_id": 123456789,
@@ -207,6 +212,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 Query params: `page` (default 1), `perPage` (default 20, máx 100), `dataInicio`/`dataFim` (`YYYY-MM-DD`), e em refeições opcionalmente `filial` (código de RU, ver 2.6).
 
 Envelope de paginação (seção 6.8), **sempre** presente em listagens:
+
 ```json
 { "data": [...], "pagination": { "total": 142, "currentPage": 1, "perPage": 20, "lastPage": 8 } }
 ```
@@ -238,6 +244,17 @@ Em `429`, a API retorna header `Retry-After` (segundos) — **leia esse header**
 ### 2.8 Fuso horário
 
 Todas as datas são ISO 8601 com offset `-03:00` (Brasília). `new Date(iso)` do JS já respeita o offset embutido na string e `toLocaleDateString`/`toLocaleTimeString` já convertem pro fuso local do dispositivo automaticamente — não escreva lógica manual de conversão de fuso.
+
+### 2.9 Cardápio — integração não-oficial, fora do contrato v2.0
+
+`docs/especificacao_tecnica.md` **não define nenhum endpoint de cardápio/menu**. A tela `app/(tabs)/cardapio.tsx` consome `https://fump.ufmg.br:3003/cardapios/cardapio`, um endpoint público (sem autenticação, GET, dado público) descoberto via inspeção de rede do site oficial (`fump.ufmg.br/cardapio-do-dia`) — **não é parte do contrato assinado**, pode mudar de forma ou sair do ar sem aviso.
+
+Implementado em `src/features/cardapio/services/cardapioApi.ts`. Regras:
+
+- Mapeamento de código de filial (Anexo A, 2.6) para o `id` numérico dessa API está em `FILIAL_TO_FUMP_ID` — RU HRTN (`0005`) não tem cardápio publicado nessa API.
+- Usa um cliente axios próprio (`fumpMenuClient`), separado do `apiClient` do contrato v2.0 — nunca misture os dois, nunca passe esse endpoint pelo `mockAdapter`/`EXPO_PUBLIC_USE_MOCK`.
+- Qualquer falha (endpoint fora do ar, filial sem dado, mudança de shape) **deve degradar para um estado vazio/erro explícito na UI** (`isError`/lista vazia em `cardapio.tsx`) — nunca cair de volta pra dado inventado ou mock silenciosamente misturado com dado real.
+- Se esse endpoint parar de funcionar em algum momento futuro, isso não é uma regressão de contrato — é a natureza de depender de uma API não documentada de terceiro.
 
 ---
 
@@ -304,6 +321,7 @@ Mensagens de app definidas em `src/config/errors.ts` — mantenha esse arquivo c
 **Bug real já cometido e corrigido:** Expo SDK 54+/RN 0.81+ ativa edge-to-edge no Android por padrão — conteúdo desenha por baixo da status bar/barra de navegação a menos que o app peça inset manualmente. `react-native-safe-area-context` está instalado mas telas sem header nativo (modais, tela de login, banners renderizados acima do `Stack`) ficavam sem nenhum inset, e um botão ("Voltar" do Histórico) sentava embaixo da barra de hora/notificação.
 
 **Regra:**
+
 - `app/_layout.tsx` já envolve tudo num `<SafeAreaProvider>` — não remova.
 - Qualquer tela/rota que **não** tenha header nativo do React Navigation (ex.: `(auth)/login.tsx`, `app/history.tsx` — modal com `headerShown: false`) deve usar `<SafeAreaView edges={['top', 'bottom']}>` (de `react-native-safe-area-context`, não o `SafeAreaView` legado do `react-native`) como container raiz.
 - Componentes renderizados **acima** do `<Stack>` no root layout (ex.: `OfflineBanner`) não ganham o inset do header de ninguém — usam `useSafeAreaInsets()` diretamente e aplicam `paddingTop: insets.top` na própria borda.
@@ -352,22 +370,27 @@ As funcionalidades devem ser estritamente isoladas por domínio de uso na pasta 
 
 Utilize Jest para testes de unidade de lógica pura de negócio. **Convenção real do projeto** (ver `jest.config.js`, `testMatch: ['**/__tests__/**/*.test.ts']`): arquivos ficam numa pasta `__tests__/` dentro do diretório do código testado, com extensão `.test.ts` — não `.spec.ts`, não co-localizado direto na pasta pai. Exemplo real: `src/features/recharge/utils/__tests__/polling.test.ts`.
 
-### O que DEVE ter teste:
+### O que DEVE ter teste
+
 - **Algoritmo de Polling + Backoff Exponencial** (`PAY-05`): Testar cálculo de tempo com jitter dentro dos limites ±1s
 - **Validação de Limites de Recarga** (`PAY-01`, `BALC-01`): valor entre R$ 5,00 e R$ 500,00 (limite é o `limite_recarga` dinâmico da API, não um teto fixo)
 - **Máscaras e Validadores de Entrada**: CPF limpo com exatamente 11 dígitos no campo `user`
 - **Estado da máquina de polling**: Transições de status (pending → approved/rejected/cancelled/expired)
 
-### O que NÃO DEVE ter teste:
+### O que NÃO DEVE ter teste
+
 - Testes de snapshot ou renderização de componentes React Native (UI)
 - Testes de integração com API mock (a menos que explicitamente solicitado)
 - Testes de configuração de build ou tooling
 
 ### Antes de considerar qualquer tarefa concluída
+
 Rode, nessa ordem, e confira que os três passam:
+
 ```bash
 pnpm exec tsc --noEmit
 pnpm exec biome check .
 pnpm exec jest
 ```
+
 Se `node`/`pnpm` não estiverem no PATH do shell, use `pnpm env use --global lts` primeiro (self-contained, não precisa de admin).
