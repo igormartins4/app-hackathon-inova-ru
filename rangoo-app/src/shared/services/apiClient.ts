@@ -1,7 +1,9 @@
 import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import { ERROR_MESSAGES } from '@/config'
 import { emitUnauthorized } from './authEvents'
+import { deleteCache } from './cacheStorage'
 import { getMockResponse } from './mockHandler'
+import { queryClient } from './queryClient'
 import { getToken, removeToken, removeUser } from './secureStorage'
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:3000'
@@ -38,7 +40,7 @@ apiClient.interceptors.request.use(async (config) => {
 // original Error instance — callers rely on `instanceof Error` upstream.
 apiClient.interceptors.response.use(
   (res) => res,
-  (error) => {
+  async (error) => {
     const status = error.response?.status as number | undefined
     let userMessage: string = status
       ? (ERROR_MESSAGES[status as keyof typeof ERROR_MESSAGES] ?? ERROR_MESSAGES[500])
@@ -57,9 +59,11 @@ apiClient.interceptors.response.use(
     error.userMessage = userMessage
 
     if (status === 401) {
-      // Token expired/invalid — clear it and let the auth layer redirect to login.
-      removeToken()
-      removeUser()
+      // Token expired/invalid — clear everything and let the auth layer redirect to login.
+      await removeToken()
+      await removeUser()
+      queryClient.clear()
+      await deleteCache('rangoo-query-cache')
       emitUnauthorized()
     }
 
