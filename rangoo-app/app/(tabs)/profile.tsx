@@ -7,19 +7,26 @@ import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useMealHistory } from '@/features/history'
 import { Button, Card, LoadingSpinner, StatusBadge, Text } from '@/shared/components/ui'
 import { formatCurrency } from '@/shared/utils'
-import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
-
-const FONT_SIZES = [
-  { key: 'p' as const, label: 'P' },
-  { key: 'm' as const, label: 'M' },
-  { key: 'g' as const, label: 'G' },
-]
+import { FONT_FAMILIES, FONT_STEPS, useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth()
   const { data: balanceData, isLoading: isBalanceLoading } = useBalance()
   const { data: mealHistory } = useMealHistory()
-  const { setTheme, fontSize, setFontSize } = useThemeStore()
+  const {
+    setTheme,
+    fontSize,
+    fontFamily,
+    increaseFontSize,
+    decreaseFontSize,
+    nextFontFamily,
+    highContrast,
+    reducedMotion,
+    useSystemColors,
+    toggleHighContrast,
+    toggleReducedMotion,
+    toggleSystemColors,
+  } = useThemeStore()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
 
@@ -138,13 +145,14 @@ export default function ProfileScreen() {
 
       <Card>
         <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-          Preferências
+          Acessibilidade
         </Text>
 
         <Pressable
           onPress={handleToggleDark}
           accessibilityRole="switch"
           accessibilityLabel="Modo escuro"
+          accessibilityHint="Alterna entre tema claro e escuro"
           accessibilityState={{ checked: isDark }}
           className="flex-row items-center justify-between py-3 border-b border-outline-variant"
         >
@@ -153,7 +161,7 @@ export default function ProfileScreen() {
               <Ionicons name={isDark ? 'moon' : 'sunny'} size={20} color={themeColors.warning} />
             </View>
             <View>
-              <Text className="text-sm font-medium text-text-primary">Modo escuro</Text>
+              <Text className="text-sm font-medium text-text-primary">Tema escuro</Text>
               <Text className="text-xs text-text-secondary">Segue o sistema por padrão</Text>
             </View>
           </View>
@@ -164,41 +172,161 @@ export default function ProfileScreen() {
           </View>
         </Pressable>
 
+        <Pressable
+          onPress={toggleHighContrast}
+          accessibilityRole="switch"
+          accessibilityLabel="Alto contraste"
+          accessibilityHint="Aumenta o contraste entre texto e fundo para melhor leitura"
+          accessibilityState={{ checked: highContrast }}
+          className="flex-row items-center justify-between py-3 border-b border-outline-variant"
+        >
+          <View className="flex-row items-center gap-3">
+            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+              <Ionicons name="contrast" size={20} color={themeColors.primary} />
+            </View>
+            <View>
+              <Text className="text-sm font-medium text-text-primary">Alto contraste</Text>
+              <Text className="text-xs text-text-secondary">Texto mais forte e legível</Text>
+            </View>
+          </View>
+          <View
+            className={`w-12 h-7 rounded-full p-0.5 ${highContrast ? 'bg-primary' : 'bg-outline'}`}
+          >
+            <View
+              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${highContrast ? 'ml-5' : 'ml-0'}`}
+            />
+          </View>
+        </Pressable>
+
+        <Pressable
+          onPress={toggleReducedMotion}
+          accessibilityRole="switch"
+          accessibilityLabel="Reduzir movimento"
+          accessibilityHint="Remove animações e transições não essenciais do aplicativo"
+          accessibilityState={{ checked: reducedMotion }}
+          className="flex-row items-center justify-between py-3 border-b border-outline-variant"
+        >
+          <View className="flex-row items-center gap-3">
+            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+              <Ionicons name="accessibility" size={20} color={themeColors.primary} />
+            </View>
+            <View>
+              <Text className="text-sm font-medium text-text-primary">Reduzir movimento</Text>
+              <Text className="text-xs text-text-secondary">Desativa animações suaves</Text>
+            </View>
+          </View>
+          <View
+            className={`w-12 h-7 rounded-full p-0.5 ${reducedMotion ? 'bg-primary' : 'bg-outline'}`}
+          >
+            <View
+              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${reducedMotion ? 'ml-5' : 'ml-0'}`}
+            />
+          </View>
+        </Pressable>
+
+        <Pressable
+          onPress={toggleSystemColors}
+          accessibilityRole="switch"
+          accessibilityLabel="Cores do sistema"
+          accessibilityHint="Usa a cor de destaque do Android quando o tema está definido como sistema"
+          accessibilityState={{ checked: useSystemColors }}
+          className="flex-row items-center justify-between py-3 border-b border-outline-variant"
+        >
+          <View className="flex-row items-center gap-3">
+            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+              <Ionicons name="color-palette" size={20} color={themeColors.primary} />
+            </View>
+            <View>
+              <Text className="text-sm font-medium text-text-primary">Cores do sistema</Text>
+              <Text className="text-xs text-text-secondary">Material You simplificado</Text>
+            </View>
+          </View>
+          <View
+            className={`w-12 h-7 rounded-full p-0.5 ${useSystemColors ? 'bg-primary' : 'bg-outline'}`}
+          >
+            <View
+              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${useSystemColors ? 'ml-5' : 'ml-0'}`}
+            />
+          </View>
+        </Pressable>
+
         <View className="py-3">
           <View className="flex-row items-center gap-3 mb-3">
             <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
               <Text className="text-sm font-bold text-primary">Aa</Text>
             </View>
-            <View>
+            <View className="flex-1">
               <Text className="text-sm font-medium text-text-primary">Tamanho da fonte</Text>
               <Text className="text-xs text-text-secondary">
-                {fontSize === 'p' ? 'Pequena' : fontSize === 'm' ? 'Média' : 'Grande'}
+                {FONT_STEPS[fontSize].label} ({FONT_STEPS[fontSize].scale}×)
               </Text>
             </View>
           </View>
-          <View className="flex-row gap-2 ml-[52px]">
-            {FONT_SIZES.map((fs) => (
-              <Pressable
-                key={fs.key}
-                onPress={() => setFontSize(fs.key)}
-                accessibilityRole="button"
-                accessibilityLabel={`Tamanho ${fs.label}`}
-                accessibilityState={{ selected: fontSize === fs.key }}
-                className={`w-12 h-12 rounded-lg items-center justify-center ${
-                  fontSize === fs.key ? 'bg-primary' : 'bg-surface-variant border border-outline'
-                }`}
-              >
-                <Text
-                  className={`text-sm font-medium ${
-                    fontSize === fs.key ? 'text-text-inverse' : 'text-text-primary'
-                  }`}
-                >
-                  {fs.label}
-                </Text>
-              </Pressable>
-            ))}
+          <View className="flex-row items-center justify-center gap-4 ml-[52px]">
+            <Pressable
+              onPress={decreaseFontSize}
+              disabled={fontSize === 0}
+              accessibilityRole="button"
+              accessibilityLabel="Diminuir fonte"
+              accessibilityHint="Reduz o tamanho do texto"
+              className={`w-12 h-12 rounded-full items-center justify-center ${
+                fontSize === 0 ? 'bg-outline/30' : 'bg-primary'
+              }`}
+            >
+              <Ionicons
+                name="remove"
+                size={22}
+                color={fontSize === 0 ? themeColors.textDisabled : themeColors.textInverse}
+              />
+            </Pressable>
+
+            <View className="items-center min-w-[100px]">
+              <Text className="text-lg font-bold text-text-primary">
+                {FONT_STEPS[fontSize].scale}×
+              </Text>
+            </View>
+
+            <Pressable
+              onPress={increaseFontSize}
+              disabled={fontSize === FONT_STEPS.length - 1}
+              accessibilityRole="button"
+              accessibilityLabel="Aumentar fonte"
+              accessibilityHint="Aumenta o tamanho do texto"
+              className={`w-12 h-12 rounded-full items-center justify-center ${
+                fontSize === FONT_STEPS.length - 1 ? 'bg-outline/30' : 'bg-primary'
+              }`}
+            >
+              <Ionicons
+                name="add"
+                size={22}
+                color={
+                  fontSize === FONT_STEPS.length - 1
+                    ? themeColors.textDisabled
+                    : themeColors.textInverse
+                }
+              />
+            </Pressable>
           </View>
         </View>
+
+        <Pressable
+          onPress={nextFontFamily}
+          accessibilityRole="button"
+          accessibilityLabel="Mudar fonte"
+          accessibilityHint="Alterna entre as fontes disponíveis"
+          className="flex-row items-center justify-between py-3 border-t border-outline-variant"
+        >
+          <View className="flex-row items-center gap-3">
+            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+              <Text className="text-sm font-bold text-primary">Ff</Text>
+            </View>
+            <View>
+              <Text className="text-sm font-medium text-text-primary">Fonte</Text>
+              <Text className="text-xs text-text-secondary">{FONT_FAMILIES[fontFamily].label}</Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={themeColors.textSecondary} />
+        </Pressable>
       </Card>
 
       <Card>

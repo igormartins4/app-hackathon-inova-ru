@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import type { BalanceResponse } from '@/features/balance'
 import { useBalance, useConsumerStatus } from '@/features/balance'
+import { BalancePreview } from '@/features/recharge/components/BalancePreview'
 import { PaymentError } from '@/features/recharge/components/PaymentError'
 import { PaymentStatus } from '@/features/recharge/components/PaymentStatus'
 import { PaymentSuccess } from '@/features/recharge/components/PaymentSuccess'
@@ -37,6 +38,7 @@ export default function RechargeScreen() {
   )
   const [newBalance, setNewBalance] = useState(0)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [selectedAmount, setSelectedAmount] = useState(0)
 
   const handleApproved = useCallback(async () => {
     await queryClient.refetchQueries({ queryKey: ['balance'] })
@@ -130,10 +132,12 @@ export default function RechargeScreen() {
                 </Text>
               </View>
             )}
+            <BalancePreview currentBalance={currentBalance} amount={selectedAmount} />
             <RechargeForm
               currentBalance={currentBalance}
               limiteRecarga={limiteRecarga}
               disabled={consumerDisabled || isSubmitting}
+              onAmountChange={setSelectedAmount}
               onSubmit={handleSubmit}
               serverError={submitError}
             />

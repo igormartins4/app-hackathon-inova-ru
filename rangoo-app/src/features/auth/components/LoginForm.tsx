@@ -60,6 +60,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
           keyboardType="numeric"
           editable={!isLoading}
           accessibilityLabel="Campo de CPF"
+          accessibilityHint="Digite os 11 números do seu CPF institucional"
           className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
         />
         {cpfError ? (
@@ -80,12 +81,14 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
             secureTextEntry={!showPassword}
             editable={!isLoading}
             accessibilityLabel="Campo de senha"
+            accessibilityHint="Digite sua senha institucional"
             className="bg-surface border border-outline rounded-xl px-4 py-3.5 pr-12 text-base text-text-primary min-h-[48px]"
           />
           <Pressable
             onPress={() => setShowPassword(!showPassword)}
             accessibilityRole="button"
             accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            accessibilityHint="Alterna a visibilidade da senha digitada"
             className="absolute right-2 top-2 w-10 h-10 items-center justify-center"
           >
             <Ionicons

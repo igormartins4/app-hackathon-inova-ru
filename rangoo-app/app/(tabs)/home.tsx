@@ -8,7 +8,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
 import { useRechargeHistory } from '@/features/history'
-import { Card, ErrorMessage, LoadingSpinner, Text } from '@/shared/components/ui'
+import { Card, ErrorMessage, FadeInView, LoadingSpinner, Text } from '@/shared/components/ui'
 import {
   formatCurrency,
   formatToLocalDateTime,
@@ -161,31 +161,35 @@ export default function HomeScreen() {
             </Text>
           ) : (
             recentRecharges.map((recarga, idx) => (
-              <Pressable
-                key={recarga.id}
-                onPress={() => router.push('/(tabs)/historico?tab=recargas')}
-                className={`flex-row items-center gap-3 px-4 py-3 ${
-                  idx < recentRecharges.length - 1 ? 'border-b border-outline-variant' : ''
-                }`}
-              >
-                <View className="w-10 h-10 rounded-full bg-success/10 items-center justify-center">
-                  <Ionicons name="card" size={20} color={themeColors.success} />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-semibold text-text-primary">Recarga PIX</Text>
-                  <Text className="text-xs text-text-secondary">
-                    {formatToLocalDateTime(recarga.data_hora)}
-                  </Text>
-                </View>
-                <View className="items-end">
-                  <Text className="text-sm font-bold text-text-primary">
-                    +{formatCurrency(recarga.valor)}
-                  </Text>
-                  <Text className="text-xs font-medium text-success">
-                    {recarga.status === 'aprovado' ? 'Aprovado' : recarga.status}
-                  </Text>
-                </View>
-              </Pressable>
+              <FadeInView key={recarga.id}>
+                <Pressable
+                  onPress={() => router.push('/(tabs)/historico?tab=recargas')}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Recarga de ${formatCurrency(recarga.valor)} em ${formatToLocalDateTime(recarga.data_hora)}`}
+                  accessibilityHint="Abre o histórico de recargas"
+                  className={`flex-row items-center gap-3 px-4 py-3 ${
+                    idx < recentRecharges.length - 1 ? 'border-b border-outline-variant' : ''
+                  }`}
+                >
+                  <View className="w-10 h-10 rounded-full bg-success/10 items-center justify-center">
+                    <Ionicons name="card" size={20} color={themeColors.success} />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm font-semibold text-text-primary">Recarga PIX</Text>
+                    <Text className="text-xs text-text-secondary">
+                      {formatToLocalDateTime(recarga.data_hora)}
+                    </Text>
+                  </View>
+                  <View className="items-end">
+                    <Text className="text-sm font-bold text-text-primary">
+                      +{formatCurrency(recarga.valor)}
+                    </Text>
+                    <Text className="text-xs font-medium text-success">
+                      {recarga.status === 'aprovado' ? 'Aprovado' : recarga.status}
+                    </Text>
+                  </View>
+                </Pressable>
+              </FadeInView>
             ))
           )}
         </Card>
@@ -224,6 +228,28 @@ export default function HomeScreen() {
             </View>
           </View>
         </LinearGradient>
+      </Pressable>
+
+      <Pressable
+        onPress={() => router.push('/(tabs)/transfer')}
+        accessibilityRole="button"
+        accessibilityLabel="Transferir saldo para outra pessoa"
+        accessibilityHint="Abre a transferência demonstrativa de créditos"
+        className="mx-4 mb-4"
+      >
+        <Card>
+          <View className="flex-row items-center gap-3">
+            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+              <Ionicons name="swap-horizontal" size={20} color={themeColors.primary} />
+            </View>
+            <View className="flex-1">
+              <Text className="text-sm font-bold text-text-primary">Ajudar um amigo</Text>
+              <Text className="text-xs text-text-secondary">
+                Transferência simulada para demonstração
+              </Text>
+            </View>
+          </View>
+        </Card>
       </Pressable>
 
       <View className="h-4" />

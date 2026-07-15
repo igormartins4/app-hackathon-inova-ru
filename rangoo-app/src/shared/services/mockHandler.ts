@@ -81,6 +81,7 @@ const MOCK_MEALS = {
 // Payment mock: tracks per-payment poll count to simulate pending→approved flow.
 // Spec §8: polling should receive pending 2-3 times before approved+creditado.
 let mockPaymentId = 1000
+let mockTransferId = 2000
 const mockPaymentPollCount = new Map<number, number>()
 
 export function getMockResponse(config: AxiosRequestConfig): unknown | null {
@@ -135,6 +136,20 @@ export function getMockResponse(config: AxiosRequestConfig): unknown | null {
       qr_code_base64: '',
       ticket_url: '',
       expiration: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    }
+  }
+
+  if (url.includes('/creditos/transferir') && method === 'post') {
+    const payload = typeof config.data === 'string' ? JSON.parse(config.data) : config.data
+    mockTransferId++
+    return {
+      transfer_id: mockTransferId,
+      status: 'approved',
+      saldo_atualizado: Math.max(
+        0,
+        MOCK_BALANCE.saldo.credito_disponivel - Number(payload?.valor ?? 0),
+      ),
+      destinatario_nome: 'AMIGO UFMG',
     }
   }
 

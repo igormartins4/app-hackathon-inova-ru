@@ -10,19 +10,23 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { QUERY_PERSIST_MAX_AGE, queryClient, queryPersister } from '@/shared/services'
-import { useFontScale, useResolvedTheme, useThemeStore } from '@/store/themeStore'
+import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const initialize = useThemeStore((s) => s.initialize)
   const resolvedTheme = useResolvedTheme()
-  const _fontScale = useFontScale()
+  const highContrast = useThemeStore((s) => s.highContrast)
 
   useEffect(() => {
     initialize()
   }, [initialize])
 
+  const themeClasses = [resolvedTheme === 'dark' ? 'dark' : '', highContrast ? 'high-contrast' : '']
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <View style={{ flex: 1 }} className={resolvedTheme === 'dark' ? 'dark' : ''}>
+    <View style={{ flex: 1 }} className={themeClasses}>
       {children}
     </View>
   )
@@ -32,6 +36,7 @@ function AuthGate() {
   const { isAuthenticated, isLoading } = useAuth()
   const { isOffline } = useNetworkStatus()
   const resolvedTheme = useResolvedTheme()
+  const reducedMotion = useThemeStore((s) => s.reducedMotion)
   const segments = useSegments()
   const router = useRouter()
 
@@ -54,7 +59,12 @@ function AuthGate() {
         {isLoading ? (
           <LoadingSpinner message="Carregando" />
         ) : (
-          <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: reducedMotion ? 'none' : 'slide_from_right',
+            }}
+          >
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
           </Stack>

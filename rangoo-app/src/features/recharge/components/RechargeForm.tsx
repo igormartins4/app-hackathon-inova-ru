@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
@@ -20,6 +20,7 @@ interface RechargeFormProps {
   limiteRecarga?: number
   disabled?: boolean
   onSubmit: (valor: number) => void
+  onAmountChange?: (valor: number) => void
   /** Erro 422 vindo da API ao criar o pagamento — renderizado inline, abaixo do input. */
   serverError?: string | null
 }
@@ -29,6 +30,7 @@ export function RechargeForm({
   limiteRecarga,
   disabled,
   onSubmit,
+  onAmountChange,
   serverError,
 }: RechargeFormProps) {
   const themeColors = useThemeColors()
@@ -42,6 +44,10 @@ export function RechargeForm({
   const validation = validateRechargeAmount(activeAmount, currentBalance, limiteRecarga)
   const exceedsLimit = activeAmount > 0 && !validation.valid
   const isValid = activeAmount > 0 && validation.valid
+
+  useEffect(() => {
+    onAmountChange?.(activeAmount)
+  }, [activeAmount, onAmountChange])
 
   function handlePreset(value: number) {
     setSelectedAmount(value)
@@ -112,6 +118,7 @@ export function RechargeForm({
             keyboardType="numeric"
             editable={!disabled}
             accessibilityLabel="Valor personalizado de recarga"
+            accessibilityHint="Digite um valor entre o mínimo e o limite disponível para recarga"
             className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
           />
           <Text className="text-xs text-text-secondary">

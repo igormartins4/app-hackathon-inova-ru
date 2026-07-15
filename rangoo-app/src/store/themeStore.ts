@@ -3,48 +3,151 @@ import { useColorScheme } from 'react-native'
 import { create } from 'zustand'
 
 type Theme = 'light' | 'dark' | 'system'
-type FontSize = 'p' | 'm' | 'g'
 
-const FONT_SCALE: Record<FontSize, number> = {
-  p: 0.85,
-  m: 1.0,
-  g: 1.15,
-}
+export const FONT_STEPS = [
+  { scale: 0.8, label: 'Pequena' },
+  { scale: 0.9, label: 'Média' },
+  { scale: 1.0, label: 'Padrão' },
+  { scale: 1.15, label: 'Grande' },
+  { scale: 1.3, label: 'Extra Grande' },
+] as const
+
+export const FONT_FAMILIES = [
+  { family: 'System', label: 'Sistema' },
+  { family: 'serif', label: 'Serif' },
+  { family: 'monospace', label: 'Monospace' },
+] as const
+
+const DEFAULT_FONT_INDEX = 2
+const DEFAULT_FONT_FAMILY_INDEX = 0
 
 const STORAGE_KEY_THEME = '@rangoo_theme'
 const STORAGE_KEY_FONT_SIZE = '@rangoo_font_size'
+const STORAGE_KEY_HIGH_CONTRAST = '@rangoo_high_contrast'
+const STORAGE_KEY_REDUCED_MOTION = '@rangoo_reduced_motion'
+const STORAGE_KEY_SYSTEM_COLORS = '@rangoo_system_colors'
+const STORAGE_KEY_FONT_FAMILY = '@rangoo_font_family'
 
 interface ThemeStoreState {
   theme: Theme
-  fontSize: FontSize
+  fontSize: number
+  fontFamily: number
+  highContrast: boolean
+  reducedMotion: boolean
+  useSystemColors: boolean
   setTheme: (theme: Theme) => void
-  setFontSize: (size: FontSize) => void
+  setFontSize: (index: number) => void
+  nextFontFamily: () => void
+  increaseFontSize: () => void
+  decreaseFontSize: () => void
+  toggleHighContrast: () => void
+  toggleReducedMotion: () => void
+  toggleSystemColors: () => void
   initialize: () => Promise<void>
 }
 
-export const useThemeStore = create<ThemeStoreState>((set, _get) => ({
+export const useThemeStore = create<ThemeStoreState>((set, get) => ({
   theme: 'system',
-  fontSize: 'm',
+  fontSize: DEFAULT_FONT_INDEX,
+  fontFamily: DEFAULT_FONT_FAMILY_INDEX,
+  highContrast: false,
+  reducedMotion: false,
+  useSystemColors: true,
   setTheme: (theme) => {
     set({ theme })
     AsyncStorage.setItem(STORAGE_KEY_THEME, theme)
   },
-  setFontSize: (fontSize) => {
-    set({ fontSize })
-    AsyncStorage.setItem(STORAGE_KEY_FONT_SIZE, fontSize)
+  setFontSize: (index) => {
+    const clamped = Math.max(0, Math.min(FONT_STEPS.length - 1, index))
+    set({ fontSize: clamped })
+    AsyncStorage.setItem(STORAGE_KEY_FONT_SIZE, String(clamped))
+  },
+  nextFontFamily: () => {
+    const next = (get().fontFamily + 1) % FONT_FAMILIES.length
+    set({ fontFamily: next })
+    AsyncStorage.setItem(STORAGE_KEY_FONT_FAMILY, String(next))
+  },
+  increaseFontSize: () => {
+    const { fontSize } = get()
+    if (fontSize < FONT_STEPS.length - 1) {
+      const next = fontSize + 1
+      set({ fontSize: next })
+      AsyncStorage.setItem(STORAGE_KEY_FONT_SIZE, String(next))
+    }
+  },
+  decreaseFontSize: () => {
+    const { fontSize } = get()
+    if (fontSize > 0) {
+      const prev = fontSize - 1
+      set({ fontSize: prev })
+      AsyncStorage.setItem(STORAGE_KEY_FONT_SIZE, String(prev))
+    }
+  },
+  toggleHighContrast: () => {
+    const next = !get().highContrast
+    set({ highContrast: next })
+    AsyncStorage.setItem(STORAGE_KEY_HIGH_CONTRAST, String(next))
+  },
+  toggleReducedMotion: () => {
+    const next = !get().reducedMotion
+    set({ reducedMotion: next })
+    AsyncStorage.setItem(STORAGE_KEY_REDUCED_MOTION, String(next))
+  },
+  toggleSystemColors: () => {
+    const next = !get().useSystemColors
+    set({ useSystemColors: next })
+    AsyncStorage.setItem(STORAGE_KEY_SYSTEM_COLORS, String(next))
   },
   initialize: async () => {
     try {
-      const [savedTheme, savedFontSize] = await Promise.all([
+      const [
+        savedTheme,
+        savedFontSize,
+        savedHighContrast,
+        savedReducedMotion,
+        savedSystemColors,
+        savedFontFamily,
+      ] = await Promise.all([
         AsyncStorage.getItem(STORAGE_KEY_THEME),
         AsyncStorage.getItem(STORAGE_KEY_FONT_SIZE),
+        AsyncStorage.getItem(STORAGE_KEY_HIGH_CONTRAST),
+        AsyncStorage.getItem(STORAGE_KEY_REDUCED_MOTION),
+        AsyncStorage.getItem(STORAGE_KEY_SYSTEM_COLORS),
+        AsyncStorage.getItem(STORAGE_KEY_FONT_FAMILY),
       ])
       const updates: Partial<ThemeStoreState> = {}
       if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
         updates.theme = savedTheme as Theme
       }
-      if (savedFontSize && ['p', 'm', 'g'].includes(savedFontSize)) {
-        updates.fontSize = savedFontSize as FontSize
+      if (savedFontSize !== null) {
+        // Migrate legacy 'p'/'m'/'g' values to numeric indices
+        if (savedFontSize === 'p') {
+          updates.fontSize = 0
+        } else if (savedFontSize === 'm') {
+          updates.fontSize = 2
+        } else if (savedFontSize === 'g') {
+          updates.fontSize = 3
+        } else {
+          const num = Number(savedFontSize)
+          if (!Number.isNaN(num) && num >= 0 && num < FONT_STEPS.length) {
+            updates.fontSize = num
+          }
+        }
+      }
+      if (savedHighContrast === 'true') {
+        updates.highContrast = true
+      }
+      if (savedReducedMotion === 'true') {
+        updates.reducedMotion = true
+      }
+      if (savedSystemColors === 'false') {
+        updates.useSystemColors = false
+      }
+      if (savedFontFamily !== null) {
+        const num = Number(savedFontFamily)
+        if (!Number.isNaN(num) && num >= 0 && num < FONT_FAMILIES.length) {
+          updates.fontFamily = num
+        }
       }
       if (Object.keys(updates).length > 0) {
         set(updates)
@@ -63,10 +166,10 @@ export function useResolvedTheme(): 'light' | 'dark' {
 
 export function useFontScale(): number {
   const fontSize = useThemeStore((s) => s.fontSize)
-  return FONT_SCALE[fontSize]
+  return FONT_STEPS[fontSize].scale
 }
 
-export function useScaledFontSize(baseSize: number): number {
-  const scale = useFontScale()
-  return Math.round(baseSize * scale)
+export function useFontFamily(): string {
+  const fontFamily = useThemeStore((s) => s.fontFamily)
+  return FONT_FAMILIES[fontFamily].family
 }

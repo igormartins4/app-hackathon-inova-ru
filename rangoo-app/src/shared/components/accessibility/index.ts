@@ -1,1 +1,0 @@
-export { AccessibleText } from './AccessibleText'

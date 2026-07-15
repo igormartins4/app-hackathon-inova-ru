@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react'
 import { ActivityIndicator, Alert, FlatList, Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Card, Text } from '@/shared/components/ui'
+import { Card, FadeInView, Text } from '@/shared/components/ui'
 import { formatCurrency, formatToLocalDate, formatToLocalTime } from '@/shared/utils'
 import type { MealRecord, RechargeRecord } from '../types/history.types'
 
@@ -62,29 +62,31 @@ const RechargeItem = memo(function RechargeItem({
       accessibilityRole="button"
       accessibilityLabel={`Detalhes da recarga de ${formatCurrency(item.valor)}`}
     >
-      <Card
-        accessibilityLabel={`Recarga de ${formatCurrency(item.valor)} em ${formatToLocalDate(item.data_hora)} — ${item.status}`}
-        className="mb-2"
-      >
-        <View className="flex-row justify-between items-center">
-          <View>
-            <Text accessibilityRole="text" className="text-sm font-medium text-text-primary">
-              {formatCurrency(item.valor)}
-            </Text>
-            <Text accessibilityRole="text" className="text-xs text-text-secondary">
-              {formatToLocalDate(item.data_hora)} · {item.metodo}
+      <FadeInView>
+        <Card
+          accessibilityLabel={`Recarga de ${formatCurrency(item.valor)} em ${formatToLocalDate(item.data_hora)} — ${item.status}`}
+          className="mb-2"
+        >
+          <View className="flex-row justify-between items-center">
+            <View>
+              <Text accessibilityRole="text" className="text-sm font-medium text-text-primary">
+                {formatCurrency(item.valor)}
+              </Text>
+              <Text accessibilityRole="text" className="text-xs text-text-secondary">
+                {formatToLocalDate(item.data_hora)} · {item.metodo}
+              </Text>
+            </View>
+            <Text
+              accessibilityRole="text"
+              className={`text-xs font-medium ${
+                item.status === 'aprovado' ? 'text-status-success' : 'text-text-secondary'
+              }`}
+            >
+              {item.status}
             </Text>
           </View>
-          <Text
-            accessibilityRole="text"
-            className={`text-xs font-medium ${
-              item.status === 'aprovado' ? 'text-status-success' : 'text-text-secondary'
-            }`}
-          >
-            {item.status}
-          </Text>
-        </View>
-      </Card>
+        </Card>
+      </FadeInView>
     </Pressable>
   )
 })
@@ -102,24 +104,26 @@ const MealItem = memo(function MealItem({
       accessibilityRole="button"
       accessibilityLabel={`Detalhes da refeição em ${item.filial.nome}`}
     >
-      <Card
-        accessibilityLabel={`Refeição em ${item.filial.nome} — ${formatCurrency(item.valor_total)}${item.gratuidade ? ' (gratuita)' : ''}`}
-        className="mb-2"
-      >
-        <View className="flex-row justify-between items-center">
-          <View>
-            <Text accessibilityRole="text" className="text-sm font-medium text-text-primary">
-              {item.filial.nome}
-            </Text>
-            <Text accessibilityRole="text" className="text-xs text-text-secondary">
-              {formatToLocalDate(item.data_hora)} · {item.quantidade}x
+      <FadeInView>
+        <Card
+          accessibilityLabel={`Refeição em ${item.filial.nome} — ${formatCurrency(item.valor_total)}${item.gratuidade ? ' (gratuita)' : ''}`}
+          className="mb-2"
+        >
+          <View className="flex-row justify-between items-center">
+            <View>
+              <Text accessibilityRole="text" className="text-sm font-medium text-text-primary">
+                {item.filial.nome}
+              </Text>
+              <Text accessibilityRole="text" className="text-xs text-text-secondary">
+                {formatToLocalDate(item.data_hora)} · {item.quantidade}x
+              </Text>
+            </View>
+            <Text accessibilityRole="text" className="text-sm font-medium text-text-secondary">
+              {item.gratuidade ? 'Gratuita' : formatCurrency(item.valor_total)}
             </Text>
           </View>
-          <Text accessibilityRole="text" className="text-sm font-medium text-text-secondary">
-            {item.gratuidade ? 'Gratuita' : formatCurrency(item.valor_total)}
-          </Text>
-        </View>
-      </Card>
+        </Card>
+      </FadeInView>
     </Pressable>
   )
 })

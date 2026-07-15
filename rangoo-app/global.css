@@ -38,6 +38,17 @@
   --color-chip-unselected: #ffffff;
 }
 
+.high-contrast {
+  --color-text-primary: #000000;
+  --color-text-secondary: #1a1a1a;
+  --color-text-disabled: #333333;
+  --color-outline: #000000;
+  --color-outline-variant: #333333;
+  --color-surface: #ffffff;
+  --color-surface-variant: #f5f5f5;
+  --color-background: #ffffff;
+}
+
 .dark {
   /* Primary — Brighter teal for dark mode */
   --color-primary: #34d399;
@@ -57,7 +68,6 @@
   /* Text */
   --color-text-primary: #f0faf6;
   --color-text-secondary: #8fb5a5;
-  /* Contraste elevado (era #4a6b5e, ~2.9:1) — placeholders ilegíveis em Android 13/MIUI (Ponto 31) */
   --color-text-disabled: #6f9384;
   --color-text-inverse: #0f1f1a;
 
@@ -69,4 +79,19 @@
   /* Chips */
   --color-chip-selected: #34d399;
   --color-chip-unselected: #1f3830;
+}
+
+.high-contrast.dark {
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-disabled: #aaaaaa;
+  --color-outline: #ffffff;
+  --color-outline-variant: #cccccc;
+  --color-surface: #000000;
+  --color-surface-variant: #111111;
+  --color-background: #000000;
+  --color-primary: #00ffaa;
+  --color-primary-light: #66ffcc;
+  --color-primary-container: #003322;
+  --color-primary-dark: #00cc88;
 }

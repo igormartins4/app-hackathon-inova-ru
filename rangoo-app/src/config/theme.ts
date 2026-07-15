@@ -5,7 +5,8 @@
 // (ActivityIndicator color, Ionicons color, tabBar*TintColor, etc.) needs a
 // literal color instead of a className, so nothing here is re-hardcoded.
 
-import { useResolvedTheme } from '@/store/themeStore'
+import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
+import { getMaterialYouAccent } from './materialYou'
 
 export const colors = {
   primary: '#1a5c4a',
@@ -42,7 +43,7 @@ export const darkColors = {
   outlineVariant: '#1f3830',
   textPrimary: '#f0faf6',
   textSecondary: '#8fb5a5',
-  textDisabled: '#4a6b5e',
+  textDisabled: '#6f9384',
   textInverse: '#0f1f1a',
   success: '#4ade80',
   error: '#f87171',
@@ -117,11 +118,51 @@ export const touchTarget = {
   min: 48,
 } as const
 
+const highContrastColors = {
+  textPrimary: '#000000',
+  textSecondary: '#1a1a1a',
+  textDisabled: '#333333',
+  outline: '#000000',
+  outlineVariant: '#333333',
+  surface: '#ffffff',
+  surfaceVariant: '#f5f5f5',
+  background: '#ffffff',
+} as const
+
+const highContrastDarkColors = {
+  textPrimary: '#ffffff',
+  textSecondary: '#e0e0e0',
+  textDisabled: '#aaaaaa',
+  outline: '#ffffff',
+  outlineVariant: '#cccccc',
+  surface: '#000000',
+  surfaceVariant: '#111111',
+  background: '#000000',
+  primary: '#00ffaa',
+  primaryLight: '#66ffcc',
+  primaryContainer: '#003322',
+  primaryDark: '#00cc88',
+} as const
+
 // Resolves to the light or dark token set for native props that can't take a
 // NativeWind className (icon `color`, ActivityIndicator, tabBar tint colors).
 export function useThemeColors() {
   const resolvedTheme = useResolvedTheme()
-  return resolvedTheme === 'dark' ? darkColors : colors
+  const { highContrast, theme, useSystemColors } = useThemeStore((s) => ({
+    highContrast: s.highContrast,
+    theme: s.theme,
+    useSystemColors: s.useSystemColors,
+  }))
+  const systemAccent = useSystemColors && theme === 'system' ? getMaterialYouAccent() : null
+  const base = {
+    ...(resolvedTheme === 'dark' ? darkColors : colors),
+    ...(systemAccent && !highContrast
+      ? { primary: systemAccent, chipSelected: systemAccent }
+      : null),
+  }
+  if (!highContrast) return base
+  const overrides = resolvedTheme === 'dark' ? highContrastDarkColors : highContrastColors
+  return { ...base, ...overrides }
 }
 
 // Returns gradient colors for the current theme
