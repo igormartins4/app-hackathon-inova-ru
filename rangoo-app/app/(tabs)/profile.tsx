@@ -1,15 +1,42 @@
 import { Ionicons } from '@expo/vector-icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { LinearGradient } from 'expo-linear-gradient'
+import { useState } from 'react'
 import { Linking, Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useMealHistory } from '@/features/history'
-import { Button, Card, LoadingSpinner, StatusBadge, Text } from '@/shared/components/ui'
+import {
+  AboutAppModal,
+  Button,
+  Card,
+  LoadingSpinner,
+  StatusBadge,
+  Text,
+} from '@/shared/components/ui'
+import { LOCALES, type Locale, useI18n } from '@/shared/i18n'
+import {
+  type DemoScenario,
+  getMockScenario,
+  resetMockState,
+  setMockScenario,
+} from '@/shared/services/mockHandler'
 import { formatCurrency } from '@/shared/utils'
 import { FONT_FAMILIES, FONT_STEPS, useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
+const DEMO_SCENARIOS: Array<{ key: DemoScenario; label: string; hint: string }> = [
+  { key: 'normal', label: 'Normal', hint: 'Saldo, PIX aprovado e históricos funcionando' },
+  { key: 'blocked', label: 'Bloqueado', hint: 'Recarga desabilitada por situação B' },
+  { key: 'inactive', label: 'Inativo', hint: 'Saldo retorna 404 de consumidor inativo' },
+  { key: 'pixExpired', label: 'PIX expira', hint: 'Polling termina como expired' },
+  { key: 'pixRejected', label: 'PIX rejeita', hint: 'Polling termina como rejected' },
+  { key: 'rateLimit', label: 'Rate limit', hint: 'Respostas 429 com Retry-After de 30s' },
+  { key: 'serverError', label: 'Erro 500', hint: 'Simula indisponibilidade da API' },
+]
+
 export default function ProfileScreen() {
+  const queryClient = useQueryClient()
   const { user, logout } = useAuth()
   const { data: balanceData, isLoading: isBalanceLoading } = useBalance()
   const { data: mealHistory } = useMealHistory()
@@ -19,7 +46,7 @@ export default function ProfileScreen() {
     fontFamily,
     increaseFontSize,
     decreaseFontSize,
-    nextFontFamily,
+    setFontFamily,
     highContrast,
     reducedMotion,
     useSystemColors,
@@ -29,6 +56,9 @@ export default function ProfileScreen() {
   } = useThemeStore()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
+  const [demoScenario, setDemoScenarioState] = useState(getMockScenario())
+  const [aboutVisible, setAboutVisible] = useState(false)
+  const { t, locale, setLocale } = useI18n()
 
   const isDark = useResolvedTheme() === 'dark'
 
@@ -42,6 +72,21 @@ export default function ProfileScreen() {
 
   const handleToggleDark = () => {
     setTheme(isDark ? 'light' : 'dark')
+  }
+
+  const refreshMockData = () => {
+    queryClient.invalidateQueries()
+  }
+
+  const handleDemoScenario = (scenario: DemoScenario) => {
+    setMockScenario(scenario)
+    setDemoScenarioState(scenario)
+    refreshMockData()
+  }
+
+  const handleResetDemo = () => {
+    resetMockState()
+    refreshMockData()
   }
 
   const totalGastoMes = (() => {
@@ -59,16 +104,14 @@ export default function ProfileScreen() {
   })()
 
   if (isBalanceLoading) {
-    return <LoadingSpinner message="Carregando perfil" />
+    return <LoadingSpinner message={t.loading} />
   }
 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-4">
       <View>
-        <Text className="text-2xl font-bold text-text-primary">Perfil</Text>
-        <Text className="text-xs text-text-secondary mt-0.5">
-          Seus dados, preferências e sobre o app
-        </Text>
+        <Text className="text-2xl font-bold text-text-primary">{t.profileTitle}</Text>
+        <Text className="text-xs text-text-secondary mt-0.5">{t.profileSubtitle}</Text>
       </View>
 
       <LinearGradient
@@ -98,31 +141,31 @@ export default function ProfileScreen() {
       </LinearGradient>
 
       {balanceData?.consumidor && (
-        <Card accessibilityLabel="Dados do consumidor" accessibilityRole="summary">
+        <Card accessibilityLabel={t.profileConsumerData} accessibilityRole="summary">
           <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            Dados do Consumidor
+            {t.profileConsumerData}
           </Text>
           <View className="gap-2">
             <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">Nome completo</Text>
+              <Text className="text-sm text-text-secondary">{t.profileFullName}</Text>
               <Text className="text-sm font-medium text-text-primary">
                 {balanceData.consumidor.nome}
               </Text>
             </View>
             <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">Tipo</Text>
+              <Text className="text-sm text-text-secondary">{t.profileType}</Text>
               <Text className="text-sm font-medium text-text-primary">
                 {balanceData.consumidor.tipo_consumidor.descricao}
               </Text>
             </View>
             <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">Centro de Custo</Text>
+              <Text className="text-sm text-text-secondary">{t.profileCostCenter}</Text>
               <Text className="text-sm font-medium text-text-primary">
                 {balanceData.consumidor.centro_custo.descricao}
               </Text>
             </View>
             <View className="flex-row justify-between py-2">
-              <Text className="text-sm text-text-secondary">Situação</Text>
+              <Text className="text-sm text-text-secondary">{t.profileSituation}</Text>
               <StatusBadge situacao={balanceData.consumidor.situacao} size="text-sm" />
             </View>
           </View>
@@ -132,10 +175,10 @@ export default function ProfileScreen() {
       {totalGastoMes > 0 && (
         <Card>
           <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            Gastos do Mês
+            {t.profileMonthlyExpenses}
           </Text>
           <View className="flex-row justify-between items-center">
-            <Text className="text-sm text-text-secondary">Total em refeições</Text>
+            <Text className="text-sm text-text-secondary">{t.profileTotalMeals}</Text>
             <Text className="text-lg font-bold text-text-primary">
               {formatCurrency(totalGastoMes)}
             </Text>
@@ -145,14 +188,55 @@ export default function ProfileScreen() {
 
       <Card>
         <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-          Acessibilidade
+          {t.profileDemoMode}
+        </Text>
+        <Text className="text-xs text-text-secondary mb-3">{t.profileDemoDescription}</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {DEMO_SCENARIOS.map((scenario) => {
+            const selected = demoScenario === scenario.key
+            return (
+              <Pressable
+                key={scenario.key}
+                onPress={() => handleDemoScenario(scenario.key)}
+                accessibilityRole="button"
+                accessibilityLabel={`Cenário ${scenario.label}`}
+                accessibilityHint={scenario.hint}
+                accessibilityState={{ selected }}
+                className={`px-3 py-2 rounded-full border ${
+                  selected ? 'bg-primary border-primary' : 'bg-surface border-outline-variant'
+                }`}
+              >
+                <Text
+                  className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
+                >
+                  {scenario.label}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </View>
+        <Pressable
+          onPress={handleResetDemo}
+          accessibilityRole="button"
+          accessibilityLabel="Resetar dados da demonstração"
+          accessibilityHint="Restaura saldo, pagamentos e históricos do cenário atual"
+          className="flex-row items-center justify-between pt-4 mt-4 border-t border-outline-variant"
+        >
+          <Text className="text-sm font-medium text-primary">{t.profileResetDemo}</Text>
+          <Ionicons name="refresh" size={18} color={themeColors.primary} />
+        </Pressable>
+      </Card>
+
+      <Card>
+        <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+          {t.profileAccessibility}
         </Text>
 
         <Pressable
           onPress={handleToggleDark}
           accessibilityRole="switch"
-          accessibilityLabel="Modo escuro"
-          accessibilityHint="Alterna entre tema claro e escuro"
+          accessibilityLabel={t.profileDarkMode}
+          accessibilityHint={t.profileDarkModeHint}
           accessibilityState={{ checked: isDark }}
           className="flex-row items-center justify-between py-3 border-b border-outline-variant"
         >
@@ -161,8 +245,8 @@ export default function ProfileScreen() {
               <Ionicons name={isDark ? 'moon' : 'sunny'} size={20} color={themeColors.warning} />
             </View>
             <View>
-              <Text className="text-sm font-medium text-text-primary">Tema escuro</Text>
-              <Text className="text-xs text-text-secondary">Segue o sistema por padrão</Text>
+              <Text className="text-sm font-medium text-text-primary">{t.profileDarkMode}</Text>
+              <Text className="text-xs text-text-secondary">{t.profileDarkModeHint}</Text>
             </View>
           </View>
           <View className={`w-12 h-7 rounded-full p-0.5 ${isDark ? 'bg-primary' : 'bg-outline'}`}>
@@ -175,8 +259,8 @@ export default function ProfileScreen() {
         <Pressable
           onPress={toggleHighContrast}
           accessibilityRole="switch"
-          accessibilityLabel="Alto contraste"
-          accessibilityHint="Aumenta o contraste entre texto e fundo para melhor leitura"
+          accessibilityLabel={t.profileHighContrast}
+          accessibilityHint={t.profileHighContrastHint}
           accessibilityState={{ checked: highContrast }}
           className="flex-row items-center justify-between py-3 border-b border-outline-variant"
         >
@@ -185,8 +269,8 @@ export default function ProfileScreen() {
               <Ionicons name="contrast" size={20} color={themeColors.primary} />
             </View>
             <View>
-              <Text className="text-sm font-medium text-text-primary">Alto contraste</Text>
-              <Text className="text-xs text-text-secondary">Texto mais forte e legível</Text>
+              <Text className="text-sm font-medium text-text-primary">{t.profileHighContrast}</Text>
+              <Text className="text-xs text-text-secondary">{t.profileHighContrastHint}</Text>
             </View>
           </View>
           <View
@@ -201,8 +285,8 @@ export default function ProfileScreen() {
         <Pressable
           onPress={toggleReducedMotion}
           accessibilityRole="switch"
-          accessibilityLabel="Reduzir movimento"
-          accessibilityHint="Remove animações e transições não essenciais do aplicativo"
+          accessibilityLabel={t.profileReducedMotion}
+          accessibilityHint={t.profileReducedMotionHint}
           accessibilityState={{ checked: reducedMotion }}
           className="flex-row items-center justify-between py-3 border-b border-outline-variant"
         >
@@ -211,8 +295,10 @@ export default function ProfileScreen() {
               <Ionicons name="accessibility" size={20} color={themeColors.primary} />
             </View>
             <View>
-              <Text className="text-sm font-medium text-text-primary">Reduzir movimento</Text>
-              <Text className="text-xs text-text-secondary">Desativa animações suaves</Text>
+              <Text className="text-sm font-medium text-text-primary">
+                {t.profileReducedMotion}
+              </Text>
+              <Text className="text-xs text-text-secondary">{t.profileReducedMotionHint}</Text>
             </View>
           </View>
           <View
@@ -227,8 +313,8 @@ export default function ProfileScreen() {
         <Pressable
           onPress={toggleSystemColors}
           accessibilityRole="switch"
-          accessibilityLabel="Cores do sistema"
-          accessibilityHint="Usa a cor de destaque do Android quando o tema está definido como sistema"
+          accessibilityLabel={t.profileSystemColors}
+          accessibilityHint={t.profileSystemColorsHint}
           accessibilityState={{ checked: useSystemColors }}
           className="flex-row items-center justify-between py-3 border-b border-outline-variant"
         >
@@ -237,8 +323,8 @@ export default function ProfileScreen() {
               <Ionicons name="color-palette" size={20} color={themeColors.primary} />
             </View>
             <View>
-              <Text className="text-sm font-medium text-text-primary">Cores do sistema</Text>
-              <Text className="text-xs text-text-secondary">Material You simplificado</Text>
+              <Text className="text-sm font-medium text-text-primary">{t.profileSystemColors}</Text>
+              <Text className="text-xs text-text-secondary">{t.profileSystemColorsHint}</Text>
             </View>
           </View>
           <View
@@ -256,7 +342,7 @@ export default function ProfileScreen() {
               <Text className="text-sm font-bold text-primary">Aa</Text>
             </View>
             <View className="flex-1">
-              <Text className="text-sm font-medium text-text-primary">Tamanho da fonte</Text>
+              <Text className="text-sm font-medium text-text-primary">{t.profileFontSize}</Text>
               <Text className="text-xs text-text-secondary">
                 {FONT_STEPS[fontSize].label} ({FONT_STEPS[fontSize].scale}×)
               </Text>
@@ -267,8 +353,7 @@ export default function ProfileScreen() {
               onPress={decreaseFontSize}
               disabled={fontSize === 0}
               accessibilityRole="button"
-              accessibilityLabel="Diminuir fonte"
-              accessibilityHint="Reduz o tamanho do texto"
+              accessibilityLabel={t.profileFontSize}
               className={`w-12 h-12 rounded-full items-center justify-center ${
                 fontSize === 0 ? 'bg-outline/30' : 'bg-primary'
               }`}
@@ -290,8 +375,7 @@ export default function ProfileScreen() {
               onPress={increaseFontSize}
               disabled={fontSize === FONT_STEPS.length - 1}
               accessibilityRole="button"
-              accessibilityLabel="Aumentar fonte"
-              accessibilityHint="Aumenta o tamanho do texto"
+              accessibilityLabel={t.profileFontSize}
               className={`w-12 h-12 rounded-full items-center justify-center ${
                 fontSize === FONT_STEPS.length - 1 ? 'bg-outline/30' : 'bg-primary'
               }`}
@@ -309,63 +393,103 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <Pressable
-          onPress={nextFontFamily}
-          accessibilityRole="button"
-          accessibilityLabel="Mudar fonte"
-          accessibilityHint="Alterna entre as fontes disponíveis"
-          className="flex-row items-center justify-between py-3 border-t border-outline-variant"
-        >
-          <View className="flex-row items-center gap-3">
+        <View className="py-3 border-t border-outline-variant">
+          <View className="flex-row items-center gap-3 mb-3">
             <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
               <Text className="text-sm font-bold text-primary">Ff</Text>
             </View>
             <View>
-              <Text className="text-sm font-medium text-text-primary">Fonte</Text>
-              <Text className="text-xs text-text-secondary">{FONT_FAMILIES[fontFamily].label}</Text>
+              <Text className="text-sm font-medium text-text-primary">{t.profileFontFamily}</Text>
+              <Text className="text-xs text-text-secondary">{t.profileFontHint}</Text>
             </View>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={themeColors.textSecondary} />
-        </Pressable>
+          <View className="flex-row bg-surface-variant rounded-full p-1 ml-[52px]">
+            {FONT_FAMILIES.map((font, index) => {
+              const selected = fontFamily === index
+              return (
+                <Pressable
+                  key={font.label}
+                  onPress={() => setFontFamily(index)}
+                  accessibilityRole="tab"
+                  accessibilityLabel={`Fonte ${font.label}`}
+                  accessibilityState={{ selected }}
+                  className={`flex-1 min-h-[48px] rounded-full items-center justify-center px-2 ${
+                    selected ? 'bg-primary' : ''
+                  }`}
+                >
+                  <Text
+                    className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
+                  >
+                    {font.label}
+                  </Text>
+                </Pressable>
+              )
+            })}
+          </View>
+        </View>
       </Card>
 
       <Card>
         <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-          Sobre o App
+          {t.profileAbout}
         </Text>
 
         <View className="gap-0">
           <View className="flex-row items-center justify-between py-3 border-b border-outline-variant">
-            <Text className="text-sm text-text-primary">Versão</Text>
-            <Text className="text-sm text-text-secondary">1.0.0</Text>
+            <Text className="text-sm text-text-primary">{t.profilePrivacy}</Text>
+            <Ionicons name="open-outline" size={16} color={themeColors.primary} />
           </View>
 
-          <Pressable
-            onPress={() => Linking.openURL('https://fump.ufmg.br')}
-            accessibilityRole="link"
-            accessibilityLabel="Política de privacidade"
-            className="flex-row items-center justify-between py-3 border-b border-outline-variant"
-          >
-            <Text className="text-sm text-primary">Política de privacidade</Text>
-            <Ionicons name="open-outline" size={16} color={themeColors.primary} />
-          </Pressable>
+          <View className="flex-row items-center justify-between py-3 border-b border-outline-variant">
+            <Text className="text-sm text-text-primary">{t.version}</Text>
+            <Text className="text-sm text-text-secondary">{t.profileAppVersion}</Text>
+          </View>
 
           <Pressable
             onPress={() => Linking.openURL('https://opensource.org/licenses/MIT')}
             accessibilityRole="link"
-            accessibilityLabel="Licença open source"
+            accessibilityLabel={t.profileLicense}
             className="flex-row items-center justify-between py-3"
           >
-            <Text className="text-sm text-primary">Licença open source (MIT)</Text>
+            <Text className="text-sm text-primary">{t.profileLicense}</Text>
             <Ionicons name="open-outline" size={16} color={themeColors.primary} />
           </Pressable>
         </View>
       </Card>
 
+      <Card>
+        <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+          Idioma / Language
+        </Text>
+        <View className="flex-row flex-wrap gap-2">
+          {(Object.keys(LOCALES) as Locale[]).map((loc) => {
+            const selected = locale === loc
+            return (
+              <Pressable
+                key={loc}
+                onPress={() => setLocale(loc)}
+                accessibilityRole="button"
+                accessibilityLabel={`${LOCALES[loc].flag} ${LOCALES[loc].label}`}
+                accessibilityState={{ selected }}
+                className={`px-3 py-2 rounded-full border ${
+                  selected ? 'bg-primary border-primary' : 'bg-surface border-outline-variant'
+                }`}
+              >
+                <Text
+                  className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
+                >
+                  {LOCALES[loc].flag} {LOCALES[loc].label}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </View>
+      </Card>
+
       <Pressable
-        onPress={() => Linking.openURL('https://github.com/igormartins4/app-hackathon-inova-ru')}
-        accessibilityRole="link"
-        accessibilityLabel="Ver repositório no GitHub"
+        onPress={() => setAboutVisible(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Sobre o Rangoo Universitário e o Hackathon InovaRU"
       >
         <LinearGradient
           colors={gradients.hackathonBadge}
@@ -379,16 +503,17 @@ export default function ProfileScreen() {
             </View>
             <View className="flex-1">
               <Text className="text-sm font-bold text-text-primary">Rangoo Universitário</Text>
-              <Text className="text-xs text-text-secondary">Hackathon InovaRU 2026/01 · FUMP</Text>
+              <Text className="text-xs text-text-secondary">{t.profileHackathon}</Text>
             </View>
             <Ionicons name="logo-github" size={18} color={themeColors.textSecondary} />
           </View>
         </LinearGradient>
       </Pressable>
 
-      <Button label="Sair" onPress={logout} variant="secondary" />
+      <Button label={t.logout} onPress={logout} variant="secondary" />
 
       <View className="h-4" />
+      <AboutAppModal visible={aboutVisible} onClose={() => setAboutVisible(false)} />
     </ScrollView>
   )
 }
