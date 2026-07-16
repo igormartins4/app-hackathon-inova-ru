@@ -32,6 +32,8 @@ export function Button({
   loading = false,
 }: ButtonProps) {
   const themeColors = useThemeColors()
+  const buttonStyle = variant === 'primary' ? { backgroundColor: themeColors.primary } : undefined
+  const textStyle = variant === 'primary' ? { color: themeColors.textInverse } : undefined
 
   return (
     <Pressable
@@ -40,6 +42,7 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled, busy: loading }}
+      style={buttonStyle}
       className={`min-h-[48px] min-w-[48px] items-center justify-center rounded-xl px-6 py-3.5 ${variantStyles[variant]} ${disabled ? 'opacity-50' : ''}`}
     >
       {loading ? (
@@ -48,7 +51,9 @@ export function Button({
           color={variant === 'secondary' ? themeColors.textPrimary : themeColors.textInverse}
         />
       ) : (
-        <Text className={`text-base font-semibold ${textStyles[variant]}`}>{label}</Text>
+        <Text style={textStyle} className={`text-base font-semibold ${textStyles[variant]}`}>
+          {label}
+        </Text>
       )}
     </Pressable>
   )

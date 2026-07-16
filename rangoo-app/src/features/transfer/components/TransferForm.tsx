@@ -4,12 +4,17 @@ import { TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
 import {
+  firstFieldError,
   formatCurrency,
   MIN_VALUE,
-  parseAmount,
-  sanitizeCurrencyInput,
-  validateRechargeAmount,
+  MONEY_MAX_LENGTH,
+  maskMoneyInput,
+  parseMoneyInput,
+  sanitizeDigits,
+  TRANSFER_DESTINATION_MAX_LENGTH,
+  transferSchema,
 } from '@/shared/utils'
+import { useScaledFontStyle } from '@/store/themeStore'
 
 interface TransferFormProps {
   currentBalance: number
@@ -20,14 +25,36 @@ interface TransferFormProps {
 
 export function TransferForm({ currentBalance, disabled, loading, onSubmit }: TransferFormProps) {
   const themeColors = useThemeColors()
+  const inputTextStyle = useScaledFontStyle(16)
   const [destinatario, setDestinatario] = useState('')
   const [amount, setAmount] = useState('')
-  const value = parseAmount(amount)
-  const validation = validateRechargeAmount(value, 0, currentBalance)
-  const canSubmit = destinatario.trim().length >= 3 && value >= MIN_VALUE && validation.valid
+  const [destinatarioError, setDestinatarioError] = useState('')
+  const [amountError, setAmountError] = useState('')
+  const value = parseMoneyInput(amount)
+  const result = transferSchema(currentBalance).safeParse({
+    destination: destinatario,
+    amount: value,
+  })
+  const canSubmit = result.success
+
+  function handleDestinationChange(text: string) {
+    setDestinatario(sanitizeDigits(text, TRANSFER_DESTINATION_MAX_LENGTH))
+    if (destinatarioError) setDestinatarioError('')
+  }
+
+  function handleAmountChange(text: string) {
+    setAmount(maskMoneyInput(text))
+    if (amountError) setAmountError('')
+  }
 
   function handleSubmit() {
-    if (!canSubmit || disabled || loading) return
+    if (disabled || loading) return
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors
+      setDestinatarioError(firstFieldError(errors, 'destination') ?? '')
+      setAmountError(firstFieldError(errors, 'amount') ?? '')
+      return
+    }
     onSubmit(destinatario.trim(), value)
   }
 
@@ -36,7 +63,7 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
       <View>
         <Text className="text-2xl font-bold text-text-primary">Transferir saldo</Text>
         <Text className="text-sm text-text-secondary mt-1">
-          Demonstração bônus para ajudar outro estudante na hora da refeição.
+          Tranfira seus créditos da conta para outra pessoa.
         </Text>
       </View>
 
@@ -46,28 +73,37 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
         </Text>
         <TextInput
           value={destinatario}
-          onChangeText={setDestinatario}
+          onChangeText={handleDestinationChange}
           placeholder="CPF ou matrícula do amigo"
           placeholderTextColor={themeColors.textDisabled}
           keyboardType="numeric"
           editable={!disabled && !loading}
+          maxLength={TRANSFER_DESTINATION_MAX_LENGTH}
           accessibilityLabel="Identificador do destinatário"
           accessibilityHint="Informe o CPF ou matrícula da pessoa que receberá o saldo"
+          style={inputTextStyle}
           className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
         />
+        {destinatarioError ? (
+          <Text accessibilityRole="alert" className="text-xs text-status-error">
+            {destinatarioError}
+          </Text>
+        ) : null}
       </View>
 
       <View className="gap-1.5">
         <Text className="text-xs font-bold text-primary uppercase tracking-wider">Valor</Text>
         <TextInput
           value={amount}
-          onChangeText={(text) => setAmount(sanitizeCurrencyInput(text))}
+          onChangeText={handleAmountChange}
           placeholder="R$ 5,00"
           placeholderTextColor={themeColors.textDisabled}
           keyboardType="numeric"
           editable={!disabled && !loading}
+          maxLength={MONEY_MAX_LENGTH}
           accessibilityLabel="Valor da transferência"
           accessibilityHint={`Informe um valor entre ${formatCurrency(MIN_VALUE)} e ${formatCurrency(currentBalance)}`}
+          style={inputTextStyle}
           className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
         />
         <Text className="text-xs text-text-secondary">
@@ -75,9 +111,7 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
         </Text>
       </View>
 
-      {value > 0 && !validation.valid ? (
-        <ErrorMessage message={validation.error ?? 'Valor fora do saldo disponível.'} />
-      ) : null}
+      {amountError ? <ErrorMessage message={amountError} /> : null}
 
       <View className="flex-row items-start gap-3 bg-surface-variant rounded-xl p-4">
         <Ionicons name="flask" size={20} color={themeColors.primary} />

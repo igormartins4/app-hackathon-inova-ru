@@ -1,4 +1,12 @@
-import { maskCpf, sanitizeCurrencyInput, unmask } from '@/shared/utils/mask'
+import {
+  maskCpf,
+  maskMoneyInput,
+  parseMoneyInput,
+  sanitizeCurrencyInput,
+  sanitizeDigits,
+  sanitizePassword,
+  unmask,
+} from '@/shared/utils/mask'
 
 describe('Mask utils', () => {
   describe('maskCpf', () => {
@@ -54,6 +62,36 @@ describe('Mask utils', () => {
     it('removes non-numeric characters', () => {
       expect(sanitizeCurrencyInput('abc123')).toBe('123')
       expect(sanitizeCurrencyInput('R$ 50')).toBe('50')
+    })
+  })
+
+  describe('maskMoneyInput', () => {
+    it('formats typed digits as cents', () => {
+      expect(maskMoneyInput('1')).toBe('R$ 0,01')
+      expect(maskMoneyInput('12')).toBe('R$ 0,12')
+      expect(maskMoneyInput('1234')).toBe('R$ 12,34')
+    })
+
+    it('strips non-digits and limits length', () => {
+      expect(maskMoneyInput('R$ abc123456', 4)).toBe('R$ 12,34')
+    })
+  })
+
+  describe('parseMoneyInput', () => {
+    it('parses Brazilian currency strings', () => {
+      expect(parseMoneyInput('R$ 12,34')).toBe(12.34)
+    })
+  })
+
+  describe('sanitizeDigits', () => {
+    it('keeps only digits with limit', () => {
+      expect(sanitizeDigits('ab12cd34', 3)).toBe('123')
+    })
+  })
+
+  describe('sanitizePassword', () => {
+    it('removes line breaks and limits length', () => {
+      expect(sanitizePassword('ab\ncd', 3)).toBe('abc')
     })
   })
 })

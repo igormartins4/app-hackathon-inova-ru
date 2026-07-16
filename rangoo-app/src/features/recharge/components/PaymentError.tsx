@@ -2,14 +2,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, Card, Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import type { PaymentStatusResponse } from '../types/recharge.types'
-
-const STATUS_MESSAGES: Record<string, string> = {
-  rejected: 'Pagamento não autorizado pelo banco.',
-  cancelled: 'Pagamento cancelado.',
-  expired: 'Código PIX expirou. Gere um novo QR Code.',
-  timeout: 'Tempo esgotado. O pagamento não foi confirmado.',
-}
 
 interface PaymentErrorProps {
   status: PaymentStatusResponse['status'] | 'timeout'
@@ -18,7 +12,16 @@ interface PaymentErrorProps {
 
 export function PaymentError({ status, onRetry }: PaymentErrorProps) {
   const themeColors = useThemeColors()
-  const message = STATUS_MESSAGES[status] ?? 'Ocorreu um erro.'
+  const { t } = useI18n()
+
+  const STATUS_MESSAGES: Record<string, string> = {
+    rejected: t.paymentErrorRejected,
+    cancelled: t.paymentErrorCancelled,
+    expired: t.paymentErrorExpired,
+    timeout: t.paymentErrorTimeout,
+  }
+
+  const message = STATUS_MESSAGES[status] ?? t.paymentErrorGeneric
 
   return (
     <View className="flex-1 items-center justify-center bg-background p-4 gap-5">
@@ -27,7 +30,7 @@ export function PaymentError({ status, onRetry }: PaymentErrorProps) {
           <Ionicons name="close-circle" size={56} color={themeColors.error} />
         </View>
         <Text className="text-2xl font-bold text-text-primary text-center">
-          Pagamento Não Confirmado
+          {t.paymentErrorTitle}
         </Text>
         <Text className="text-sm text-text-secondary text-center">{message}</Text>
       </View>
@@ -35,8 +38,8 @@ export function PaymentError({ status, onRetry }: PaymentErrorProps) {
       <Card className="w-full max-w-sm">
         <View className="items-center gap-4">
           <View className="w-full gap-3">
-            <Button label="Tentar novamente" onPress={onRetry} variant="primary" />
-            <Button label="Voltar ao início" onPress={onRetry} variant="secondary" />
+            <Button label={t.paymentErrorRetry} onPress={onRetry} variant="primary" />
+            <Button label={t.paymentErrorBack} onPress={onRetry} variant="secondary" />
           </View>
         </View>
       </Card>

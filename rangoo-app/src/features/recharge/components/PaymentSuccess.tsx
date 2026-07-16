@@ -5,6 +5,7 @@ import { Share, View } from 'react-native'
 import { captureRef } from 'react-native-view-shot'
 import { useThemeColors } from '@/config'
 import { Button, Card, Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import { formatCurrency, formatTime, formatToLocalDate } from '@/shared/utils'
 
 interface PaymentSuccessProps {
@@ -16,6 +17,7 @@ interface PaymentSuccessProps {
 export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessProps) {
   const themeColors = useThemeColors()
   const receiptRef = useRef<View>(null)
+  const { t } = useI18n()
 
   const shareAsText = useCallback(async () => {
     const now = new Date()
@@ -24,18 +26,18 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
     try {
       await Share.share({
         message: [
-          `Comprovante de Recarga — Rangoo`,
+          `${t.paymentSuccessTitle} — Rangoo`,
           ``,
-          `Valor: ${formatCurrency(amount)}`,
-          `Data: ${dateStr} às ${timeStr}`,
-          `Método: PIX`,
-          `Novo saldo: ${formatCurrency(newBalance)}`,
+          `${t.paymentSuccessValorRecarregado}: ${formatCurrency(amount)}`,
+          `${t.historyDate}: ${dateStr} ${t.historyTime} ${timeStr}`,
+          `${t.paymentSuccessMetodo}: PIX`,
+          `${t.paymentSuccessNovoSaldo}: ${formatCurrency(newBalance)}`,
           ``,
           `Rangoo Universitário — Hackathon InovaRU 2026`,
         ].join('\n'),
       })
     } catch {}
-  }, [amount, newBalance])
+  }, [amount, newBalance, t])
 
   const handleShare = useCallback(async () => {
     try {
@@ -44,7 +46,7 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
       if (canShare) {
         await Sharing.shareAsync(uri, {
           mimeType: 'image/png',
-          dialogTitle: 'Comprovante Rangoo Universitário',
+          dialogTitle: `Rangoo Universitário`,
         })
       } else {
         await shareAsText()
@@ -61,18 +63,18 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
           <Ionicons name="checkmark-circle" size={56} color={themeColors.success} />
         </View>
         <Text className="text-2xl font-bold text-text-primary text-center">
-          Recarga confirmada!
+          {t.paymentSuccessTitle}
         </Text>
-        <Text className="text-sm text-text-secondary text-center">
-          Seus créditos foram adicionados com sucesso
-        </Text>
+        <Text className="text-sm text-text-secondary text-center">{t.paymentSuccessSubtitle}</Text>
       </View>
 
       <View ref={receiptRef} collapsable={false} className="w-full max-w-sm">
         <Card className="bg-background">
           <View className="items-center gap-4">
             <View>
-              <Text className="text-xs text-text-secondary text-center">Valor recarregado</Text>
+              <Text className="text-xs text-text-secondary text-center">
+                {t.paymentSuccessValorRecarregado}
+              </Text>
               <Text className="text-4xl font-bold text-success text-center mt-1">
                 +{formatCurrency(amount)}
               </Text>
@@ -82,19 +84,19 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
 
             <View className="w-full gap-3">
               <View className="flex-row justify-between items-center">
-                <Text className="text-sm text-text-secondary">Novo saldo</Text>
+                <Text className="text-sm text-text-secondary">{t.paymentSuccessNovoSaldo}</Text>
                 <Text className="text-sm font-bold text-text-primary">
                   {formatCurrency(newBalance)}
                 </Text>
               </View>
               <View className="flex-row justify-between items-center">
-                <Text className="text-sm text-text-secondary">Horário</Text>
+                <Text className="text-sm text-text-secondary">{t.paymentSuccessHorario}</Text>
                 <Text className="text-sm font-bold text-text-primary">
-                  Hoje, {formatTime(new Date())}
+                  {t.cardapioHoje}, {formatTime(new Date())}
                 </Text>
               </View>
               <View className="flex-row justify-between items-center">
-                <Text className="text-sm text-text-secondary">Método</Text>
+                <Text className="text-sm text-text-secondary">{t.paymentSuccessMetodo}</Text>
                 <Text className="text-sm font-bold text-text-primary">PIX</Text>
               </View>
             </View>
@@ -103,8 +105,8 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
       </View>
 
       <View className="w-full max-w-sm gap-3">
-        <Button label="Compartilhar comprovante" onPress={handleShare} variant="secondary" />
-        <Button label="Voltar ao início" onPress={onBack} variant="primary" />
+        <Button label={t.paymentSuccessCompartilhar} onPress={handleShare} variant="secondary" />
+        <Button label={t.paymentSuccessVoltar} onPress={onBack} variant="primary" />
       </View>
     </View>
   )

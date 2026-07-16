@@ -5,13 +5,16 @@ import { Pressable, TextInput, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
 import {
+  firstFieldError,
   formatCurrency,
   MAX_VALUE,
   MIN_VALUE,
-  parseAmount,
-  sanitizeCurrencyInput,
-  validateRechargeAmount,
+  MONEY_MAX_LENGTH,
+  maskMoneyInput,
+  parseMoneyInput,
+  rechargeSchema,
 } from '@/shared/utils'
+import { useScaledFontStyle } from '@/store/themeStore'
 
 const PRESET_AMOUNTS = [5, 10, 20, 30, 50]
 
@@ -35,15 +38,20 @@ export function RechargeForm({
 }: RechargeFormProps) {
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
+  const inputTextStyle = useScaledFontStyle(16)
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
   const [customAmount, setCustomAmount] = useState('')
+  const [amountError, setAmountError] = useState('')
 
-  const customValue = parseAmount(customAmount)
+  const customValue = parseMoneyInput(customAmount)
   const activeAmount = selectedAmount ?? (customValue >= MIN_VALUE ? customValue : 0)
   const maxVal = limiteRecarga ?? MAX_VALUE
-  const validation = validateRechargeAmount(activeAmount, currentBalance, limiteRecarga)
-  const exceedsLimit = activeAmount > 0 && !validation.valid
-  const isValid = activeAmount > 0 && validation.valid
+  const validation = rechargeSchema(currentBalance, maxVal).safeParse({ amount: activeAmount })
+  const validationError =
+    activeAmount > 0 && !validation.success
+      ? firstFieldError(validation.error.flatten().fieldErrors, 'amount')
+      : undefined
+  const isValid = activeAmount > 0 && validation.success
 
   useEffect(() => {
     onAmountChange?.(activeAmount)
@@ -52,15 +60,21 @@ export function RechargeForm({
   function handlePreset(value: number) {
     setSelectedAmount(value)
     setCustomAmount('')
+    setAmountError('')
   }
 
   function handleCustomChange(text: string) {
-    setCustomAmount(sanitizeCurrencyInput(text))
+    setCustomAmount(maskMoneyInput(text))
     setSelectedAmount(null)
+    if (amountError) setAmountError('')
   }
 
   function handleSubmit() {
-    if (!isValid || disabled) return
+    if (disabled) return
+    if (!isValid) {
+      setAmountError(validationError ?? `Valor mínimo é ${formatCurrency(MIN_VALUE)}.`)
+      return
+    }
     onSubmit(activeAmount)
   }
 
@@ -117,8 +131,10 @@ export function RechargeForm({
             placeholderTextColor={themeColors.textDisabled}
             keyboardType="numeric"
             editable={!disabled}
+            maxLength={MONEY_MAX_LENGTH}
             accessibilityLabel="Valor personalizado de recarga"
             accessibilityHint="Digite um valor entre o mínimo e o limite disponível para recarga"
+            style={inputTextStyle}
             className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
           />
           <Text className="text-xs text-text-secondary">
@@ -126,8 +142,10 @@ export function RechargeForm({
           </Text>
         </View>
 
-        {exceedsLimit && <ErrorMessage message={validation.error ?? 'Valor fora do limite.'} />}
-        {!exceedsLimit && serverError && <ErrorMessage message={serverError} />}
+        {(amountError || validationError) && (
+          <ErrorMessage message={amountError || validationError || 'Valor fora do limite.'} />
+        )}
+        {!amountError && !validationError && serverError && <ErrorMessage message={serverError} />}
       </View>
 
       <LinearGradient

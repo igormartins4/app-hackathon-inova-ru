@@ -3,7 +3,17 @@ import { useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
-import { isValidCpf, maskCpf, unmask } from '@/shared/utils'
+import {
+  CPF_MAX_LENGTH,
+  firstFieldError,
+  loginSchema,
+  maskCpf,
+  PASSWORD_MAX_LENGTH,
+  sanitizeDigits,
+  sanitizePassword,
+  unmask,
+} from '@/shared/utils'
+import { useScaledFontStyle } from '@/store/themeStore'
 
 interface LoginFormProps {
   onSubmit: (cpf: string, password: string) => void
@@ -18,32 +28,28 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   const [passwordError, setPasswordError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const themeColors = useThemeColors()
+  const inputTextStyle = useScaledFontStyle(16)
 
   const handleCpfChange = (text: string) => {
-    setCpf(maskCpf(text))
+    setCpf(maskCpf(sanitizeDigits(text, 11)))
     if (cpfError) setCpfError('')
   }
 
   const handlePasswordChange = (text: string) => {
-    setPassword(text)
+    setPassword(sanitizePassword(text))
     if (passwordError) setPasswordError('')
   }
 
   const handleSubmit = () => {
     const clean = unmask(cpf)
-    let hasError = false
+    const result = loginSchema.safeParse({ cpf: clean, password })
 
-    if (!isValidCpf(cpf)) {
-      setCpfError('CPF inválido.')
-      hasError = true
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors
+      setCpfError(firstFieldError(errors, 'cpf') ?? '')
+      setPasswordError(firstFieldError(errors, 'password') ?? '')
+      return
     }
-
-    if (!password.trim()) {
-      setPasswordError('Senha é obrigatória.')
-      hasError = true
-    }
-
-    if (hasError) return
 
     onSubmit(clean, password)
   }
@@ -59,8 +65,10 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
           placeholderTextColor={themeColors.textDisabled}
           keyboardType="numeric"
           editable={!isLoading}
+          maxLength={CPF_MAX_LENGTH}
           accessibilityLabel="Campo de CPF"
           accessibilityHint="Digite os 11 números do seu CPF institucional"
+          style={inputTextStyle}
           className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
         />
         {cpfError ? (
@@ -80,8 +88,10 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
             placeholderTextColor={themeColors.textDisabled}
             secureTextEntry={!showPassword}
             editable={!isLoading}
+            maxLength={PASSWORD_MAX_LENGTH}
             accessibilityLabel="Campo de senha"
             accessibilityHint="Digite sua senha institucional"
+            style={inputTextStyle}
             className="bg-surface border border-outline rounded-xl px-4 py-3.5 pr-12 text-base text-text-primary min-h-[48px]"
           />
           <Pressable
