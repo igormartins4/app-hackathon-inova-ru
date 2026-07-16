@@ -7,11 +7,13 @@ import { useBalance, useConsumerStatus } from '@/features/balance'
 import { createTransfer, TransferForm } from '@/features/transfer'
 import { Button, Card, ErrorMessage, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
+import { useI18n } from '@/shared/i18n'
 import { formatCurrency, getErrorMessage } from '@/shared/utils'
 
 export default function TransferScreen() {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { t } = useI18n()
   const { data: balanceData, isLoading } = useBalance()
   const { isBlocked, isInactive, message: consumerMessage } = useConsumerStatus()
   const { isOffline } = useNetworkStatus()
@@ -41,18 +43,20 @@ export default function TransferScreen() {
     }
   }
 
-  if (isLoading) return <LoadingSpinner message="Carregando saldo" />
+  if (isLoading) return <LoadingSpinner message={t.balanceLoading} />
 
   if (success) {
     return (
       <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-4">
-        <Card accessibilityRole="summary" accessibilityLabel="Transferência simulada concluída">
-          <Text className="text-2xl font-bold text-text-primary">Transferência enviada</Text>
+        <Card accessibilityRole="summary" accessibilityLabel={t.transferSuccessTitle}>
+          <Text className="text-2xl font-bold text-text-primary">{t.transferSuccessTitle}</Text>
           <Text className="text-sm text-text-secondary mt-2">
-            Saldo enviado para {success.nome}. Novo saldo: {formatCurrency(success.saldo)}.
+            {t.transferSuccessMessage
+              .replace('{name}', success.nome)
+              .replace('{balance}', formatCurrency(success.saldo))}
           </Text>
         </Card>
-        <Button label="Voltar ao início" onPress={() => router.push('/(tabs)/home')} />
+        <Button label={t.paymentSuccessVoltar} onPress={() => router.push('/(tabs)/home')} />
       </ScrollView>
     )
   }
@@ -62,7 +66,7 @@ export default function TransferScreen() {
       {disabled && (
         <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
           <Text className="text-center text-sm text-status-error">
-            {isOffline ? 'Conecte-se à internet para transferir' : consumerMessage}
+            {isOffline ? t.transferConecteSe : consumerMessage}
           </Text>
         </View>
       )}

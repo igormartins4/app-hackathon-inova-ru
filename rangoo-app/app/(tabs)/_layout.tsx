@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeColors } from '@/config'
+import { useI18n } from '@/shared/i18n'
 import { useThemeStore } from '@/store/themeStore'
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name']
@@ -17,6 +18,15 @@ const TAB_ICONS: Record<string, { focused: IoniconsName; default: IoniconsName }
 export default function TabLayout() {
   const themeColors = useThemeColors()
   const reducedMotion = useThemeStore((s) => s.reducedMotion)
+  const { t } = useI18n()
+
+  const TAB_LABELS: Record<string, string> = {
+    home: t.tabHome,
+    recharge: t.tabRecharge,
+    cardapio: t.tabCardapio,
+    historico: t.tabHistorico,
+    profile: t.tabProfile,
+  }
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1 }}>
@@ -35,7 +45,7 @@ export default function TabLayout() {
             fontSize: 12,
             fontWeight: '500',
           },
-          // Cada tela já renderiza seu próprio título estilizado no conteúdo —
+          // Cada tela já renderiza seu título estilizado no conteúdo —
           // o header nativo do Expo Router duplicava esse título (Ponto 10 do QA).
           headerShown: false,
           animation: reducedMotion ? 'none' : 'fade',
@@ -44,75 +54,75 @@ export default function TabLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            title: 'Início',
-            tabBarLabel: 'Início',
+            title: TAB_LABELS.home,
+            tabBarLabel: TAB_LABELS.home,
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = focused ? TAB_ICONS.home.focused : TAB_ICONS.home.default
               return <Ionicons name={iconName} size={size} color={color} />
             },
-            tabBarAccessibilityLabel: 'Início',
+            tabBarAccessibilityLabel: TAB_LABELS.home,
           }}
         />
         <Tabs.Screen
           name="balance"
           options={{
             href: null,
-            title: 'Saldo',
+            title: t.balanceTitle,
           }}
         />
         <Tabs.Screen
           name="recharge"
           options={{
-            title: 'Recarga',
-            tabBarLabel: 'Recarga',
+            title: TAB_LABELS.recharge,
+            tabBarLabel: TAB_LABELS.recharge,
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = focused ? TAB_ICONS.recharge.focused : TAB_ICONS.recharge.default
               return <Ionicons name={iconName} size={size} color={color} />
             },
-            tabBarAccessibilityLabel: 'Recarga',
+            tabBarAccessibilityLabel: TAB_LABELS.recharge,
           }}
         />
         <Tabs.Screen
           name="transfer"
           options={{
             href: null,
-            title: 'Transferência',
+            title: t.transferTitle,
           }}
         />
         <Tabs.Screen
           name="cardapio"
           options={{
-            title: 'Cardápio',
-            tabBarLabel: 'Cardápio',
+            title: TAB_LABELS.cardapio,
+            tabBarLabel: TAB_LABELS.cardapio,
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = focused ? TAB_ICONS.cardapio.focused : TAB_ICONS.cardapio.default
               return <Ionicons name={iconName} size={size} color={color} />
             },
-            tabBarAccessibilityLabel: 'Cardápio',
+            tabBarAccessibilityLabel: TAB_LABELS.cardapio,
           }}
         />
         <Tabs.Screen
           name="historico"
           options={{
-            title: 'Histórico',
-            tabBarLabel: 'Histórico',
+            title: TAB_LABELS.historico,
+            tabBarLabel: TAB_LABELS.historico,
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = focused ? TAB_ICONS.historico.focused : TAB_ICONS.historico.default
               return <Ionicons name={iconName} size={size} color={color} />
             },
-            tabBarAccessibilityLabel: 'Histórico',
+            tabBarAccessibilityLabel: TAB_LABELS.historico,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Perfil',
-            tabBarLabel: 'Perfil',
+            title: TAB_LABELS.profile,
+            tabBarLabel: TAB_LABELS.profile,
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = focused ? TAB_ICONS.profile.focused : TAB_ICONS.profile.default
               return <Ionicons name={iconName} size={size} color={color} />
             },
-            tabBarAccessibilityLabel: 'Perfil',
+            tabBarAccessibilityLabel: TAB_LABELS.profile,
           }}
         />
       </Tabs>

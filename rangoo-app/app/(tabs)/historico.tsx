@@ -13,12 +13,14 @@ import {
   useRechargeHistory,
 } from '@/features/history'
 import { Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 
 type Tab = 'recargas' | 'refeicoes'
 
 export default function HistoricoScreen() {
   const params = useLocalSearchParams<{ tab?: string }>()
   const themeColors = useThemeColors()
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<Tab>(
     params.tab === 'refeicoes' ? 'refeicoes' : 'recargas',
   )
@@ -59,15 +61,13 @@ export default function HistoricoScreen() {
     <View className="flex-1 bg-background">
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
         <View>
-          <Text className="text-2xl font-bold text-text-primary">Histórico</Text>
-          <Text className="text-xs text-text-secondary mt-0.5">
-            Suas recargas e refeições nos RUs
-          </Text>
+          <Text className="text-2xl font-bold text-text-primary">{t.historicoTitle}</Text>
+          <Text className="text-xs text-text-secondary mt-0.5">{t.historicoSubtitle}</Text>
         </View>
         <Pressable
           onPress={() => setShowFilter((v) => !v)}
           accessibilityRole="button"
-          accessibilityLabel="Filtrar por período"
+          accessibilityLabel={t.historicoFiltrarPeriodo}
           accessibilityState={{ selected: showFilter }}
           className="w-10 h-10 rounded-full bg-surface items-center justify-center"
         >
@@ -78,26 +78,26 @@ export default function HistoricoScreen() {
       <View className="flex-row px-4 gap-1 mb-2">
         {(
           [
-            { key: 'recargas' as const, label: 'Recargas' },
-            { key: 'refeicoes' as const, label: 'Refeições' },
+            { key: 'recargas' as const, label: t.historicoRecargasTab },
+            { key: 'refeicoes' as const, label: t.historicoRefeicoesTab },
           ] as const
-        ).map((t) => (
+        ).map((tab) => (
           <Pressable
-            key={t.key}
-            onPress={() => setActiveTab(t.key)}
+            key={tab.key}
+            onPress={() => setActiveTab(tab.key)}
             accessibilityRole="tab"
-            accessibilityLabel={t.label}
-            accessibilityState={{ selected: activeTab === t.key }}
+            accessibilityLabel={tab.label}
+            accessibilityState={{ selected: activeTab === tab.key }}
             className={`flex-1 items-center py-3 min-h-[48px] ${
-              activeTab === t.key ? 'border-b-2 border-primary' : ''
+              activeTab === tab.key ? 'border-b-2 border-primary' : ''
             }`}
           >
             <Text
               className={`text-sm font-medium ${
-                activeTab === t.key ? 'text-primary font-bold' : 'text-text-secondary'
+                activeTab === tab.key ? 'text-primary font-bold' : 'text-text-secondary'
               }`}
             >
-              {t.label}
+              {tab.label}
             </Text>
           </Pressable>
         ))}

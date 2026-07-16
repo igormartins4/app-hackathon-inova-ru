@@ -6,46 +6,44 @@ import { useThemeColors } from '@/config'
 import type { FilialCode } from '@/features/cardapio'
 import { MenuCalendar, RESTAURANTES_CARDAPIO, useCardapio } from '@/features/cardapio'
 import { Card, LoadingSpinner, Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import { isToday } from '@/shared/utils'
 
 type TipoRefeicao = 'almoco' | 'jantar'
 
-const MEALS: { key: TipoRefeicao; label: string; icon: string }[] = [
-  { key: 'almoco', label: 'Almoço', icon: 'sunny' },
-  { key: 'jantar', label: 'Jantar', icon: 'moon' },
-]
-
 const FAVORITES_KEY = '@rangoo_favorite_rus'
 
-function formatDate(date: Date): string {
-  const days = [
-    'Domingo',
-    'Segunda-feira',
-    'Terça-feira',
-    'Quarta-feira',
-    'Quinta-feira',
-    'Sexta-feira',
-    'Sábado',
-  ]
-  const months = [
-    'janeiro',
-    'fevereiro',
-    'março',
-    'abril',
-    'maio',
-    'junho',
-    'julho',
-    'agosto',
-    'setembro',
-    'outubro',
-    'novembro',
-    'dezembro',
-  ]
+function formatDate(date: Date, days: string[], months: string[]): string {
   return `${days[date.getDay()]}, ${date.getDate()} de ${months[date.getMonth()]}`
 }
 
+const WEEKDAYS_PT = [
+  'Domingo',
+  'Segunda-feira',
+  'Terça-feira',
+  'Quarta-feira',
+  'Quinta-feira',
+  'Sexta-feira',
+  'Sábado',
+]
+const MONTHS_PT = [
+  'janeiro',
+  'fevereiro',
+  'março',
+  'abril',
+  'maio',
+  'junho',
+  'julho',
+  'agosto',
+  'setembro',
+  'outubro',
+  'novembro',
+  'dezembro',
+]
+
 export default function CardapioScreen() {
   const themeColors = useThemeColors()
+  const { t } = useI18n()
   const [restaurante, setRestaurante] = useState<FilialCode>('0003')
   const [tipoRefeicao, setTipoRefeicao] = useState<TipoRefeicao>('almoco')
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -107,32 +105,35 @@ export default function CardapioScreen() {
     [themeColors],
   )
 
+  const meals = [
+    { key: 'almoco' as const, label: t.cardapioAlmoco, icon: 'sunny' },
+    { key: 'jantar' as const, label: t.cardapioJantar, icon: 'moon' },
+  ]
+
   if (isLoading) {
-    return <LoadingSpinner message="Carregando cardápio" />
+    return <LoadingSpinner message={t.cardapioLoading} />
   }
 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-5">
       <View>
-        <Text className="text-2xl font-bold text-text-primary">Cardápio</Text>
-        <Text className="text-xs text-text-secondary mt-0.5">
-          Consulte o menu do dia nos RUs da UFMG
-        </Text>
+        <Text className="text-2xl font-bold text-text-primary">{t.cardapioTitle}</Text>
+        <Text className="text-xs text-text-secondary mt-0.5">{t.cardapioSubtitleConsulte}</Text>
       </View>
 
       <View className="gap-2">
         <View className="flex-row items-center justify-between">
           <Text className="text-xs font-bold text-primary uppercase tracking-wider">
-            Restaurante Universitário
+            {t.cardapioRestaurante}
           </Text>
           {favorites.length > 0 && (
             <Pressable
               onPress={() => setShowAll((v) => !v)}
               accessibilityRole="button"
-              accessibilityLabel={showAll ? 'Mostrar favoritos' : 'Mostrar todos'}
+              accessibilityLabel={showAll ? t.cardapioMostrarFavoritos : t.cardapioMostrarTodos}
             >
               <Text className="text-xs font-semibold text-primary">
-                {showAll ? 'Favoritos' : 'Todos'}
+                {showAll ? t.cardapioFavoritos : t.cardapioTodos}
               </Text>
             </Pressable>
           )}
@@ -145,7 +146,7 @@ export default function CardapioScreen() {
                 <Pressable
                   onPress={() => setRestaurante(r.key)}
                   accessibilityRole="button"
-                  accessibilityLabel={`Restaurante ${r.label}`}
+                  accessibilityLabel={`${t.cardapioRestaurante} ${r.label}`}
                   accessibilityState={{ selected: restaurante === r.key }}
                   className={`flex-row items-center gap-2 rounded-full px-4 py-2.5 min-h-[44px] ${
                     restaurante === r.key ? 'bg-primary' : 'bg-surface border border-outline'
@@ -166,7 +167,9 @@ export default function CardapioScreen() {
                   onPress={() => toggleFavorite(r.key)}
                   accessibilityRole="button"
                   accessibilityLabel={
-                    isFav ? `Remover ${r.label} dos favoritos` : `Favoritar ${r.label}`
+                    isFav
+                      ? `${t.back} ${r.label} ${t.cardapioFavoritos}`
+                      : `${t.cardapioFavoritos} ${r.label}`
                   }
                   className="w-8 h-8 rounded-full items-center justify-center"
                 >
@@ -181,34 +184,38 @@ export default function CardapioScreen() {
           })}
         </ScrollView>
         {favorites.length === 0 && !showAll && (
-          <Text className="text-xs text-text-secondary">
-            Nenhum favorito selecionado. Toque na estrela para favoritar.
-          </Text>
+          <Text className="text-xs text-text-secondary">{t.cardapioNenhumFavorito}</Text>
         )}
       </View>
 
       <View className="gap-2">
-        <Text className="text-xs font-bold text-primary uppercase tracking-wider">Data</Text>
+        <Text className="text-xs font-bold text-primary uppercase tracking-wider">
+          {t.cardapioData}
+        </Text>
         <MenuCalendar selectedDate={selectedDate} onSelectDate={setSelectedDate} />
         <Pressable
           onPress={() => !today && setSelectedDate(new Date())}
           accessibilityRole="button"
-          accessibilityLabel={today ? 'Data de hoje' : 'Voltar para hoje'}
+          accessibilityLabel={today ? t.cardapioHoje : t.cardapioVoltarParaHoje}
           className="flex-row items-center gap-1"
         >
-          <Text className="text-sm font-medium text-text-primary">{formatDate(selectedDate)}</Text>
+          <Text className="text-sm font-medium text-text-primary">
+            {formatDate(selectedDate, WEEKDAYS_PT, MONTHS_PT)}
+          </Text>
           {today ? (
-            <Text className="text-success text-xs font-bold"> · Hoje</Text>
+            <Text className="text-success text-xs font-bold"> · {t.cardapioHoje}</Text>
           ) : (
-            <Text className="text-primary text-xs font-bold"> · Voltar para hoje</Text>
+            <Text className="text-primary text-xs font-bold"> · {t.cardapioVoltarParaHoje}</Text>
           )}
         </Pressable>
       </View>
 
       <View className="gap-2">
-        <Text className="text-xs font-bold text-primary uppercase tracking-wider">Refeição</Text>
+        <Text className="text-xs font-bold text-primary uppercase tracking-wider">
+          {t.cardapioMeal}
+        </Text>
         <View className="flex-row bg-surface-variant rounded-full p-1">
-          {MEALS.map((m) => {
+          {meals.map((m) => {
             const disabled =
               !showAll &&
               !RESTAURANTES_CARDAPIO.find((r) => r.key === restaurante)?.hasDinner &&
@@ -252,11 +259,9 @@ export default function CardapioScreen() {
         <Card className="items-center gap-2 py-6">
           <Ionicons name="cloud-offline-outline" size={28} color={themeColors.textSecondary} />
           <Text className="text-sm font-medium text-text-primary text-center">
-            Não foi possível carregar o cardápio agora
+            {t.cardapioErro}
           </Text>
-          <Text className="text-xs text-text-secondary text-center">
-            O cardápio vem direto do site da FUMP e pode estar temporariamente indisponível.
-          </Text>
+          <Text className="text-xs text-text-secondary text-center">{t.cardapioErroDetalhe}</Text>
         </Card>
       )}
 
@@ -264,10 +269,10 @@ export default function CardapioScreen() {
         <Card className="items-center gap-2 py-6">
           <Ionicons name="moon-outline" size={28} color={themeColors.textSecondary} />
           <Text className="text-sm font-medium text-text-primary text-center">
-            {selectedRU?.label} não serve janta
+            {t.cardapioSemJantar.replace('{ru}', selectedRU?.label ?? '')}
           </Text>
           <Text className="text-xs text-text-secondary text-center">
-            Selecione outro restaurante para ver o cardápio do jantar.
+            {t.cardapioSemJantarDetalhe}
           </Text>
         </Card>
       )}
@@ -276,7 +281,7 @@ export default function CardapioScreen() {
         <Card className="items-center gap-2 py-6">
           <Ionicons name="restaurant-outline" size={28} color={themeColors.textSecondary} />
           <Text className="text-sm font-medium text-text-primary text-center">
-            Cardápio não disponível para este RU nesta data
+            {t.cardapioIndisponivel}
           </Text>
         </Card>
       )}
@@ -302,7 +307,7 @@ export default function CardapioScreen() {
                 <Text className="text-sm text-text-primary">{item.nome}</Text>
                 {item.vegano && (
                   <View className="bg-success/10 rounded-full px-2 py-0.5">
-                    <Text className="text-[10px] font-medium text-success">Vegano</Text>
+                    <Text className="text-[10px] font-medium text-success">{t.cardapioVegano}</Text>
                   </View>
                 )}
               </View>

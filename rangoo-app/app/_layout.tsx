@@ -1,7 +1,9 @@
 import '../global.css'
 
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
+import { useFonts } from 'expo-font'
 import { Stack, useRouter, useSegments } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { View } from 'react-native'
@@ -9,8 +11,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
+import { useI18n } from '@/shared/i18n'
 import { QUERY_PERSIST_MAX_AGE, queryClient, queryPersister } from '@/shared/services'
 import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
+
+SplashScreen.preventAutoHideAsync()
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const initialize = useThemeStore((s) => s.initialize)
@@ -39,6 +44,7 @@ function AuthGate() {
   const reducedMotion = useThemeStore((s) => s.reducedMotion)
   const segments = useSegments()
   const router = useRouter()
+  const { t } = useI18n()
 
   useEffect(() => {
     if (isLoading) return
@@ -57,7 +63,7 @@ function AuthGate() {
       <View className="flex-1">
         <OfflineBanner visible={isOffline} />
         {isLoading ? (
-          <LoadingSpinner message="Carregando" />
+          <LoadingSpinner message={t.loading} />
         ) : (
           <Stack
             screenOptions={{
@@ -76,6 +82,25 @@ function AuthGate() {
 }
 
 export default function RootLayout() {
+  const initializeI18n = useI18n((s) => s.initialize)
+
+  const [fontsLoaded] = useFonts({
+    Lora: require('../assets/fonts/Lora.ttf'),
+    'JetBrains Mono': require('../assets/fonts/JetBrainsMono.ttf'),
+  })
+
+  useEffect(() => {
+    initializeI18n()
+  }, [initializeI18n])
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync()
+    }
+  }, [fontsLoaded])
+
+  if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: '#f0faf6' }} />
+
   return (
     <SafeAreaProvider>
       <PersistQueryClientProvider

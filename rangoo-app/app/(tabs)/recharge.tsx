@@ -13,12 +13,14 @@ import { createPayment } from '@/features/recharge/services/rechargeApi'
 import type { PaymentStatusResponse } from '@/features/recharge/types/recharge.types'
 import { Text } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
+import { useI18n } from '@/shared/i18n'
 import { getErrorMessage } from '@/shared/utils'
 
 type FlowStep = 'amount' | 'polling' | 'success' | 'error'
 
 export default function RechargeScreen() {
   const queryClient = useQueryClient()
+  const { t } = useI18n()
   const { data: balanceData } = useBalance()
   const { isBlocked, isInactive, message: consumerMessage } = useConsumerStatus()
   const { isOffline } = useNetworkStatus()
@@ -127,9 +129,7 @@ export default function RechargeScreen() {
             )}
             {isOffline && (
               <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
-                <Text className="text-center text-sm text-status-error">
-                  Conecte-se à internet para recarregar
-                </Text>
+                <Text className="text-center text-sm text-status-error">{t.rechargeConecteSe}</Text>
               </View>
             )}
             <BalancePreview currentBalance={currentBalance} amount={selectedAmount} />
