@@ -86,7 +86,7 @@
       "responses": [
         {
           "uuid": "a1e6c1b0-1f1a-4b1a-9c1a-000000000021",
-          "body": "{\n  \"consumidor\": {\n    \"nome\": \"GERSON SANTOS\",\n    \"tipo_consumidor\": { \"codigo\": \"01\", \"descricao\": \"ESTUDANTE REGULAR\" },\n    \"centro_custo\": { \"tipo\": \"Graduacao\", \"descricao\": \"CIENCIA DA COMPUTACAO\" },\n    \"situacao\": \"A\"\n  },\n  \"saldo\": {\n    \"credito_disponivel\": 45.50,\n    \"limite_recarga\": 500.00\n  }\n}",
+          "body": "{\n  \"consumidor\": {\n    \"nome\": \"GERSON SANTOS\",\n    \"tipo_consumidor\": { \"codigo\": \"01\", \"descricao\": \"ESTUDANTE REGULAR\" },\n    \"centro_custo\": { \"tipo\": \"Graduacao\", \"descricao\": \"SISTEMAS DE INFORMAÇÃO\" },\n    \"situacao\": \"A\"\n  },\n  \"saldo\": {\n    \"credito_disponivel\": 45.50,\n    \"limite_recarga\": 500.00\n  }\n}",
           "latency": 0,
           "statusCode": 200,
           "label": "200 ativo (default)",
@@ -110,7 +110,7 @@
         },
         {
           "uuid": "a1e6c1b0-1f1a-4b1a-9c1a-000000000022",
-          "body": "{\n  \"consumidor\": {\n    \"nome\": \"GERSON SANTOS\",\n    \"tipo_consumidor\": { \"codigo\": \"01\", \"descricao\": \"ESTUDANTE REGULAR\" },\n    \"centro_custo\": { \"tipo\": \"Graduacao\", \"descricao\": \"CIENCIA DA COMPUTACAO\" },\n    \"situacao\": \"B\"\n  },\n  \"saldo\": {\n    \"credito_disponivel\": 12.00,\n    \"limite_recarga\": 500.00\n  }\n}",
+          "body": "{\n  \"consumidor\": {\n    \"nome\": \"GERSON SANTOS\",\n    \"tipo_consumidor\": { \"codigo\": \"01\", \"descricao\": \"ESTUDANTE REGULAR\" },\n    \"centro_custo\": { \"tipo\": \"Graduacao\", \"descricao\": \"SISTEMAS DE INFORMAÇÃO\" },\n    \"situacao\": \"B\"\n  },\n  \"saldo\": {\n    \"credito_disponivel\": 12.00,\n    \"limite_recarga\": 500.00\n  }\n}",
           "latency": 0,
           "statusCode": 200,
           "label": "200 bloqueado (?situacao=B)",

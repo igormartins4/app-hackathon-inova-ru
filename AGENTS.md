@@ -149,7 +149,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
   "consumidor": {
     "nome": "JOÃO DA SILVA",
     "tipo_consumidor": { "codigo": "01", "descricao": "ESTUDANTE REGULAR" },
-    "centro_custo": { "tipo": "Graduação", "descricao": "CIENCIA DA COMPUTACAO" },
+    "centro_custo": { "tipo": "Graduação", "descricao": "SISTEMAS DE INFORMAÇÃO" },
     "situacao": "A"
   },
   "saldo": {

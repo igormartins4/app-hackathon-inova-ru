@@ -12,6 +12,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 - **Armazenamento:** AsyncStorage (compatível com Expo Go)
 - **QR Code:** react-native-qrcode-svg
 - **Animações:** React Native Reanimated 4
+- **Validação:** Zod 4 + máscaras locais
 - **Build:** EAS Build
 
 ## Arquitetura
@@ -28,8 +29,8 @@ src/
 │   ├── auth/               # Login, gerenciamento de token
 │   ├── balance/            # Exibição de saldo, dados do consumidor
 │   ├── recharge/           # Fluxo PIX, QR Code, polling
-│   ├── history/            # Histórico de recargas e refeições (API real)
-│   ├── cardapio/           # Cardápio do dia (mock — não existe endpoint na spec)
+│   ├── history/            # Histórico de recargas e refeições
+│   ├── cardapio/           # Cardápio do dia (integração pública não-oficial)
 │   └── profile/            # Perfil do usuário (reutiliza dados do balance)
 ├── shared/
 │   ├── components/
@@ -37,7 +38,7 @@ src/
 │   │   └── accessibility/  # AccessibleText
 │   ├── hooks/              # useNetworkStatus, useAccessibility
 │   ├── services/           # Cliente API, armazenamento seguro, cache, mock
-│   └── utils/              # Helpers (CPF, erros, validação de recarga)
+│   └── utils/              # CPF, máscaras, Zod, validação e formatação
 ├── store/                  # Stores Zustand
 └── config/                 # Constantes, tema, mensagens de erro
 ```
@@ -69,7 +70,7 @@ O app tem **dois jeitos de mockar a API**, escolhidos pela variável `EXPO_PUBLI
 | **Setup** | Zero — já vem pronto | `pnpm mock` num segundo terminal |
 | **`.env`** | `EXPO_PUBLIC_USE_MOCK=true` (ou nem crie o `.env`) | `EXPO_PUBLIC_USE_MOCK=false` + `EXPO_PUBLIC_API_URL` |
 | **Roda de verdade na rede?** | Não — tudo dentro do processo JS | Sim — HTTP real em `localhost:3001` |
-| **Testa o polling de verdade?** | Não — aprova o pagamento na 1ª consulta | Sim — simula `pending` 3x antes de aprovar |
+| **Testa o polling de verdade?** | Sim — simula `pending` antes de `approved` + `creditado:true` | Sim — simula `pending` 3x antes de aprovar |
 | **Testa `network_security_config.xml`?** | Não | Sim |
 | **Quando usar** | Desenvolvimento rápido de UI | Testar fluxo de pagamento/erro de ponta a ponta |
 
@@ -81,9 +82,11 @@ Não precisa de nada além do app rodando (assumindo que já rodou `pnpm install
 pnpm start
 ```
 
-Escaneie o QR Code com o app Expo Go. Todas as dependências nativas vêm com o Expo Go — não precisa de build customizado.
+Escaneie o QR Code com o app Expo Go. O script usa `expo start --offline` por padrão para evitar chamadas à API da Expo em redes com certificado corporativo/autoassinado.
 
-**Login:** qualquer CPF de 11 dígitos (ex.: `12345678901`) + qualquer senha (ex.: `123456`) — o mock não valida senha.
+**Login:** CPF válido de 11 dígitos (ex.: `52998224725`) + qualquer senha (ex.: `123456`) — senha nunca é persistida.
+
+O Perfil inclui o card **Modo demonstração**, que alterna cenários do mock embutido: normal, conta bloqueada, consumidor inativo, PIX expirado, PIX rejeitado, rate limit e erro 500.
 
 ### Opção B — Servidor Mockoon (rede real)
 
@@ -113,7 +116,7 @@ pnpm start
 
 > `10.0.2.2` é o alias que o **emulador Android** usa pra falar com a máquina host — é o `localhost` de fora do emulador. Testando no navegador (`pnpm web`) ou no Expo Go de um celular físico na mesma rede Wi-Fi, troque por `http://<ip-da-sua-maquina>:3001` (ex.: `192.168.1.50`).
 
-**Login (Mockoon):** CPF `12345678901` + senha **exatamente** `senha_do_usuario` (única credencial configurada com sucesso — qualquer outra senha responde `401`, de propósito, pra testar o fluxo de erro).
+**Login (Mockoon):** CPF válido como `52998224725` + senha **exatamente** `senha_do_usuario` (única credencial configurada com sucesso — qualquer outra senha responde `401`, de propósito, pra testar o fluxo de erro).
 
 **O que esse mock cobre, rota por rota:**
 
@@ -148,7 +151,7 @@ pnpm exec eas build --platform android
 pnpm test
 ```
 
-Os testes unitários cobrem o algoritmo de polling, validação de CPF e lógica de limites de recarga.
+Os testes unitários cobrem polling, CPF, máscaras, validação de formulários, limites de recarga e contraste dos tokens principais.
 
 ## Estrutura do Projeto
 
@@ -159,7 +162,7 @@ Os testes unitários cobrem o algoritmo de polling, validação de CPF e lógica
 | `features/balance/` | Exibição de saldo, status do consumidor |
 | `features/recharge/` | Fluxo de pagamento PIX, QR Code, polling |
 | `features/history/` | Histórico de recargas e refeições |
-| `features/cardapio/` | Cardápio do dia (mock — sem endpoint na spec v2.0) |
+| `features/cardapio/` | Cardápio do dia (integração pública não-oficial, fora da spec v2.0) |
 | `features/profile/` | Perfil do usuário (dados do consumidor) |
 | `shared/components/ui/` | Componentes reutilizáveis |
 | `shared/hooks/` | Hooks React customizados |
@@ -179,6 +182,39 @@ Conecta na API FUMP v2.0. Veja `src/config/constants.ts` para os endpoints.
 | `/creditos/pagamento/:id/status` | GET | Consultar status do pagamento |
 | `/creditos/recargas` | GET | Histórico de recargas |
 | `/creditos/refeicoes` | GET | Histórico de refeições |
+
+## Acessibilidade e UX
+
+- Alto contraste claro/escuro com tokens dedicados em `global.css` e `src/config/theme.ts`.
+- Tamanho de fonte ajustável no Perfil; textos usam `ScaledText` e campos de formulário escalam junto.
+- Reduzir movimento remove animações de navegação e troca `FadeInView` por `View` comum.
+- Cores do sistema usam Material You em props nativas quando disponível; alto contraste tem prioridade e desativa cores dinâmicas.
+- Todos os campos têm máscara, sanitização e limite por contexto.
+
+## Manutenção Rápida
+
+- Contrato da API: `../docs/especificacao_tecnica.md` é a fonte de verdade.
+- Cliente HTTP e mock embutido: `src/shared/services/apiClient.ts` e `src/shared/services/mockHandler.ts`.
+- Máscaras e validação: `src/shared/utils/mask.ts` e `src/shared/utils/forms.ts`.
+- Tema/contraste/Material You: `global.css`, `tailwind.config.js`, `src/config/theme.ts`, `src/config/materialYou.ts`.
+- Componentes base: `src/shared/components/ui/`.
+- Fluxo PIX: `src/features/recharge/`.
+- Cardápio: `src/features/cardapio/`; integração pública não-oficial, fora do contrato v2.0.
+
+Antes de enviar mudanças, rode:
+
+```bash
+pnpm exec tsc --noEmit
+pnpm exec biome check .
+pnpm exec jest
+pnpm exec expo export --platform android
+```
+
+Em redes com certificado autoassinado, checks online da Expo podem precisar de workaround local:
+
+```powershell
+$env:NODE_TLS_REJECT_UNAUTHORIZED='0'; pnpm dlx expo-doctor --verbose
+```
 
 ## Licença
 

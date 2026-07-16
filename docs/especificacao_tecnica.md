@@ -460,7 +460,7 @@ Retorna os dados do consumidor e o saldo vinculados ao token.
   "consumidor": {
     "nome": "JOÃO DA SILVA",
     "tipo_consumidor": { "codigo": "01", "descricao": "ESTUDANTE REGULAR" },
-    "centro_custo": { "tipo": "Graduação", "descricao": "CIENCIA DA COMPUTACAO" },
+    "centro_custo": { "tipo": "Graduação", "descricao": "SISTEMAS DE INFORMAÇÃO" },
     "situacao": "A"
   },
   "saldo": {
