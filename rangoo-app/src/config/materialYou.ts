@@ -1,4 +1,4 @@
-import { type ColorValue, Platform, PlatformColor } from 'react-native'
+import { type ColorValue, Platform } from 'react-native'
 
 export interface MaterialYouColors {
   primary: ColorValue
@@ -6,19 +6,10 @@ export interface MaterialYouColors {
   textInverse: ColorValue
 }
 
-function androidColor(attr: string): ColorValue {
-  return PlatformColor(attr)
-}
-
+// ponytail: Material You dynamic colors require Theme.Material3 in styles.xml
+// which is not available without the material-components-android dependency.
+// Disabled — theming is handled via CSS variables in global.css.
 export function getMaterialYouColors(): MaterialYouColors | null {
   if (Platform.OS !== 'android') return null
-  try {
-    return {
-      primary: androidColor('?attr/colorPrimary'),
-      primaryContainer: androidColor('?attr/colorPrimaryContainer'),
-      textInverse: androidColor('?attr/colorOnPrimary'),
-    }
-  } catch {
-    return null
-  }
+  return null
 }
