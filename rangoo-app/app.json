@@ -34,8 +34,7 @@
         }
       ],
       "./plugins/withNetworkSecurityConfig",
-      "./plugins/withForceDarkDisabled",
-      "./plugins/withDynamicColors"
+      "./plugins/withForceDarkDisabled"
     ],
     "extra": {
       "router": {},
