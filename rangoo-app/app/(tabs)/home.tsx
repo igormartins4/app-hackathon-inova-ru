@@ -2,13 +2,22 @@ import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import { useCallback, useMemo } from 'react'
-import { Pressable, View } from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
 import { useRechargeHistory } from '@/features/history'
-import { Card, ErrorMessage, FadeInView, LoadingSpinner, Text } from '@/shared/components/ui'
+import {
+  Card,
+  ErrorMessage,
+  FadeInView,
+  LoadingSpinner,
+  LowBalanceBanner,
+  NoticeCarousel,
+  Text,
+} from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import {
   formatCurrency,
   formatToLocalDateTime,
@@ -16,17 +25,14 @@ import {
   getGreeting,
   toTitleCase,
 } from '@/shared/utils'
+import { useThemeStore } from '@/store/themeStore'
 
 const QUICK_ACTIONS = [
-  { key: 'cardapio', label: 'Cardápio', icon: 'book' as const },
-  { key: 'historico', label: 'Histórico', icon: 'time' as const },
+  { key: 'cardapio', labelKey: 'homeCardapio' as const, icon: 'book' as const },
+  { key: 'historico', labelKey: 'homeHistorico' as const, icon: 'time' as const },
 ]
 
-const GREETING_PHRASES = ['Bora rangar', 'Manda ver', 'Hora de comer']
-
-function getGreetingPhrase(): string {
-  return GREETING_PHRASES[Math.floor(Math.random() * GREETING_PHRASES.length)]
-}
+const GREETING_PHRASES = ['homePhrase'] as const
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -36,10 +42,14 @@ export default function HomeScreen() {
   const { data: rechargeHistory } = useRechargeHistory()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
+  const { t } = useI18n()
+  const hideSensitiveData = useThemeStore((s) => s.hideSensitiveData)
+  const toggleHideSensitiveData = useThemeStore((s) => s.toggleHideSensitiveData)
   const recentRecharges = useMemo(
     () => rechargeHistory?.pages[0]?.data.slice(0, 3) ?? [],
     [rechargeHistory],
   )
+  const phraseIndex = useMemo(() => Math.floor(Math.random() * GREETING_PHRASES.length), [])
 
   const handleQuickAction = useCallback(
     (key: string) => {
@@ -56,13 +66,13 @@ export default function HomeScreen() {
   )
 
   if (isLoading) {
-    return <LoadingSpinner message="Carregando" />
+    return <LoadingSpinner message={t.loading} />
   }
 
   if (isInactive) {
     return (
       <View className="flex-1 bg-background px-4 pt-8">
-        <ErrorMessage message={message ?? 'Conta inativa. Procure a FUMP.'} />
+        <ErrorMessage message={message ?? t.errorInactiveAccount} />
       </View>
     )
   }
@@ -81,10 +91,10 @@ export default function HomeScreen() {
 
   const firstName = user?.nome ? toTitleCase(user.nome).split(' ')[0] : 'Estudante'
   const greeting = getGreeting()
-  const phrase = getGreetingPhrase()
+  const phrase = t[GREETING_PHRASES[phraseIndex]]
 
   return (
-    <View className="flex-1 bg-background">
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="pb-4">
       <View className="px-4 pt-4 pb-2">
         <Text className="text-sm text-text-secondary">{greeting},</Text>
         <Text
@@ -96,6 +106,10 @@ export default function HomeScreen() {
         <Text className="text-xs text-text-secondary mt-0.5">{phrase}!</Text>
       </View>
 
+      <NoticeCarousel />
+
+      <LowBalanceBanner />
+
       <View className="px-4 mb-4">
         <LinearGradient
           colors={gradients.balanceCard}
@@ -104,23 +118,42 @@ export default function HomeScreen() {
           style={{ borderRadius: 16 }}
         >
           <View className="p-5">
-            <Text className="text-xs font-medium text-text-inverse/70 uppercase tracking-wider">
-              Saldo Disponível
-            </Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-xs font-medium text-text-inverse/70 uppercase tracking-wider">
+                {t.homeBalanceTitle}
+              </Text>
+              <Pressable
+                onPress={toggleHideSensitiveData}
+                accessibilityRole="switch"
+                accessibilityLabel={hideSensitiveData ? t.showSensitiveData : t.hideSensitiveData}
+                accessibilityState={{ checked: hideSensitiveData }}
+                hitSlop={8}
+                className="p-1"
+              >
+                <Ionicons
+                  name={hideSensitiveData ? 'eye-off' : 'eye'}
+                  size={18}
+                  color={themeColors.textInverse}
+                  style={{ opacity: 0.7 }}
+                />
+              </Pressable>
+            </View>
             <Text
-              accessibilityLabel={`Saldo disponível: ${formatCurrency(saldo)}`}
+              accessibilityLabel={`${t.homeBalanceTitle}: ${hideSensitiveData ? t.hideSensitiveData : formatCurrency(saldo)}`}
               className="text-4xl font-bold text-text-inverse mt-2"
             >
-              {formatCurrency(saldo)}
+              {hideSensitiveData ? '••••' : formatCurrency(saldo)}
             </Text>
             <Pressable
               onPress={() => router.push('/(tabs)/recharge')}
               accessibilityRole="button"
-              accessibilityLabel="Recarregar via PIX"
+              accessibilityLabel={t.homeRechargeButton}
               className="flex-row items-center gap-2 bg-text-inverse/20 rounded-full px-4 py-2.5 mt-4 self-start min-h-[48px]"
             >
               <Ionicons name="add" size={18} color={themeColors.textInverse} />
-              <Text className="text-sm font-semibold text-text-inverse">Recarregar via PIX</Text>
+              <Text className="text-sm font-semibold text-text-inverse">
+                {t.homeRechargeButton}
+              </Text>
             </Pressable>
           </View>
         </LinearGradient>
@@ -132,32 +165,32 @@ export default function HomeScreen() {
             key={action.key}
             onPress={() => handleQuickAction(action.key)}
             accessibilityRole="button"
-            accessibilityLabel={action.label}
+            accessibilityLabel={t[action.labelKey]}
             className="flex-1 items-center justify-center gap-2 rounded-xl py-4 min-h-[80px]"
             style={{ backgroundColor: QUICK_ACTION_COLORS[index] }}
           >
             <Ionicons name={action.icon} size={28} color={themeColors.primary} />
-            <Text className="text-sm font-medium text-text-primary">{action.label}</Text>
+            <Text className="text-sm font-medium text-text-primary">{t[action.labelKey]}</Text>
           </Pressable>
         ))}
       </View>
 
       <View className="px-4 mb-4">
         <View className="flex-row items-center justify-between mb-3">
-          <Text className="text-sm font-bold text-text-primary">Últimas recargas</Text>
+          <Text className="text-sm font-bold text-text-primary">{t.homeRecentRecharges}</Text>
           <Pressable
             onPress={() => router.push('/(tabs)/historico?tab=recargas')}
             accessibilityRole="button"
-            accessibilityLabel="Ver todo o histórico"
+            accessibilityLabel={t.homeSeeAll}
           >
-            <Text className="text-sm font-semibold text-primary">Ver tudo</Text>
+            <Text className="text-sm font-semibold text-primary">{t.homeSeeAll}</Text>
           </Pressable>
         </View>
 
         <Card className="p-0 overflow-hidden">
           {recentRecharges.length === 0 ? (
             <Text className="text-sm text-text-secondary text-center py-4">
-              Você ainda não fez recargas no período.
+              {t.homeEmptyRecharges}
             </Text>
           ) : (
             recentRecharges.map((recarga, idx) => (
@@ -165,8 +198,7 @@ export default function HomeScreen() {
                 <Pressable
                   onPress={() => router.push('/(tabs)/historico?tab=recargas')}
                   accessibilityRole="button"
-                  accessibilityLabel={`Recarga de ${formatCurrency(recarga.valor)} em ${formatToLocalDateTime(recarga.data_hora)}`}
-                  accessibilityHint="Abre o histórico de recargas"
+                  accessibilityLabel={`${t.homeRechargePix} ${formatCurrency(recarga.valor)} ${formatToLocalDateTime(recarga.data_hora)}`}
                   className={`flex-row items-center gap-3 px-4 py-3 ${
                     idx < recentRecharges.length - 1 ? 'border-b border-outline-variant' : ''
                   }`}
@@ -175,7 +207,9 @@ export default function HomeScreen() {
                     <Ionicons name="card" size={20} color={themeColors.success} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-sm font-semibold text-text-primary">Recarga PIX</Text>
+                    <Text className="text-sm font-semibold text-text-primary">
+                      {t.homeRechargePix}
+                    </Text>
                     <Text className="text-xs text-text-secondary">
                       {formatToLocalDateTime(recarga.data_hora)}
                     </Text>
@@ -209,7 +243,7 @@ export default function HomeScreen() {
       <Pressable
         onPress={() => router.push('/(tabs)/cardapio')}
         accessibilityRole="button"
-        accessibilityLabel="Ver cardápio dos RUs"
+        accessibilityLabel={t.homeMenuBanner}
         className="mx-4 mb-4"
       >
         <LinearGradient
@@ -223,8 +257,8 @@ export default function HomeScreen() {
               <Ionicons name="restaurant" size={20} color={themeColors.primary} />
             </View>
             <View className="flex-1">
-              <Text className="text-sm font-bold text-text-primary">Cardápio do dia</Text>
-              <Text className="text-xs text-success font-medium">Ver cardápio dos RUs →</Text>
+              <Text className="text-sm font-bold text-text-primary">{t.homeMenuBanner}</Text>
+              <Text className="text-xs text-success font-medium">{t.homeMenuBannerSubtitle}</Text>
             </View>
           </View>
         </LinearGradient>
@@ -233,8 +267,8 @@ export default function HomeScreen() {
       <Pressable
         onPress={() => router.push('/(tabs)/transfer')}
         accessibilityRole="button"
-        accessibilityLabel="Transferir saldo para outra pessoa"
-        accessibilityHint="Abre a transferência demonstrativa de créditos"
+        accessibilityLabel={t.homeTransferTitle}
+        accessibilityHint={t.homeTransferDescription}
         className="mx-4 mb-4"
       >
         <Card>
@@ -243,16 +277,14 @@ export default function HomeScreen() {
               <Ionicons name="swap-horizontal" size={20} color={themeColors.primary} />
             </View>
             <View className="flex-1">
-              <Text className="text-sm font-bold text-text-primary">Ajudar um amigo</Text>
-              <Text className="text-xs text-text-secondary">
-                Transferência simulada para demonstração
-              </Text>
+              <Text className="text-sm font-bold text-text-primary">{t.homeTransferTitle}</Text>
+              <Text className="text-xs text-text-secondary">{t.homeTransferDescription}</Text>
             </View>
           </View>
         </Card>
       </Pressable>
 
       <View className="h-4" />
-    </View>
+    </ScrollView>
   )
 }

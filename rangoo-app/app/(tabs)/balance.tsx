@@ -7,11 +7,13 @@ import { BalanceCard } from '@/features/balance/components/BalanceCard'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { Card, ErrorMessage, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
+import { useI18n } from '@/shared/i18n'
 import { getErrorMessage } from '@/shared/utils'
 
 export default function BalanceScreen() {
   const router = useRouter()
   const themeColors = useThemeColors()
+  const { t } = useI18n()
   const { data, isLoading, isError, error, refetch, isStale, dataUpdatedAt } = useBalance()
   const { isOffline } = useNetworkStatus()
   const [refreshing, setRefreshing] = useState(false)
@@ -23,7 +25,7 @@ export default function BalanceScreen() {
   }, [refetch])
 
   if (isLoading) {
-    return <LoadingSpinner message="Carregando saldo" />
+    return <LoadingSpinner message={t.balanceLoading} />
   }
 
   if (isError) {
@@ -44,23 +46,31 @@ export default function BalanceScreen() {
         <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
-          accessibilityLabel="Voltar"
+          accessibilityLabel={t.back}
           className="w-10 h-10 rounded-full bg-surface items-center justify-center"
         >
           <Ionicons name="chevron-back" size={24} color={themeColors.primary} />
         </Pressable>
-        <Text className="text-2xl font-bold text-text-primary">Meu Saldo</Text>
+        <Text className="text-2xl font-bold text-text-primary">{t.balanceTitle}</Text>
       </View>
 
       {(isStale || isOffline) && (
         <Card
-          accessibilityLabel={isOffline ? 'Sem conexão' : 'Aviso de saldo em cache'}
+          accessibilityLabel={
+            isOffline ? t.errorNoConnection : t.balanceCache.replace('{time}', '')
+          }
           className="mx-4"
         >
           <Text accessibilityRole="text" className="text-center text-xs text-warning">
             {isOffline
-              ? 'Sem conexão — exibindo o último saldo salvo no aparelho'
-              : `Exibindo saldo salvo em ${new Date(dataUpdatedAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} — puxe para atualizar`}
+              ? t.balanceOffline
+              : t.balanceCache.replace(
+                  '{time}',
+                  new Date(dataUpdatedAt).toLocaleTimeString(undefined, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  }),
+                )}
           </Text>
         </Card>
       )}
@@ -77,11 +87,11 @@ export default function BalanceScreen() {
       <Pressable
         onPress={() => router.push('/(tabs)/recharge')}
         accessibilityRole="button"
-        accessibilityLabel="Recarregar via PIX"
+        accessibilityLabel={t.balanceRechargePix}
         className="mx-4 mb-4 flex-row items-center justify-center gap-2 bg-primary rounded-xl py-4 min-h-[52px]"
       >
         <Ionicons name="refresh-circle" size={20} color={themeColors.textInverse} />
-        <Text className="text-base font-bold text-text-inverse">Recarregar via PIX</Text>
+        <Text className="text-base font-bold text-text-inverse">{t.balanceRechargePix}</Text>
       </Pressable>
 
       <View className="h-4" />

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useColorScheme } from 'react-native'
+import { Platform, type TextStyle, useColorScheme } from 'react-native'
 import { create } from 'zustand'
 
 type Theme = 'light' | 'dark' | 'system'
@@ -12,10 +12,29 @@ export const FONT_STEPS = [
   { scale: 1.3, label: 'Extra Grande' },
 ] as const
 
+// ponytail: real font families loaded via expo-font in _layout.tsx
+export const SERIF_FAMILY = Platform.select({
+  android: 'Lora',
+  ios: 'Lora',
+  default: 'Lora',
+}) as TextStyle['fontFamily']
+
+export const MONOSPACE_FAMILY = Platform.select({
+  android: 'JetBrains Mono',
+  ios: 'JetBrains Mono',
+  default: 'JetBrains Mono',
+}) as TextStyle['fontFamily']
+
 export const FONT_FAMILIES = [
-  { family: 'System', label: 'Sistema' },
-  { family: 'serif', label: 'Serif' },
-  { family: 'monospace', label: 'Monospace' },
+  { family: undefined, label: 'Sistema' },
+  {
+    family: SERIF_FAMILY,
+    label: 'Serif',
+  },
+  {
+    family: MONOSPACE_FAMILY,
+    label: 'Monospace',
+  },
 ] as const
 
 const DEFAULT_FONT_INDEX = 2
@@ -27,6 +46,7 @@ const STORAGE_KEY_HIGH_CONTRAST = '@rangoo_high_contrast'
 const STORAGE_KEY_REDUCED_MOTION = '@rangoo_reduced_motion'
 const STORAGE_KEY_SYSTEM_COLORS = '@rangoo_system_colors'
 const STORAGE_KEY_FONT_FAMILY = '@rangoo_font_family'
+const STORAGE_KEY_HIDE_SENSITIVE = '@rangoo_hide_sensitive'
 
 interface ThemeStoreState {
   theme: Theme
@@ -35,14 +55,17 @@ interface ThemeStoreState {
   highContrast: boolean
   reducedMotion: boolean
   useSystemColors: boolean
+  hideSensitiveData: boolean
   setTheme: (theme: Theme) => void
   setFontSize: (index: number) => void
+  setFontFamily: (index: number) => void
   nextFontFamily: () => void
   increaseFontSize: () => void
   decreaseFontSize: () => void
   toggleHighContrast: () => void
   toggleReducedMotion: () => void
   toggleSystemColors: () => void
+  toggleHideSensitiveData: () => void
   initialize: () => Promise<void>
 }
 
@@ -53,6 +76,7 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
   highContrast: false,
   reducedMotion: false,
   useSystemColors: true,
+  hideSensitiveData: false,
   setTheme: (theme) => {
     set({ theme })
     AsyncStorage.setItem(STORAGE_KEY_THEME, theme)
@@ -61,6 +85,11 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
     const clamped = Math.max(0, Math.min(FONT_STEPS.length - 1, index))
     set({ fontSize: clamped })
     AsyncStorage.setItem(STORAGE_KEY_FONT_SIZE, String(clamped))
+  },
+  setFontFamily: (index) => {
+    const clamped = Math.max(0, Math.min(FONT_FAMILIES.length - 1, index))
+    set({ fontFamily: clamped })
+    AsyncStorage.setItem(STORAGE_KEY_FONT_FAMILY, String(clamped))
   },
   nextFontFamily: () => {
     const next = (get().fontFamily + 1) % FONT_FAMILIES.length
@@ -98,6 +127,11 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
     set({ useSystemColors: next })
     AsyncStorage.setItem(STORAGE_KEY_SYSTEM_COLORS, String(next))
   },
+  toggleHideSensitiveData: () => {
+    const next = !get().hideSensitiveData
+    set({ hideSensitiveData: next })
+    AsyncStorage.setItem(STORAGE_KEY_HIDE_SENSITIVE, String(next))
+  },
   initialize: async () => {
     try {
       const [
@@ -107,6 +141,7 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
         savedReducedMotion,
         savedSystemColors,
         savedFontFamily,
+        savedHideSensitive,
       ] = await Promise.all([
         AsyncStorage.getItem(STORAGE_KEY_THEME),
         AsyncStorage.getItem(STORAGE_KEY_FONT_SIZE),
@@ -114,6 +149,7 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
         AsyncStorage.getItem(STORAGE_KEY_REDUCED_MOTION),
         AsyncStorage.getItem(STORAGE_KEY_SYSTEM_COLORS),
         AsyncStorage.getItem(STORAGE_KEY_FONT_FAMILY),
+        AsyncStorage.getItem(STORAGE_KEY_HIDE_SENSITIVE),
       ])
       const updates: Partial<ThemeStoreState> = {}
       if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
@@ -140,14 +176,17 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
       if (savedReducedMotion === 'true') {
         updates.reducedMotion = true
       }
-      if (savedSystemColors === 'false') {
-        updates.useSystemColors = false
+      if (savedSystemColors !== null) {
+        updates.useSystemColors = savedSystemColors === 'true'
       }
       if (savedFontFamily !== null) {
         const num = Number(savedFontFamily)
         if (!Number.isNaN(num) && num >= 0 && num < FONT_FAMILIES.length) {
           updates.fontFamily = num
         }
+      }
+      if (savedHideSensitive === 'true') {
+        updates.hideSensitiveData = true
       }
       if (Object.keys(updates).length > 0) {
         set(updates)
@@ -169,7 +208,13 @@ export function useFontScale(): number {
   return FONT_STEPS[fontSize].scale
 }
 
-export function useFontFamily(): string {
+export function useFontFamily(): string | undefined {
   const fontFamily = useThemeStore((s) => s.fontFamily)
   return FONT_FAMILIES[fontFamily].family
+}
+
+export function useScaledFontStyle(baseFontSize = 16) {
+  const scale = useFontScale()
+  const fontFamily = useFontFamily()
+  return { ...(fontFamily ? { fontFamily } : null), fontSize: Math.round(baseFontSize * scale) }
 }
