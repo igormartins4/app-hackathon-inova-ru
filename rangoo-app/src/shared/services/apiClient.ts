@@ -1,4 +1,9 @@
-import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios'
 import { ERROR_MESSAGES } from '@/config'
 import { emitUnauthorized } from './authEvents'
 import { deleteCache } from './cacheStorage'
@@ -10,14 +15,20 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:3000'
 const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
 
 function mockAdapter(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
-  const data = getMockResponse(config)
-  return Promise.resolve({
-    data,
-    status: 200,
-    statusText: 'OK',
-    headers: new AxiosHeaders(),
+  const mock = getMockResponse(config)
+  const response = {
+    data: mock.data,
+    status: mock.status,
+    statusText: mock.statusText ?? (mock.status >= 400 ? 'Error' : 'OK'),
+    headers: new AxiosHeaders(mock.headers),
     config,
-  })
+  }
+
+  if (mock.status >= 400) {
+    return Promise.reject(new AxiosError('Mock API error', undefined, config, undefined, response))
+  }
+
+  return Promise.resolve(response)
 }
 
 export const apiClient = axios.create({

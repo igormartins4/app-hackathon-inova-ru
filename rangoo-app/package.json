@@ -2,9 +2,10 @@
   "name": "rangoo-universitario",
   "version": "1.0.0",
   "main": "expo-router/entry",
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@11.11.0",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --offline",
+    "start:online": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -36,6 +37,7 @@
     "expo-router": "~57.0.6",
     "expo-secure-store": "~57.0.1",
     "expo-sharing": "~57.0.1",
+    "expo-splash-screen": "~57.0.1",
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.1",
     "nativewind": "4.2.6",
@@ -48,8 +50,9 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
     "react-native-svg": "15.15.4",
-    "react-native-view-shot": "^4.0.3",
+    "react-native-view-shot": "5.1.0",
     "react-native-worklets": "0.10.0",
+    "zod": "^4.4.3",
     "zustand": "5.0.14"
   },
   "devDependencies": {
