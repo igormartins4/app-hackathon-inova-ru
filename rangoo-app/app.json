@@ -8,11 +8,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#f0faf6"
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -39,7 +34,8 @@
         }
       ],
       "./plugins/withNetworkSecurityConfig",
-      "./plugins/withForceDarkDisabled"
+      "./plugins/withForceDarkDisabled",
+      "./plugins/withDynamicColors"
     ],
     "extra": {
       "router": {},
