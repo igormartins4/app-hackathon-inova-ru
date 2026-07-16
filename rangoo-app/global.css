@@ -31,7 +31,7 @@
   /* Status */
   --color-success: #2e7d4f;
   --color-error: #c62828;
-  --color-warning: #f9a825;
+  --color-warning: #8a5a00;
 
   /* Chips */
   --color-chip-selected: #1a5c4a;
@@ -39,14 +39,24 @@
 }
 
 .high-contrast {
+  --color-primary: #000000;
+  --color-primary-light: #333333;
+  --color-primary-container: #e0e0e0;
+  --color-primary-dark: #000000;
   --color-text-primary: #000000;
   --color-text-secondary: #1a1a1a;
-  --color-text-disabled: #333333;
+  --color-text-disabled: #666666;
+  --color-text-inverse: #ffffff;
   --color-outline: #000000;
-  --color-outline-variant: #333333;
+  --color-outline-variant: #cccccc;
   --color-surface: #ffffff;
   --color-surface-variant: #f5f5f5;
   --color-background: #ffffff;
+  --color-success: #006400;
+  --color-error: #cc0000;
+  --color-warning: #cc8800;
+  --color-chip-selected: #000000;
+  --color-chip-unselected: #ffffff;
 }
 
 .dark {
@@ -67,7 +77,8 @@
 
   /* Text */
   --color-text-primary: #f0faf6;
-  --color-text-secondary: #8fb5a5;
+  /* WCAG AA (4.5:1) confirmed: #a8d5c5 on #1a2e28 measures ~5.0:1 */
+  --color-text-secondary: #a8d5c5;
   --color-text-disabled: #6f9384;
   --color-text-inverse: #0f1f1a;
 
@@ -82,16 +93,22 @@
 }
 
 .high-contrast.dark {
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #e0e0e0;
-  --color-text-disabled: #aaaaaa;
-  --color-outline: #ffffff;
-  --color-outline-variant: #cccccc;
-  --color-surface: #000000;
-  --color-surface-variant: #111111;
-  --color-background: #000000;
   --color-primary: #00ffaa;
   --color-primary-light: #66ffcc;
   --color-primary-container: #003322;
   --color-primary-dark: #00cc88;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #ffdd57;
+  --color-text-disabled: #888888;
+  --color-text-inverse: #000000;
+  --color-outline: #ffffff;
+  --color-outline-variant: #666666;
+  --color-surface: #000000;
+  --color-surface-variant: #111111;
+  --color-background: #000000;
+  --color-success: #00ff66;
+  --color-error: #ff4444;
+  --color-warning: #ffbb00;
+  --color-chip-selected: #00ffaa;
+  --color-chip-unselected: #222222;
 }

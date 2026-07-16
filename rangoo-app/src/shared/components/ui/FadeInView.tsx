@@ -1,16 +1,24 @@
+import { View, type ViewProps } from 'react-native'
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated'
 import { useThemeStore } from '@/store/themeStore'
 
-type FadeInViewProps = React.ComponentProps<typeof Animated.View>
+interface FadeInViewProps extends ViewProps {
+  children: React.ReactNode
+}
 
 export function FadeInView({ children, ...props }: FadeInViewProps) {
   const reducedMotion = useThemeStore((s) => s.reducedMotion)
 
+  if (reducedMotion) {
+    // ponytail: keep wrapper View so FlatList keys/className/style are preserved
+    return <View {...props}>{children}</View>
+  }
+
   return (
     <Animated.View
-      entering={reducedMotion ? undefined : FadeIn.duration(220)}
-      exiting={reducedMotion ? undefined : FadeOut.duration(140)}
-      layout={reducedMotion ? undefined : Layout.duration(180)}
+      entering={FadeIn.duration(220)}
+      exiting={FadeOut.duration(140)}
+      layout={Layout.duration(180)}
       {...props}
     >
       {children}

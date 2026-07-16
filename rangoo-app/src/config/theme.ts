@@ -6,7 +6,7 @@
 // literal color instead of a className, so nothing here is re-hardcoded.
 
 import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
-import { getMaterialYouAccent } from './materialYou'
+import { getMaterialYouColors } from './materialYou'
 
 export const colors = {
   primary: '#1a5c4a',
@@ -24,7 +24,7 @@ export const colors = {
   textInverse: '#ffffff',
   success: '#2e7d4f',
   error: '#c62828',
-  warning: '#f9a825',
+  warning: '#8a5a00',
   chipSelected: '#1a5c4a',
   chipUnselected: '#ffffff',
   white: '#ffffff',
@@ -42,7 +42,8 @@ export const darkColors = {
   outline: '#2d4a3e',
   outlineVariant: '#1f3830',
   textPrimary: '#f0faf6',
-  textSecondary: '#8fb5a5',
+  /* WCAG AA: #a8d5c5 on #1a2e28 ≈ 5.0:1 */
+  textSecondary: '#a8d5c5',
   textDisabled: '#6f9384',
   textInverse: '#0f1f1a',
   success: '#4ade80',
@@ -119,54 +120,96 @@ export const touchTarget = {
 } as const
 
 const highContrastColors = {
+  primary: '#000000',
+  primaryLight: '#333333',
+  primaryContainer: '#e0e0e0',
+  primaryDark: '#000000',
   textPrimary: '#000000',
   textSecondary: '#1a1a1a',
-  textDisabled: '#333333',
+  textDisabled: '#666666',
+  textInverse: '#ffffff',
   outline: '#000000',
-  outlineVariant: '#333333',
+  outlineVariant: '#cccccc',
   surface: '#ffffff',
   surfaceVariant: '#f5f5f5',
   background: '#ffffff',
+  success: '#006400',
+  error: '#cc0000',
+  warning: '#cc8800',
+  chipSelected: '#000000',
+  chipUnselected: '#ffffff',
 } as const
 
 const highContrastDarkColors = {
-  textPrimary: '#ffffff',
-  textSecondary: '#e0e0e0',
-  textDisabled: '#aaaaaa',
-  outline: '#ffffff',
-  outlineVariant: '#cccccc',
-  surface: '#000000',
-  surfaceVariant: '#111111',
-  background: '#000000',
   primary: '#00ffaa',
   primaryLight: '#66ffcc',
   primaryContainer: '#003322',
   primaryDark: '#00cc88',
+  textPrimary: '#ffffff',
+  textSecondary: '#ffdd57',
+  textDisabled: '#888888',
+  textInverse: '#000000',
+  outline: '#ffffff',
+  outlineVariant: '#666666',
+  surface: '#000000',
+  surfaceVariant: '#111111',
+  background: '#000000',
+  success: '#00ff66',
+  error: '#ff4444',
+  warning: '#ffbb00',
+  chipSelected: '#00ffaa',
+  chipUnselected: '#222222',
 } as const
 
 // Resolves to the light or dark token set for native props that can't take a
 // NativeWind className (icon `color`, ActivityIndicator, tabBar tint colors).
 export function useThemeColors() {
   const resolvedTheme = useResolvedTheme()
-  const { highContrast, theme, useSystemColors } = useThemeStore((s) => ({
-    highContrast: s.highContrast,
-    theme: s.theme,
-    useSystemColors: s.useSystemColors,
-  }))
-  const systemAccent = useSystemColors && theme === 'system' ? getMaterialYouAccent() : null
+  const highContrast = useThemeStore((s) => s.highContrast)
+  const useSystemColors = useThemeStore((s) => s.useSystemColors)
+  const systemColors = useSystemColors && !highContrast ? getMaterialYouColors() : null
   const base = {
     ...(resolvedTheme === 'dark' ? darkColors : colors),
-    ...(systemAccent && !highContrast
-      ? { primary: systemAccent, chipSelected: systemAccent }
-      : null),
+    ...(systemColors && !highContrast ? systemColors : null),
   }
   if (!highContrast) return base
   const overrides = resolvedTheme === 'dark' ? highContrastDarkColors : highContrastColors
   return { ...base, ...overrides }
 }
 
+const highContrastGradientColors = {
+  light: {
+    loginHeader: ['#e0e0e0', '#f0f0f0', '#ffffff'] as const,
+    balanceCard: ['#000000', '#333333', '#000000'] as const,
+    balanceDetail: ['#f5f5f5', '#eeeeee'] as const,
+    profileCard: ['#f5f5f5', '#eeeeee', '#f5f5f5'] as const,
+    infoBanner: ['#f0f0f0', '#ffffff'] as const,
+    hackathonBadge: ['#e0e0e0', '#d0d0d0'] as const,
+    ruBanner: ['#f0f0f0', '#ffffff'] as const,
+    quickActionCardapio: '#e0e0e0',
+    quickActionHistorico: '#e0e0e0',
+  },
+  dark: {
+    loginHeader: ['#003322', '#002211', '#003322'] as const,
+    balanceCard: ['#00cc88', '#00ffaa', '#00cc88'] as const,
+    balanceDetail: ['#111111', '#0a0a0a'] as const,
+    profileCard: ['#111111', '#0a0a0a', '#111111'] as const,
+    infoBanner: ['#111111', '#0a0a0a'] as const,
+    hackathonBadge: ['#222222', '#1a1a1a'] as const,
+    ruBanner: ['#111111', '#0a0a0a'] as const,
+    quickActionCardapio: '#222222',
+    quickActionHistorico: '#222222',
+  },
+} as const
+
 // Returns gradient colors for the current theme
 export function useGradientColors() {
   const resolvedTheme = useResolvedTheme()
+  const highContrast = useThemeStore((s) => s.highContrast)
+  if (highContrast) {
+    return resolvedTheme === 'dark'
+      ? highContrastGradientColors.dark
+      : highContrastGradientColors.light
+  }
   return resolvedTheme === 'dark' ? gradientColors.dark : gradientColors.light
 }

@@ -18,6 +18,8 @@ const CLASS_FONT_SIZES: Record<string, number> = {
   'text-balance': 40,
 }
 
+const ARBITRARY_TEXT_SIZE = /^text-\[(\d+)px\]$/
+
 function resolveFontSize(style?: TextProps['style']): number | undefined {
   if (!style) return undefined
   const flat = StyleSheet.flatten(style)
@@ -30,7 +32,10 @@ function resolveClassFontSize(className?: string): number | undefined {
   if (!className) return undefined
   return className
     .split(/\s+/)
-    .map((name) => CLASS_FONT_SIZES[name])
+    .map((name) => {
+      const arbitrary = name.match(ARBITRARY_TEXT_SIZE)?.[1]
+      return CLASS_FONT_SIZES[name] ?? (arbitrary ? Number(arbitrary) : undefined)
+    })
     .find((size) => size != null)
 }
 
@@ -41,7 +46,7 @@ export function ScaledText({ children, className, style, ...props }: ScaledTextP
 
   const scaledStyle = [
     style,
-    { fontFamily },
+    fontFamily ? { fontFamily } : null,
     baseFontSize != null && fontScale !== 1
       ? { fontSize: Math.round(baseFontSize * fontScale) }
       : null,
