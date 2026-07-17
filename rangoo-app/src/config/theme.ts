@@ -84,24 +84,6 @@ export const gradientColors = {
 
 export type GradientColors = typeof gradientColors.light
 
-export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
-} as const
-
-export const radii = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  '2xl': 24,
-  full: 9999,
-} as const
-
 export const fontSize = {
   xs: 12,
   sm: 14,
@@ -111,16 +93,6 @@ export const fontSize = {
   '2xl': 24,
   '3xl': 28,
   balance: 40,
-} as const
-
-export const timing = {
-  fast: 150,
-  normal: 250,
-  slow: 400,
-} as const
-
-export const touchTarget = {
-  min: 48,
 } as const
 
 const highContrastColors = {

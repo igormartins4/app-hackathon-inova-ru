@@ -2,7 +2,7 @@
  * Input masking and sanitization utilities.
  * CPF-specific masks delegate to cpf.ts for single-source validation.
  */
-import { cleanCpf, formatCpf } from './cpf'
+import { formatCpf } from './cpf'
 import { formatCurrency, parseCurrencyStringToNumber } from './currency'
 
 export const CPF_MAX_LENGTH = 14
@@ -26,9 +26,6 @@ export function sanitizeDigits(value: string, maxLength = Number.POSITIVE_INFINI
 export function sanitizePassword(value: string, maxLength = PASSWORD_MAX_LENGTH): string {
   return value.replace(/[\r\n\t]/g, '').slice(0, maxLength)
 }
-
-/** Clean a formatted CPF to raw digits (alias for cpf.cleanCpf). */
-export const cleanCpfDigits = cleanCpf
 
 /**
  * Sanitize currency input: allow only digits, one decimal separator (`,``.`),

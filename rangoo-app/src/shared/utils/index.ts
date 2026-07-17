@@ -16,7 +16,6 @@ export { firstFieldError, loginSchema, rechargeSchema, transferSchema } from './
 export { toTitleCase, truncateText } from './layout'
 export {
   CPF_MAX_LENGTH,
-  cleanCpfDigits,
   MONEY_MAX_LENGTH,
   maskCpf,
   maskMoneyInput,
