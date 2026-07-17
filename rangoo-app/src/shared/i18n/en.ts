@@ -83,6 +83,8 @@ export default {
   profileSystemColors: 'System colors',
   profileSystemColorsHint: 'Simplified Material You',
   profileFontSize: 'Font size',
+  profileFontSizeDecrease: 'Decrease font size',
+  profileFontSizeIncrease: 'Increase font size',
   profileFontFamily: 'Font',
   profileFontHint: 'Choose your reading style',
   profileAbout: 'About the App',

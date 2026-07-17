@@ -6,8 +6,9 @@ import { Stack, useRouter, useSegments } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
-import { View } from 'react-native'
+import { useColorScheme, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { colors, darkColors } from '@/config/theme'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
@@ -83,6 +84,7 @@ function AuthGate() {
 
 export default function RootLayout() {
   const initializeI18n = useI18n((s) => s.initialize)
+  const colorScheme = useColorScheme()
 
   const [fontsLoaded] = useFonts({
     Lora: require('../assets/fonts/Lora.ttf'),
@@ -99,7 +101,10 @@ export default function RootLayout() {
     }
   }, [fontsLoaded])
 
-  if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: '#f0faf6' }} />
+  if (!fontsLoaded) {
+    const fallbackBackground = colorScheme === 'dark' ? darkColors.background : colors.background
+    return <View style={{ flex: 1, backgroundColor: fallbackBackground }} />
+  }
 
   return (
     <SafeAreaProvider>

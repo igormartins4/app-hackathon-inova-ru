@@ -36,10 +36,13 @@ export default function HistoricoScreen() {
     else if (params.tab === 'recargas') setActiveTab('recargas')
   }, [params.tab])
 
-  const dateParams = {
-    dataInicio: dateRange.start ?? undefined,
-    dataFim: dateRange.end ?? undefined,
-  }
+  const dateParams = useMemo(
+    () => ({
+      dataInicio: dateRange.start ?? undefined,
+      dataFim: dateRange.end ?? undefined,
+    }),
+    [dateRange.start, dateRange.end],
+  )
 
   const rechargeQuery = useRechargeHistory(dateParams, { enabled: activeTab === 'recargas' })
   const mealQuery = useMealHistory(
@@ -69,7 +72,7 @@ export default function HistoricoScreen() {
           accessibilityRole="button"
           accessibilityLabel={t.historicoFiltrarPeriodo}
           accessibilityState={{ selected: showFilter }}
-          className="w-10 h-10 rounded-full bg-surface items-center justify-center"
+          className="w-12 h-12 rounded-full bg-surface items-center justify-center"
         >
           <Ionicons name="filter" size={20} color={themeColors.primary} />
         </Pressable>

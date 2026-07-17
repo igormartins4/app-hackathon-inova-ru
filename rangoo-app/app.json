@@ -18,7 +18,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.rangoo.app"
+      "package": "com.rangoo.app",
+      "predictiveBackGestureEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png",

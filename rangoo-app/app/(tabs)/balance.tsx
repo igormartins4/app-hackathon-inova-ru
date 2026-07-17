@@ -47,7 +47,7 @@ export default function BalanceScreen() {
           onPress={() => router.back()}
           accessibilityRole="button"
           accessibilityLabel={t.back}
-          className="w-10 h-10 rounded-full bg-surface items-center justify-center"
+          className="w-12 h-12 rounded-full bg-surface items-center justify-center"
         >
           <Ionicons name="chevron-back" size={24} color={themeColors.primary} />
         </Pressable>

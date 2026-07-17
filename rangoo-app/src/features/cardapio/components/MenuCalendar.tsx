@@ -69,6 +69,7 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
           onPress={handlePreviousWeek}
           accessibilityRole="button"
           accessibilityLabel="Semana anterior"
+          hitSlop={6}
           className="w-10 h-10 rounded-full items-center justify-center"
         >
           <Ionicons name="chevron-back" size={20} color={themeColors.textSecondary} />
@@ -80,6 +81,7 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
           onPress={handleNextWeek}
           accessibilityRole="button"
           accessibilityLabel="Próxima semana"
+          hitSlop={6}
           className="w-10 h-10 rounded-full items-center justify-center"
         >
           <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
@@ -97,6 +99,7 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
               accessibilityRole="button"
               accessibilityLabel={`${WEEKDAY_LABELS[idx]}, dia ${day.getDate()}${isToday ? ', hoje' : ''}`}
               accessibilityState={{ selected: isSelected }}
+              hitSlop={6}
               className="items-center gap-1 w-10"
             >
               <Text className="text-xs text-text-secondary font-medium">{WEEKDAY_LABELS[idx]}</Text>

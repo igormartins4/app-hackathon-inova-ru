@@ -98,7 +98,7 @@ export function NoticeCarousel() {
           onPress={() => setDismissed(true)}
           accessibilityRole="button"
           accessibilityLabel={t.close}
-          hitSlop={8}
+          hitSlop={16}
           style={{ marginTop: 2 }}
         >
           <Ionicons name="close" size={16} color={themeColors.textSecondary} />
@@ -110,7 +110,7 @@ export function NoticeCarousel() {
           onPress={goPrev}
           accessibilityRole="button"
           accessibilityLabel={t.back}
-          hitSlop={8}
+          hitSlop={16}
         >
           <Ionicons name="chevron-back" size={20} color={themeColors.textSecondary} />
         </Pressable>
@@ -134,7 +134,7 @@ export function NoticeCarousel() {
           onPress={goNext}
           accessibilityRole="button"
           accessibilityLabel={t.cardapioGoToday}
-          hitSlop={8}
+          hitSlop={16}
         >
           <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
         </Pressable>

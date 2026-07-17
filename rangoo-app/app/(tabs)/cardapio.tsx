@@ -171,6 +171,7 @@ export default function CardapioScreen() {
                       ? `${t.back} ${r.label} ${t.cardapioFavoritos}`
                       : `${t.cardapioFavoritos} ${r.label}`
                   }
+                  hitSlop={8}
                   className="w-8 h-8 rounded-full items-center justify-center"
                 >
                   <Ionicons

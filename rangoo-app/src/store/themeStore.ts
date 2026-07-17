@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Platform, type TextStyle, useColorScheme } from 'react-native'
+import { AccessibilityInfo, Platform, type TextStyle, useColorScheme } from 'react-native'
 import { create } from 'zustand'
 
 type Theme = 'light' | 'dark' | 'system'
@@ -175,6 +175,9 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
       }
       if (savedReducedMotion === 'true') {
         updates.reducedMotion = true
+      } else if (savedReducedMotion === null) {
+        // Sem preferência salva: herda "Remover animações" do Android (AccessibilityInfo)
+        updates.reducedMotion = await AccessibilityInfo.isReduceMotionEnabled()
       }
       if (savedSystemColors !== null) {
         updates.useSystemColors = savedSystemColors === 'true'

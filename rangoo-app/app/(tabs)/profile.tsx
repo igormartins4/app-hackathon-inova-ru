@@ -353,7 +353,7 @@ export default function ProfileScreen() {
               onPress={decreaseFontSize}
               disabled={fontSize === 0}
               accessibilityRole="button"
-              accessibilityLabel={t.profileFontSize}
+              accessibilityLabel={t.profileFontSizeDecrease}
               className={`w-12 h-12 rounded-full items-center justify-center ${
                 fontSize === 0 ? 'bg-outline/30' : 'bg-primary'
               }`}
@@ -375,7 +375,7 @@ export default function ProfileScreen() {
               onPress={increaseFontSize}
               disabled={fontSize === FONT_STEPS.length - 1}
               accessibilityRole="button"
-              accessibilityLabel={t.profileFontSize}
+              accessibilityLabel={t.profileFontSizeIncrease}
               className={`w-12 h-12 rounded-full items-center justify-center ${
                 fontSize === FONT_STEPS.length - 1 ? 'bg-outline/30' : 'bg-primary'
               }`}

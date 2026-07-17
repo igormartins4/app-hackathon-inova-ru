@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
-import { Linking, Pressable, View } from 'react-native'
+import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useGradientColors, useThemeColors } from '@/config'
 import { LoginForm } from '@/features/auth/components/LoginForm'
@@ -52,98 +52,104 @@ export default function LoginScreen() {
           </View>
         </LinearGradient>
 
-        <View
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{
             position: 'absolute',
             top: '30%',
             left: 0,
             right: 0,
             bottom: 0,
-            paddingHorizontal: 24,
           }}
         >
-          <View className="bg-surface rounded-2xl p-6 shadow-lg">
-            <View className="gap-5">
-              <View className="gap-1">
-                <Text accessibilityLabel="Rangoo" className="text-2xl font-bold text-text-primary">
-                  {t.loginTitle}
-                </Text>
-                <Text className="text-sm text-text-secondary">{t.loginSubtitle}</Text>
-              </View>
-
-              {hasPendingSession && (
-                <View className="gap-2">
-                  <Pressable
-                    onPress={handleBiometricLogin}
-                    accessibilityRole="button"
-                    accessibilityLabel="Entrar com biometria"
-                    className="flex-row items-center justify-center gap-2 bg-surface-variant border border-outline rounded-xl py-3.5 min-h-[48px]"
+          <ScrollView contentContainerClassName="px-6" keyboardShouldPersistTaps="handled">
+            <View className="bg-surface rounded-2xl p-6 shadow-lg">
+              <View className="gap-5">
+                <View className="gap-1">
+                  <Text
+                    accessibilityLabel="Rangoo"
+                    className="text-2xl font-bold text-text-primary"
                   >
-                    <Ionicons name="finger-print" size={20} color={themeColors.primary} />
-                    <Text className="text-sm font-semibold text-primary">
-                      Entrar com biometria
-                      {pendingUserName ? ` (${pendingUserName.split(' ')[0]})` : ''}
-                    </Text>
-                  </Pressable>
-                  {biometricError ? (
-                    <Text
-                      accessibilityRole="alert"
-                      className="text-xs text-status-error text-center"
-                    >
-                      {biometricError}
-                    </Text>
-                  ) : null}
-                  <View className="flex-row items-center gap-2">
-                    <View className="flex-1 h-px bg-outline-variant" />
-                    <Text className="text-xs text-text-secondary">ou entre com CPF e senha</Text>
-                    <View className="flex-1 h-px bg-outline-variant" />
-                  </View>
+                    {t.loginTitle}
+                  </Text>
+                  <Text className="text-sm text-text-secondary">{t.loginSubtitle}</Text>
                 </View>
-              )}
 
-              <LoginForm onSubmit={handleSubmit} isLoading={isLoading} error={error} />
+                {hasPendingSession && (
+                  <View className="gap-2">
+                    <Pressable
+                      onPress={handleBiometricLogin}
+                      accessibilityRole="button"
+                      accessibilityLabel="Entrar com biometria"
+                      className="flex-row items-center justify-center gap-2 bg-surface-variant border border-outline rounded-xl py-3.5 min-h-[48px]"
+                    >
+                      <Ionicons name="finger-print" size={20} color={themeColors.primary} />
+                      <Text className="text-sm font-semibold text-primary">
+                        Entrar com biometria
+                        {pendingUserName ? ` (${pendingUserName.split(' ')[0]})` : ''}
+                      </Text>
+                    </Pressable>
+                    {biometricError ? (
+                      <Text
+                        accessibilityRole="alert"
+                        className="text-xs text-status-error text-center"
+                      >
+                        {biometricError}
+                      </Text>
+                    ) : null}
+                    <View className="flex-row items-center gap-2">
+                      <View className="flex-1 h-px bg-outline-variant" />
+                      <Text className="text-xs text-text-secondary">ou entre com CPF e senha</Text>
+                      <View className="flex-1 h-px bg-outline-variant" />
+                    </View>
+                  </View>
+                )}
+
+                <LoginForm onSubmit={handleSubmit} isLoading={isLoading} error={error} />
+              </View>
             </View>
-          </View>
 
-          <View className="gap-3 mt-6">
-            <Pressable
-              onPress={() => Linking.openURL('https://fump.ufmg.br')}
-              accessibilityRole="link"
-              accessibilityLabel={t.loginRegister}
-              className="items-center py-2"
-            >
-              <Text className="text-sm text-primary">
-                {t.loginNoAccount} <Text className="font-bold">{t.loginRegister}</Text>
+            <View className="gap-3 mt-6">
+              <Pressable
+                onPress={() => Linking.openURL('https://fump.ufmg.br')}
+                accessibilityRole="link"
+                accessibilityLabel={t.loginRegister}
+                className="items-center py-2"
+              >
+                <Text className="text-sm text-primary">
+                  {t.loginNoAccount} <Text className="font-bold">{t.loginRegister}</Text>
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => Linking.openURL('https://fump.ufmg.br')}
+                accessibilityRole="link"
+                accessibilityLabel={t.loginFumpLink}
+                className="items-center py-2"
+              >
+                <Text className="text-sm text-text-secondary">
+                  Esqueceu a senha?{' '}
+                  <Text className="font-bold text-primary">{t.loginFumpLink}</Text>
+                </Text>
+              </Pressable>
+
+              <Text className="text-center text-xs text-text-secondary mt-2">
+                FUMP · Fundação Universitária Mendes Pimentel
               </Text>
-            </Pressable>
 
-            <Pressable
-              onPress={() => Linking.openURL('https://fump.ufmg.br')}
-              accessibilityRole="link"
-              accessibilityLabel={t.loginFumpLink}
-              className="items-center py-2"
-            >
-              <Text className="text-sm text-text-secondary">
-                Esqueceu a senha? <Text className="font-bold text-primary">{t.loginFumpLink}</Text>
-              </Text>
-            </Pressable>
-
-            <Text className="text-center text-xs text-text-secondary mt-2">
-              FUMP · Fundação Universitária Mendes Pimentel
-            </Text>
-
-            <Pressable
-              onPress={() => setAboutVisible(true)}
-              accessibilityRole="button"
-              accessibilityLabel="Sobre o Rangoo Universitário e o Hackathon InovaRU"
-              className="items-center py-2"
-            >
-              <Text className="text-center text-xs text-text-secondary">
-                {t.loginHackathon} · Sobre o projeto
-              </Text>
-            </Pressable>
-          </View>
-        </View>
+              <Pressable
+                onPress={() => setAboutVisible(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Sobre o Rangoo Universitário e o Hackathon InovaRU"
+                className="items-center py-2"
+              >
+                <Text className="text-center text-xs text-text-secondary">
+                  {t.loginHackathon} · Sobre o projeto
+                </Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
       <AboutAppModal visible={aboutVisible} onClose={() => setAboutVisible(false)} />
     </SafeAreaView>

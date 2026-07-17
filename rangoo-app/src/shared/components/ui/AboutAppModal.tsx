@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Linking, Modal, Pressable, ScrollView, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeColors } from '@/config'
 import { useI18n } from '@/shared/i18n'
 import { Button } from './Button'
@@ -21,7 +22,7 @@ export function AboutAppModal({ visible, onClose }: AboutAppModalProps) {
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-background">
+      <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-background">
         <ScrollView className="flex-1" contentContainerClassName="p-5 gap-5">
           <View className="flex-row items-start justify-between gap-4">
             <View className="flex-1">
@@ -77,7 +78,7 @@ export function AboutAppModal({ visible, onClose }: AboutAppModalProps) {
           />
           <Button label={t.aboutClose} onPress={onClose} />
         </ScrollView>
-      </View>
+      </SafeAreaView>
     </Modal>
   )
 }
