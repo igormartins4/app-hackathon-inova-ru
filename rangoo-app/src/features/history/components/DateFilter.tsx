@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native'
 import { Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import { toDateParam } from '@/shared/utils'
 
 interface DateFilterProps {
@@ -9,13 +10,14 @@ interface DateFilterProps {
   onFilter: (days: number | null, start: string | null, end: string | null) => void
 }
 
-const QUICK_OPTIONS = [
-  { label: '7 dias', days: 7 },
-  { label: '30 dias', days: 30 },
-  { label: 'Todos', days: null },
-] as const
-
 export function DateFilter({ selected, onFilter }: DateFilterProps) {
+  const { t } = useI18n()
+  const QUICK_OPTIONS = [
+    { label: t.dateFilter7Days, days: 7 },
+    { label: t.dateFilter30Days, days: 30 },
+    { label: t.cardapioTodos, days: null },
+  ] as const
+
   const handlePress = (days: number | null) => {
     if (days === null) {
       onFilter(null, null, null)
@@ -29,7 +31,7 @@ export function DateFilter({ selected, onFilter }: DateFilterProps) {
 
   return (
     <View
-      accessibilityLabel="Filtro de período"
+      accessibilityLabel={t.historicoFiltrarPeriodo}
       accessibilityRole="search"
       className="flex-row gap-2"
     >
@@ -37,7 +39,7 @@ export function DateFilter({ selected, onFilter }: DateFilterProps) {
         <Pressable
           key={opt.label}
           accessibilityRole="button"
-          accessibilityLabel={`Filtrar por ${opt.label}`}
+          accessibilityLabel={t.dateFilterByA11y.replace('{label}', opt.label)}
           accessibilityState={{ selected: selected === opt.days }}
           onPress={() => handlePress(opt.days)}
           className={`rounded-lg px-4 py-2.5 min-h-[48px] items-center justify-center ${

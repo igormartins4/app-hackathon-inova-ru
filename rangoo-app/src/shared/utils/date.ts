@@ -79,12 +79,62 @@ export function getTimeLeft(expiration: string): string {
   return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
 }
 
-/** Return time-of-day greeting in Portuguese. */
-export function getGreeting(): string {
+/** Time-of-day bucket for the greeting — caller resolves the translated string. */
+export function getGreetingPeriod(): 'morning' | 'afternoon' | 'evening' {
   const hour = new Date().getHours()
-  if (hour < 12) return 'Bom dia'
-  if (hour < 18) return 'Boa tarde'
-  return 'Boa noite'
+  if (hour < 12) return 'morning'
+  if (hour < 18) return 'afternoon'
+  return 'evening'
+}
+
+const INTL_LOCALE_MAP: Record<string, string> = {
+  'pt-BR': 'pt-BR',
+  en: 'en-US',
+  es: 'es-ES',
+  fr: 'fr-FR',
+}
+
+function toIntlLocale(locale: string): string {
+  return INTL_LOCALE_MAP[locale] ?? 'pt-BR'
+}
+
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
+
+/** "Terça-feira, 17 de julho" (pt-BR) / "Tuesday, July 17" (en) — locale-correct
+ * weekday + day + month, letting Intl handle per-language word order. */
+export function formatFullWeekdayDate(date: Date, locale: string): string {
+  const formatted = new Intl.DateTimeFormat(toIntlLocale(locale), {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(date)
+  return capitalize(formatted)
+}
+
+/** "julho" (pt-BR) / "July" (en) — bare month name. */
+export function getMonthName(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), { month: 'long' }).format(date)
+}
+
+/** "julho de 2026" (pt-BR) / "July 2026" (en) — calendar header. */
+export function formatMonthYear(date: Date, locale: string): string {
+  const formatted = new Intl.DateTimeFormat(toIntlLocale(locale), {
+    month: 'long',
+    year: 'numeric',
+  }).format(date)
+  return capitalize(formatted)
+}
+
+/** Single-letter weekday labels (D S T Q Q S S in pt-BR) starting on Sunday,
+ * localized via Intl instead of a hardcoded PT array. */
+export function getNarrowWeekdayLabels(locale: string): string[] {
+  const intlLocale = toIntlLocale(locale)
+  // Jan 4 1970 was a Sunday — used as a stable anchor to walk the week.
+  return Array.from({ length: 7 }, (_, i) =>
+    new Intl.DateTimeFormat(intlLocale, { weekday: 'narrow' }).format(new Date(1970, 0, 4 + i)),
+  )
 }
 
 /** Check if a date is today. */

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import {
   firstFieldError,
   formatCurrency,
@@ -40,6 +41,7 @@ export function RechargeForm({
 }: RechargeFormProps) {
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
+  const { t } = useI18n()
   const inputTextStyle = useScaledFontStyle(16)
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
   const [customAmount, setCustomAmount] = useState('')
@@ -74,7 +76,9 @@ export function RechargeForm({
   function handleSubmit() {
     if (disabled) return
     if (!isValid) {
-      setAmountError(validationError ?? `Valor mínimo é ${formatCurrency(MIN_VALUE)}.`)
+      setAmountError(
+        validationError ?? t.rechargeMinErrorPrefix.replace('{min}', formatCurrency(MIN_VALUE)),
+      )
       return
     }
     onSubmit(activeAmount)
@@ -83,15 +87,13 @@ export function RechargeForm({
   return (
     <View className="gap-5">
       <View>
-        <Text className="text-2xl font-bold text-text-primary">Recarregar Saldo</Text>
-        <Text className="text-sm text-text-secondary mt-1">
-          Escolha o valor e gere um QR Code PIX
-        </Text>
+        <Text className="text-2xl font-bold text-text-primary">{t.rechargeFormTitle}</Text>
+        <Text className="text-sm text-text-secondary mt-1">{t.rechargeFormSubtitle}</Text>
       </View>
 
       <View className="gap-3">
         <Text className="text-xs font-bold text-primary uppercase tracking-wider">
-          Selecione o Valor
+          {t.rechargeSelectAmount}
         </Text>
         <View className="flex-row flex-wrap gap-3">
           {PRESET_AMOUNTS.map((amount) => {
@@ -103,7 +105,10 @@ export function RechargeForm({
                 onPress={() => handlePreset(amount)}
                 disabled={disabled || wouldExceed}
                 accessibilityRole="button"
-                accessibilityLabel={`Recarregar ${formatCurrency(amount)}`}
+                accessibilityLabel={t.rechargePresetA11y.replace(
+                  '{amount}',
+                  formatCurrency(amount),
+                )}
                 accessibilityState={{
                   selected: isSelected,
                   disabled: disabled || wouldExceed,
@@ -129,23 +134,25 @@ export function RechargeForm({
           <TextInput
             value={customAmount}
             onChangeText={handleCustomChange}
-            placeholder="R$ Outro valor..."
+            placeholder={t.rechargeCustomPlaceholder}
             placeholderTextColor={themeColors.textDisabled}
             keyboardType="numeric"
             editable={!disabled}
             maxLength={MONEY_MAX_LENGTH}
-            accessibilityLabel="Valor personalizado de recarga"
-            accessibilityHint="Digite um valor entre o mínimo e o limite disponível para recarga"
+            accessibilityLabel={t.rechargeCustomA11yLabel}
+            accessibilityHint={t.rechargeCustomA11yHint}
             style={inputTextStyle}
             className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
           />
           <Text className="text-xs text-text-secondary">
-            Mínimo {formatCurrency(MIN_VALUE)} · Máximo {formatCurrency(maxVal)}
+            {t.rechargeMinMax
+              .replace('{min}', formatCurrency(MIN_VALUE))
+              .replace('{max}', formatCurrency(maxVal))}
           </Text>
         </View>
 
         {(amountError || validationError) && (
-          <ErrorMessage message={amountError || validationError || 'Valor fora do limite.'} />
+          <ErrorMessage message={amountError || validationError || t.rechargeOutOfLimit} />
         )}
         {!amountError && !validationError && serverError && <ErrorMessage message={serverError} />}
       </View>
@@ -159,16 +166,14 @@ export function RechargeForm({
         <View className="flex-row items-start gap-3 p-4">
           <Ionicons name="flash" size={22} color={themeColors.warning} />
           <View className="flex-1">
-            <Text className="text-sm font-bold text-success">Aprovação em até 2 minutos</Text>
-            <Text className="text-xs text-text-secondary mt-1">
-              Seus créditos são liberados automaticamente após confirmação do PIX.
-            </Text>
+            <Text className="text-sm font-bold text-success">{t.rechargeApprovalTime}</Text>
+            <Text className="text-xs text-text-secondary mt-1">{t.rechargeApprovalDetail}</Text>
           </View>
         </View>
       </LinearGradient>
 
       <Button
-        label="Gerar QR Code PIX"
+        label={t.rechargeGenerateQr}
         onPress={handleSubmit}
         disabled={!isValid || disabled}
         loading={isSubmitting}

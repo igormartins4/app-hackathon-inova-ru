@@ -11,6 +11,7 @@ import {
   AboutAppModal,
   Button,
   Card,
+  ErrorMessage,
   LoadingSpinner,
   StatusBadge,
   Text,
@@ -22,7 +23,7 @@ import {
   resetMockState,
   setMockScenario,
 } from '@/shared/services/mockHandler'
-import { formatCurrency } from '@/shared/utils'
+import { formatCurrency, getErrorMessage } from '@/shared/utils'
 import { FONT_FAMILIES, FONT_STEPS, useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
 // Chaves de cenário de demonstração só existem enquanto o app roda contra o
@@ -43,8 +44,18 @@ const DEMO_SCENARIOS: Array<{ key: DemoScenario; label: string; hint: string }> 
 export default function ProfileScreen() {
   const queryClient = useQueryClient()
   const { user, logout } = useAuth()
-  const { data: balanceData, isLoading: isBalanceLoading } = useBalance()
-  const { data: mealHistory } = useMealHistory()
+  const {
+    data: balanceData,
+    isLoading: isBalanceLoading,
+    isError: isBalanceError,
+    error: balanceError,
+    refetch: refetchBalance,
+  } = useBalance()
+  const {
+    data: mealHistory,
+    isError: isMealHistoryError,
+    refetch: refetchMealHistory,
+  } = useMealHistory()
   const {
     setTheme,
     fontSize,
@@ -117,6 +128,14 @@ export default function ProfileScreen() {
     return <LoadingSpinner message={t.loading} />
   }
 
+  if (isBalanceError) {
+    return (
+      <View className="flex-1 bg-background px-4 pt-8">
+        <ErrorMessage message={getErrorMessage(balanceError)} onRetry={refetchBalance} />
+      </View>
+    )
+  }
+
   return (
     <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-4">
       <View>
@@ -135,10 +154,12 @@ export default function ProfileScreen() {
             <Text className="text-2xl font-bold text-text-inverse">{initials}</Text>
           </View>
           <View className="flex-1">
-            <Text className="text-lg font-bold text-text-primary">{user?.nome ?? 'Estudante'}</Text>
+            <Text className="text-lg font-bold text-text-primary">
+              {user?.nome ?? t.defaultStudentLabel}
+            </Text>
             <Text className="text-sm text-text-secondary mt-0.5">{user?.email ?? ''}</Text>
             <Text className="text-xs text-text-secondary mt-0.5">
-              {balanceData?.consumidor?.tipo_consumidor?.descricao ?? 'Estudante'} ·{' '}
+              {balanceData?.consumidor?.tipo_consumidor?.descricao ?? t.defaultStudentLabel} ·{' '}
               {balanceData?.consumidor?.centro_custo?.descricao ?? ''}
             </Text>
             {balanceData?.consumidor?.situacao && (
@@ -182,7 +203,11 @@ export default function ProfileScreen() {
         </Card>
       )}
 
-      {totalGastoMes > 0 && (
+      {isMealHistoryError && (
+        <ErrorMessage message={t.profileMealHistoryError} onRetry={refetchMealHistory} />
+      )}
+
+      {!isMealHistoryError && totalGastoMes > 0 && (
         <Card>
           <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
             {t.profileMonthlyExpenses}

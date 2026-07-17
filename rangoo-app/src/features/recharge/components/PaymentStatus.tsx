@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Alert, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import { QrCodeDisplay } from './QrCodeDisplay'
 
 interface PaymentStatusProps {
@@ -24,25 +25,20 @@ export function PaymentStatus({
   onCancel,
 }: PaymentStatusProps) {
   const themeColors = useThemeColors()
+  const { t } = useI18n()
 
   const handleCancelPress = () => {
-    Alert.alert(
-      'Cancelar recarga?',
-      'Se você já pagou o PIX, aguarde a confirmação em vez de cancelar — cancelar só some com este QR Code, não estorna nada.',
-      [
-        { text: 'Voltar', style: 'cancel' },
-        { text: 'Cancelar recarga', style: 'destructive', onPress: onCancel },
-      ],
-    )
+    Alert.alert(t.qrCancelConfirmTitle, t.qrCancelConfirmBody, [
+      { text: t.qrCancelConfirmBack, style: 'cancel' },
+      { text: t.qrCancelRecharge, style: 'destructive', onPress: onCancel },
+    ])
   }
 
   return (
     <View className="gap-5">
       <View>
-        <Text className="text-2xl font-bold text-text-primary">Pagar via PIX</Text>
-        <Text className="text-sm text-text-secondary mt-1">
-          Escanear o QR Code ou copie o código
-        </Text>
+        <Text className="text-2xl font-bold text-text-primary">{t.qrPayViaPix}</Text>
+        <Text className="text-sm text-text-secondary mt-1">{t.qrScanOrCopy}</Text>
       </View>
 
       <QrCodeDisplay
@@ -60,13 +56,11 @@ export function PaymentStatus({
           className="flex-row items-center gap-3 bg-status-error/10 rounded-xl p-4"
         >
           <Ionicons name="warning" size={20} color={themeColors.error} />
-          <Text className="text-sm text-status-error flex-1">
-            Tempo esgotado. O pagamento não foi confirmado.
-          </Text>
+          <Text className="text-sm text-status-error flex-1">{t.qrTimedOut}</Text>
         </View>
       )}
 
-      <Button label="Cancelar recarga" onPress={handleCancelPress} variant="secondary" />
+      <Button label={t.qrCancelRecharge} onPress={handleCancelPress} variant="secondary" />
     </View>
   )
 }

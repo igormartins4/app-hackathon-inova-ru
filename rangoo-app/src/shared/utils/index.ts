@@ -1,12 +1,16 @@
 export { cleanCpf, formatCpf, isValidCpf } from './cpf'
 export { formatCurrency, parseCurrencyStringToNumber } from './currency'
 export {
+  formatFullWeekdayDate,
+  formatMonthYear,
   formatTime,
   formatToLocalDate,
   formatToLocalDateTime,
   formatToLocalTime,
   getFriendlyRelativeDate,
-  getGreeting,
+  getGreetingPeriod,
+  getMonthName,
+  getNarrowWeekdayLabels,
   getTimeLeft,
   isToday,
   toDateParam,

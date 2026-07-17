@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, View } from 'react-native'
 import { RESTAURANTES_OFICIAIS } from '@/config'
 import { Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 
 interface FilialFilterProps {
   /** Código do RU atualmente aplicado no pai (null = "Todos"), pra este
@@ -10,6 +11,7 @@ interface FilialFilterProps {
 }
 
 export function FilialFilter({ selected, onFilter }: FilialFilterProps) {
+  const { t } = useI18n()
   const handlePress = (codigo: string | null) => {
     onFilter(codigo)
   }
@@ -18,13 +20,13 @@ export function FilialFilter({ selected, onFilter }: FilialFilterProps) {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      accessibilityLabel="Filtro de restaurante"
+      accessibilityLabel={t.filialFilterA11yLabel}
       accessibilityRole="search"
     >
       <View className="flex-row gap-2">
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Todos os restaurantes"
+          accessibilityLabel={t.filialFilterAllA11y}
           accessibilityState={{ selected: selected === null }}
           onPress={() => handlePress(null)}
           className={`rounded-lg px-4 py-2.5 min-h-[48px] items-center justify-center ${
@@ -34,14 +36,14 @@ export function FilialFilter({ selected, onFilter }: FilialFilterProps) {
           <Text
             className={`text-sm font-medium ${selected === null ? 'text-text-inverse' : 'text-text-primary'}`}
           >
-            Todos
+            {t.cardapioTodos}
           </Text>
         </Pressable>
         {RESTAURANTES_OFICIAIS.map((ru) => (
           <Pressable
             key={ru.codigo}
             accessibilityRole="button"
-            accessibilityLabel={`Filtrar por ${ru.nome}`}
+            accessibilityLabel={t.filialFilterByA11y.replace('{nome}', ru.nome)}
             accessibilityState={{ selected: selected === ru.codigo }}
             onPress={() => handlePress(ru.codigo)}
             className={`rounded-lg px-4 py-2.5 min-h-[48px] items-center justify-center ${

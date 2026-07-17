@@ -7,43 +7,15 @@ import type { FilialCode } from '@/features/cardapio'
 import { MenuCalendar, RESTAURANTES_CARDAPIO, useCardapio } from '@/features/cardapio'
 import { Button, Card, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
-import { isToday } from '@/shared/utils'
+import { formatFullWeekdayDate, isToday } from '@/shared/utils'
 
 type TipoRefeicao = 'almoco' | 'jantar'
 
 const FAVORITES_KEY = '@rangoo_favorite_rus'
 
-function formatDate(date: Date, days: string[], months: string[]): string {
-  return `${days[date.getDay()]}, ${date.getDate()} de ${months[date.getMonth()]}`
-}
-
-const WEEKDAYS_PT = [
-  'Domingo',
-  'Segunda-feira',
-  'Terça-feira',
-  'Quarta-feira',
-  'Quinta-feira',
-  'Sexta-feira',
-  'Sábado',
-]
-const MONTHS_PT = [
-  'janeiro',
-  'fevereiro',
-  'março',
-  'abril',
-  'maio',
-  'junho',
-  'julho',
-  'agosto',
-  'setembro',
-  'outubro',
-  'novembro',
-  'dezembro',
-]
-
 export default function CardapioScreen() {
   const themeColors = useThemeColors()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const [restaurante, setRestaurante] = useState<FilialCode>('0003')
   const [tipoRefeicao, setTipoRefeicao] = useState<TipoRefeicao>('almoco')
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -234,7 +206,7 @@ export default function CardapioScreen() {
           className="flex-row items-center gap-1"
         >
           <Text className="text-sm font-medium text-text-primary">
-            {formatDate(selectedDate, WEEKDAYS_PT, MONTHS_PT)}
+            {formatFullWeekdayDate(selectedDate, locale)}
           </Text>
           {today ? (
             <Text className="text-success text-xs font-bold"> · {t.cardapioHoje}</Text>

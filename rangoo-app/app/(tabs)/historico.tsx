@@ -136,9 +136,9 @@ export default function HistoricoScreen() {
       {!showFilter && hasActiveFilter && (
         <View className="flex-row items-center justify-between px-4 mb-2 py-2 bg-primary/10 rounded-xl mx-4">
           <Text className="text-xs font-medium text-primary flex-1" numberOfLines={1}>
-            {selectedDays ? `Últimos ${selectedDays} dias` : ''}
+            {selectedDays ? t.historyActiveFilterDays.replace('{days}', String(selectedDays)) : ''}
             {selectedDays && filial ? ' · ' : ''}
-            {filial ? 'RU filtrado' : ''}
+            {filial ? t.historyActiveFilterRu : ''}
           </Text>
           <Pressable
             onPress={handleClearFilter}

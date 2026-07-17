@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
 import {
   CPF_MAX_LENGTH,
   firstFieldError,
@@ -28,6 +29,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   const [passwordError, setPasswordError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const themeColors = useThemeColors()
+  const { t } = useI18n()
   const inputTextStyle = useScaledFontStyle(16)
   const passwordInputRef = useRef<TextInput>(null)
 
@@ -58,17 +60,19 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   return (
     <View className="gap-4">
       <View className="gap-1.5">
-        <Text className="text-xs font-bold text-primary uppercase tracking-wider">CPF</Text>
+        <Text className="text-xs font-bold text-primary uppercase tracking-wider">
+          {t.loginCpfLabel}
+        </Text>
         <TextInput
           value={cpf}
           onChangeText={handleCpfChange}
-          placeholder="000.000.000-00"
+          placeholder={t.loginCpfPlaceholder}
           placeholderTextColor={themeColors.textDisabled}
           keyboardType="numeric"
           editable={!isLoading}
           maxLength={CPF_MAX_LENGTH}
-          accessibilityLabel="Campo de CPF"
-          accessibilityHint="Digite os 11 números do seu CPF institucional"
+          accessibilityLabel={t.loginCpfA11yLabel}
+          accessibilityHint={t.loginCpfA11yHint}
           autoComplete="username"
           textContentType="username"
           returnKeyType="next"
@@ -88,7 +92,9 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
       </View>
 
       <View className="gap-1.5">
-        <Text className="text-xs font-bold text-primary uppercase tracking-wider">Senha</Text>
+        <Text className="text-xs font-bold text-primary uppercase tracking-wider">
+          {t.loginPasswordLabel}
+        </Text>
         <View className="relative">
           <TextInput
             ref={passwordInputRef}
@@ -99,8 +105,8 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
             secureTextEntry={!showPassword}
             editable={!isLoading}
             maxLength={PASSWORD_MAX_LENGTH}
-            accessibilityLabel="Campo de senha"
-            accessibilityHint="Digite sua senha institucional"
+            accessibilityLabel={t.loginPasswordA11yLabel}
+            accessibilityHint={t.loginPasswordA11yHint}
             autoComplete="password"
             textContentType="password"
             returnKeyType="done"
@@ -111,8 +117,8 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
           <Pressable
             onPress={() => setShowPassword(!showPassword)}
             accessibilityRole="button"
-            accessibilityLabel={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-            accessibilityHint="Alterna a visibilidade da senha digitada"
+            accessibilityLabel={showPassword ? t.loginHidePassword : t.loginShowPassword}
+            accessibilityHint={t.loginTogglePasswordHint}
             className="absolute right-2 top-2 w-10 h-10 items-center justify-center"
           >
             <Ionicons
@@ -135,7 +141,12 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
 
       {error ? <ErrorMessage message={error} /> : null}
 
-      <Button label="Entrar" onPress={handleSubmit} loading={isLoading} disabled={isLoading} />
+      <Button
+        label={t.loginButton}
+        onPress={handleSubmit}
+        loading={isLoading}
+        disabled={isLoading}
+      />
     </View>
   )
 }

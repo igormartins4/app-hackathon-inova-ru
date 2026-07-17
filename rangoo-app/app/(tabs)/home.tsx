@@ -22,7 +22,7 @@ import {
   formatCurrency,
   formatToLocalDateTime,
   getErrorMessage,
-  getGreeting,
+  getGreetingPeriod,
   toTitleCase,
 } from '@/shared/utils'
 import { useThemeStore } from '@/store/themeStore'
@@ -89,8 +89,13 @@ export default function HomeScreen() {
 
   const QUICK_ACTION_COLORS = [gradients.quickActionCardapio, gradients.quickActionHistorico]
 
-  const firstName = user?.nome ? toTitleCase(user.nome).split(' ')[0] : 'Estudante'
-  const greeting = getGreeting()
+  const firstName = user?.nome ? toTitleCase(user.nome).split(' ')[0] : t.defaultStudentLabel
+  const GREETING_KEYS = {
+    morning: 'homeGreetingMorning',
+    afternoon: 'homeGreetingAfternoon',
+    evening: 'homeGreetingEvening',
+  } as const
+  const greeting = t[GREETING_KEYS[getGreetingPeriod()]]
   const phrase = t[GREETING_PHRASES[phraseIndex]]
 
   return (

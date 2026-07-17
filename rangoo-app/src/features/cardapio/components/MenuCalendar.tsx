@@ -3,35 +3,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Text } from '@/shared/components/ui'
+import { useI18n } from '@/shared/i18n'
+import { formatMonthYear, getMonthName, getNarrowWeekdayLabels } from '@/shared/utils'
 
 interface MenuCalendarProps {
   selectedDate: Date
   onSelectDate: (date: Date) => void
 }
 
-const WEEKDAYS = [
-  { key: 'dom', label: 'D' },
-  { key: 'seg', label: 'S' },
-  { key: 'ter', label: 'T' },
-  { key: 'qua', label: 'Q' },
-  { key: 'qui', label: 'Q' },
-  { key: 'sex', label: 'S' },
-  { key: 'sab', label: 'S' },
-] as const
-const MONTH_LABELS = [
-  'janeiro',
-  'fevereiro',
-  'março',
-  'abril',
-  'maio',
-  'junho',
-  'julho',
-  'agosto',
-  'setembro',
-  'outubro',
-  'novembro',
-  'dezembro',
-]
+const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
 
 function isSameDay(a: Date, b: Date): boolean {
   return (
@@ -94,7 +74,9 @@ const MONTH_RANGE = 12
 
 export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) {
   const themeColors = useThemeColors()
+  const { t, locale } = useI18n()
   const today = useMemo(() => new Date(), [])
+  const weekdayLabels = useMemo(() => getNarrowWeekdayLabels(locale), [locale])
   const [viewMonth, setViewMonth] = useState(() => startOfMonth(selectedDate))
 
   // Se o dia selecionado mudar pra outro mês por fora (ex.: botão "voltar
@@ -120,7 +102,7 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
 
   return (
     <View
-      accessibilityLabel="Calendário de cardápio"
+      accessibilityLabel={t.menuCalendarA11yLabel}
       className="bg-surface border border-outline rounded-2xl p-3 gap-3"
     >
       <View className="flex-row items-center justify-between">
@@ -128,20 +110,20 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
           onPress={handlePreviousMonth}
           disabled={atMin}
           accessibilityRole="button"
-          accessibilityLabel="Mês anterior"
+          accessibilityLabel={t.menuCalendarPrevMonth}
           accessibilityState={{ disabled: atMin }}
           className={`w-12 h-12 rounded-full items-center justify-center ${atMin ? 'opacity-30' : ''}`}
         >
           <Ionicons name="chevron-back" size={20} color={themeColors.textSecondary} />
         </Pressable>
         <Text className="text-sm font-bold text-text-primary">
-          {MONTH_LABELS[viewMonth.getMonth()]} de {viewMonth.getFullYear()}
+          {formatMonthYear(viewMonth, locale)}
         </Text>
         <Pressable
           onPress={handleNextMonth}
           disabled={atMax}
           accessibilityRole="button"
-          accessibilityLabel="Próximo mês"
+          accessibilityLabel={t.menuCalendarNextMonth}
           accessibilityState={{ disabled: atMax }}
           className={`w-12 h-12 rounded-full items-center justify-center ${atMax ? 'opacity-30' : ''}`}
         >
@@ -150,9 +132,9 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
       </View>
 
       <View className="flex-row justify-between">
-        {WEEKDAYS.map((weekday) => (
-          <View key={weekday.key} className="w-9 items-center">
-            <Text className="text-xs text-text-secondary font-medium">{weekday.label}</Text>
+        {WEEKDAY_KEYS.map((key, idx) => (
+          <View key={key} className="w-9 items-center">
+            <Text className="text-xs text-text-secondary font-medium">{weekdayLabels[idx]}</Text>
           </View>
         ))}
       </View>
@@ -165,12 +147,18 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
             }
             const isSelected = isSameDay(cell.date, selectedDate)
             const isToday = isSameDay(cell.date, today)
+            const dayLabel = `${t.menuCalendarDayA11y
+              .replace('{day}', String(cell.date.getDate()))
+              .replace(
+                '{month}',
+                getMonthName(cell.date, locale),
+              )}${isToday ? t.menuCalendarTodaySuffix : ''}`
             return (
               <Pressable
                 key={cell.date.toISOString()}
                 onPress={() => onSelectDate(cell.date)}
                 accessibilityRole="button"
-                accessibilityLabel={`Dia ${cell.date.getDate()} de ${MONTH_LABELS[cell.date.getMonth()]}${isToday ? ', hoje' : ''}`}
+                accessibilityLabel={dayLabel}
                 accessibilityState={{ selected: isSelected }}
                 hitSlop={8}
                 className="items-center justify-center w-9 h-9"
