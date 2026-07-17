@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
+import { StatusBar } from 'expo-status-bar'
 import { Linking, Modal, Pressable, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeColors } from '@/config'
 import { useI18n } from '@/shared/i18n'
+import { useResolvedTheme } from '@/store/themeStore'
 import { Button } from './Button'
 import { ScaledText as Text } from './ScaledText'
 
@@ -14,14 +16,20 @@ interface AboutAppModalProps {
 export function AboutAppModal({ visible, onClose }: AboutAppModalProps) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
+  const resolvedTheme = useResolvedTheme()
 
   return (
     <Modal
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
+      statusBarTranslucent
       onRequestClose={onClose}
     >
+      {/* Modal do Android abre em janela nativa própria — sem isto, a barra de
+          status volta pro padrão do sistema (ícones escuros) e some contra um
+          fundo escuro. Reafirma o estilo certo enquanto o modal está aberto. */}
+      <StatusBar style={resolvedTheme === 'dark' ? 'light' : 'dark'} />
       <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-background">
         <ScrollView className="flex-1" contentContainerClassName="p-5 gap-5">
           <View className="flex-row items-start justify-between gap-4">

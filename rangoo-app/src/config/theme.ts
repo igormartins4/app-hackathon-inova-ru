@@ -145,24 +145,27 @@ const highContrastColors = {
   chipUnselected: '#ffffff',
 } as const
 
+// Só preto + branco/amarelo nos elementos de marca — sem verde/neon. Status
+// (sucesso/erro) mantém cor semântica distinta, pois depende de cor pra
+// diferenciar aprovado/rejeitado além do texto.
 const highContrastDarkColors = {
-  primary: '#00ffaa',
-  primaryLight: '#66ffcc',
-  primaryContainer: '#003322',
-  primaryDark: '#00cc88',
+  primary: '#ffffff',
+  primaryLight: '#ffff00',
+  primaryContainer: '#333300',
+  primaryDark: '#cccc00',
   textPrimary: '#ffffff',
-  textSecondary: '#ffdd57',
-  textDisabled: '#888888',
+  textSecondary: '#ffff00',
+  textDisabled: '#999999',
   textInverse: '#000000',
   outline: '#ffffff',
   outlineVariant: '#666666',
   surface: '#000000',
   surfaceVariant: '#111111',
   background: '#000000',
-  success: '#00ff66',
-  error: '#ff4444',
+  success: '#00ff00',
+  error: '#ff3333',
   warning: '#ffbb00',
-  chipSelected: '#00ffaa',
+  chipSelected: '#ffffff',
   chipUnselected: '#222222',
 } as const
 
@@ -190,8 +193,8 @@ const highContrastGradientColors = {
     quickActionHistorico: '#e0e0e0',
   },
   dark: {
-    loginHeader: ['#003322', '#002211', '#003322'] as const,
-    balanceCard: ['#00cc88', '#00ffaa', '#00cc88'] as const,
+    loginHeader: ['#000000', '#1a1a1a', '#000000'] as const,
+    balanceCard: ['#cccc00', '#ffff00', '#cccc00'] as const,
     balanceDetail: ['#111111', '#0a0a0a'] as const,
     profileCard: ['#111111', '#0a0a0a', '#111111'] as const,
     infoBanner: ['#111111', '#0a0a0a'] as const,

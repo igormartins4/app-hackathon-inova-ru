@@ -95,23 +95,26 @@
   --color-chip-unselected: #1f3830;
 }
 
+/* Alto contraste escuro: só preto + branco/amarelo nos elementos de marca —
+   sem verde/neon. Status (sucesso/erro) mantém cor semântica distinta, pois
+   depende de cor pra diferenciar aprovado/rejeitado além do texto. */
 .high-contrast.dark {
-  --color-primary: #00ffaa;
-  --color-primary-light: #66ffcc;
-  --color-primary-container: #003322;
-  --color-primary-dark: #00cc88;
+  --color-primary: #ffffff;
+  --color-primary-light: #ffff00;
+  --color-primary-container: #333300;
+  --color-primary-dark: #cccc00;
   --color-text-primary: #ffffff;
-  --color-text-secondary: #ffdd57;
-  --color-text-disabled: #888888;
+  --color-text-secondary: #ffff00;
+  --color-text-disabled: #999999;
   --color-text-inverse: #000000;
   --color-outline: #ffffff;
   --color-outline-variant: #666666;
   --color-surface: #000000;
   --color-surface-variant: #111111;
   --color-background: #000000;
-  --color-success: #00ff66;
-  --color-error: #ff4444;
+  --color-success: #00ff00;
+  --color-error: #ff3333;
   --color-warning: #ffbb00;
-  --color-chip-selected: #00ffaa;
+  --color-chip-selected: #ffffff;
   --color-chip-unselected: #222222;
 }
