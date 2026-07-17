@@ -35,7 +35,7 @@ export function NoticeBanner() {
           onPress={() => setDismissed(true)}
           accessibilityRole="button"
           accessibilityLabel={t.close}
-          hitSlop={8}
+          hitSlop={16}
           className="mt-0.5"
         >
           <Ionicons name="close" size={16} color={themeColors.textSecondary} />

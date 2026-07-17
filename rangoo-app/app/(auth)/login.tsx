@@ -1,7 +1,15 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
-import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, View } from 'react-native'
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useGradientColors, useThemeColors } from '@/config'
 import { LoginForm } from '@/features/auth/components/LoginForm'
@@ -33,6 +41,15 @@ export default function LoginScreen() {
           : 'Não foi possível confirmar sua identidade.',
       )
     }
+  }
+
+  const handleHelp = () => {
+    Alert.alert('Precisa de ajuda?', undefined, [
+      { text: t.loginRegister, onPress: () => Linking.openURL('https://fump.ufmg.br') },
+      { text: t.loginFumpLink, onPress: () => Linking.openURL('https://fump.ufmg.br') },
+      { text: 'Sobre o projeto', onPress: () => setAboutVisible(true) },
+      { text: t.cancel, style: 'cancel' },
+    ])
   }
 
   return (
@@ -104,46 +121,19 @@ export default function LoginScreen() {
               </View>
             </View>
 
-            <View className="gap-3 mt-6">
+            <View className="gap-2 mt-6">
               <Pressable
-                onPress={() => Linking.openURL('https://fump.ufmg.br')}
-                accessibilityRole="link"
-                accessibilityLabel={t.loginRegister}
-                accessibilityHint="Abre o site da FUMP em outro app pra você se cadastrar"
-                className="items-center py-2"
-              >
-                <Text className="text-sm text-primary">
-                  {t.loginNoAccount} <Text className="font-bold">{t.loginRegister}</Text>
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => Linking.openURL('https://fump.ufmg.br')}
-                accessibilityRole="link"
-                accessibilityLabel={t.loginFumpLink}
-                accessibilityHint="Abre o site da FUMP em outro app pra você recuperar sua senha"
-                className="items-center py-2"
-              >
-                <Text className="text-sm text-text-secondary">
-                  Esqueceu a senha?{' '}
-                  <Text className="font-bold text-primary">{t.loginFumpLink}</Text>
-                </Text>
-              </Pressable>
-
-              <Text className="text-center text-xs text-text-secondary mt-2">
-                FUMP · Fundação Universitária Mendes Pimentel
-              </Text>
-
-              <Pressable
-                onPress={() => setAboutVisible(true)}
+                onPress={handleHelp}
                 accessibilityRole="button"
-                accessibilityLabel="Sobre o Rangoo Universitário e o Hackathon InovaRU"
-                className="items-center py-2"
+                accessibilityLabel="Precisa de ajuda? Cadastro, recuperar senha ou sobre o projeto"
+                className="items-center py-2 min-h-[48px] justify-center"
               >
-                <Text className="text-center text-xs text-text-secondary">
-                  {t.loginHackathon} · Sobre o projeto
-                </Text>
+                <Text className="text-sm font-semibold text-primary">Precisa de ajuda?</Text>
               </Pressable>
+
+              <Text className="text-center text-xs text-text-secondary">
+                FUMP · Fundação Universitária Mendes Pimentel · {t.loginHackathon}
+              </Text>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

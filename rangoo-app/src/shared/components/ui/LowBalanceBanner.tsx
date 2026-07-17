@@ -41,7 +41,8 @@ export function LowBalanceBanner() {
             onPress={() => router.push('/(tabs)/recharge')}
             accessibilityRole="button"
             accessibilityLabel={t.homeRechargeButton}
-            className="self-start mt-1"
+            hitSlop={8}
+            className="self-start mt-1 min-h-[48px] justify-center"
           >
             <Text className="text-sm font-bold" style={{ color: themeColors.warning }}>
               {t.homeRechargeButton}
@@ -52,7 +53,7 @@ export function LowBalanceBanner() {
           onPress={() => setDismissed(true)}
           accessibilityRole="button"
           accessibilityLabel={t.close}
-          hitSlop={8}
+          hitSlop={16}
           className="mt-0.5"
         >
           <Ionicons name="close" size={16} color={themeColors.textSecondary} />

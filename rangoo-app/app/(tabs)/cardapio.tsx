@@ -180,7 +180,7 @@ export default function CardapioScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={`${t.cardapioRestaurante} ${r.label}`}
                   accessibilityState={{ selected: restaurante === r.key }}
-                  className={`flex-row items-center gap-2 rounded-full px-4 py-2.5 min-h-[44px] ${
+                  className={`flex-row items-center gap-2 rounded-full px-4 py-2.5 min-h-[48px] ${
                     restaurante === r.key ? 'bg-primary' : 'bg-surface border border-outline'
                   }`}
                 >
@@ -188,6 +188,7 @@ export default function CardapioScreen() {
                     <Ionicons name="checkmark" size={16} color={themeColors.textInverse} />
                   )}
                   <Text
+                    numberOfLines={1}
                     className={`text-sm font-medium ${
                       restaurante === r.key ? 'text-text-inverse' : 'text-text-primary'
                     }`}
@@ -203,7 +204,7 @@ export default function CardapioScreen() {
                       ? `${t.back} ${r.label} ${t.cardapioFavoritos}`
                       : `${t.cardapioFavoritos} ${r.label}`
                   }
-                  hitSlop={8}
+                  hitSlop={10}
                   className="w-8 h-8 rounded-full items-center justify-center"
                 >
                   <Ionicons
@@ -340,7 +341,9 @@ export default function CardapioScreen() {
                   idx < secao.itens.length - 1 ? 'border-b border-outline-variant' : ''
                 }`}
               >
-                <Text className="text-sm text-text-primary">{item.nome}</Text>
+                <Text className="flex-1 text-sm text-text-primary" numberOfLines={2}>
+                  {item.nome}
+                </Text>
                 {item.vegano && (
                   <View className="bg-success/10 rounded-full px-2 py-0.5">
                     <Text className="text-[10px] font-medium text-success">{t.cardapioVegano}</Text>

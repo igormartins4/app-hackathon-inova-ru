@@ -94,7 +94,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
             ref={passwordInputRef}
             value={password}
             onChangeText={handlePasswordChange}
-            placeholder="minhaSenha"
+            placeholder="••••••••"
             placeholderTextColor={themeColors.textDisabled}
             secureTextEntry={!showPassword}
             editable={!isLoading}

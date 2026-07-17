@@ -239,47 +239,19 @@ export default function HomeScreen() {
       )}
 
       <Pressable
-        onPress={() => router.push('/(tabs)/cardapio')}
-        accessibilityRole="button"
-        accessibilityLabel={t.homeMenuBanner}
-        className="mx-4 mb-4"
-      >
-        <LinearGradient
-          colors={gradients.ruBanner}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{ borderRadius: 12 }}
-        >
-          <View className="flex-row items-center gap-3 p-4">
-            <View className="w-10 h-10 rounded-full bg-primary/20 items-center justify-center">
-              <Ionicons name="restaurant" size={20} color={themeColors.primary} />
-            </View>
-            <View className="flex-1">
-              <Text className="text-sm font-bold text-text-primary">{t.homeMenuBanner}</Text>
-              <Text className="text-xs text-success font-medium">{t.homeMenuBannerSubtitle}</Text>
-            </View>
-          </View>
-        </LinearGradient>
-      </Pressable>
-
-      <Pressable
         onPress={() => router.push('/(tabs)/transfer')}
         accessibilityRole="button"
         accessibilityLabel={t.homeTransferTitle}
         accessibilityHint={t.homeTransferDescription}
-        className="mx-4 mb-4"
+        className="mx-4 mb-4 opacity-70"
       >
-        <Card>
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
-              <Ionicons name="swap-horizontal" size={20} color={themeColors.primary} />
-            </View>
-            <View className="flex-1">
-              <Text className="text-sm font-bold text-text-primary">{t.homeTransferTitle}</Text>
-              <Text className="text-xs text-text-secondary">{t.homeTransferDescription}</Text>
-            </View>
+        <View className="flex-row items-center gap-3 py-2">
+          <Ionicons name="swap-horizontal" size={18} color={themeColors.textSecondary} />
+          <View className="flex-1">
+            <Text className="text-xs font-medium text-text-secondary">{t.homeTransferTitle}</Text>
+            <Text className="text-xs text-text-secondary">{t.homeTransferDescription}</Text>
           </View>
-        </Card>
+        </View>
       </Pressable>
 
       <View className="h-4" />

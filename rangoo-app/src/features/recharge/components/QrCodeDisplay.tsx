@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import * as Clipboard from 'expo-clipboard'
 import { memo, useCallback, useEffect, useState } from 'react'
-import { Image, Linking, Pressable, Share, View } from 'react-native'
+import { ActivityIndicator, Image, Linking, Pressable, Share, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { useThemeColors } from '@/config'
 import { Text } from '@/shared/components/ui'
@@ -59,6 +59,7 @@ export function QrCodeDisplay({
   const themeColors = useThemeColors()
   const [copied, setCopied] = useState(false)
   const [base64Failed, setBase64Failed] = useState(false)
+  const [sharing, setSharing] = useState(false)
 
   const handleCopy = useCallback(async () => {
     await Clipboard.setStringAsync(qrCode)
@@ -67,11 +68,15 @@ export function QrCodeDisplay({
   }, [qrCode])
 
   const handleShare = useCallback(async () => {
+    setSharing(true)
     try {
       await Share.share({
         message: `PIX para recarga no Rangoo: ${qrCode}`,
       })
-    } catch {}
+    } catch {
+    } finally {
+      setSharing(false)
+    }
   }, [qrCode])
 
   const hasServerImage = !!qrCodeBase64 && !base64Failed
@@ -131,7 +136,7 @@ export function QrCodeDisplay({
             onPress={handleCopy}
             accessibilityRole="button"
             accessibilityLabel={copied ? 'Código copiado' : 'Copiar código PIX'}
-            className="flex-row items-center gap-1.5 bg-primary/10 rounded-lg px-3 py-2 min-h-[40px]"
+            className="flex-row items-center gap-1.5 bg-primary/10 rounded-lg px-3 py-2 min-h-[48px]"
           >
             <Ionicons name={copied ? 'checkmark' : 'copy'} size={16} color={themeColors.primary} />
             <Text className="text-xs font-semibold text-primary">
@@ -143,11 +148,17 @@ export function QrCodeDisplay({
 
       <Pressable
         onPress={handleShare}
+        disabled={sharing}
         accessibilityRole="button"
         accessibilityLabel="Compartilhar código"
-        className="flex-row items-center justify-center gap-2 bg-surface border border-outline rounded-xl py-3.5 min-h-[48px]"
+        accessibilityState={{ busy: sharing }}
+        className={`flex-row items-center justify-center gap-2 bg-surface border border-outline rounded-xl py-3.5 min-h-[48px] ${sharing ? 'opacity-60' : ''}`}
       >
-        <Ionicons name="share-outline" size={20} color={themeColors.primary} />
+        {sharing ? (
+          <ActivityIndicator size="small" color={themeColors.primary} />
+        ) : (
+          <Ionicons name="share-outline" size={20} color={themeColors.primary} />
+        )}
         <Text className="text-sm font-semibold text-primary">Compartilhar código</Text>
       </Pressable>
     </View>

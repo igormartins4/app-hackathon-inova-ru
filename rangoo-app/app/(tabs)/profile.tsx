@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
-import { Linking, Pressable, ScrollView, View } from 'react-native'
+import { Alert, Linking, Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
@@ -90,6 +90,13 @@ export default function ProfileScreen() {
   const handleResetDemo = () => {
     resetMockState()
     refreshMockData()
+  }
+
+  const handleLogout = () => {
+    Alert.alert('Sair da conta?', 'Você vai precisar do CPF e senha da FUMP pra entrar de novo.', [
+      { text: t.cancel, style: 'cancel' },
+      { text: t.logout, style: 'destructive', onPress: logout },
+    ])
   }
 
   const totalGastoMes = (() => {
@@ -402,10 +409,20 @@ export default function ProfileScreen() {
             onPress={() => Linking.openURL('https://opensource.org/licenses/MIT')}
             accessibilityRole="link"
             accessibilityLabel={t.profileLicense}
-            className="flex-row items-center justify-between py-3"
+            className="flex-row items-center justify-between py-3 border-b border-outline-variant"
           >
             <Text className="text-sm text-primary">{t.profileLicense}</Text>
             <Ionicons name="open-outline" size={16} color={themeColors.primary} />
+          </Pressable>
+
+          <Pressable
+            onPress={() => setAboutVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Sobre o Rangoo Universitário e o Hackathon InovaRU"
+            className="flex-row items-center justify-between py-3"
+          >
+            <Text className="text-sm text-primary">Sobre o Rangoo · {t.profileHackathon}</Text>
+            <Ionicons name="chevron-forward" size={16} color={themeColors.primary} />
           </Pressable>
         </View>
       </Card>
@@ -424,7 +441,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={`${LOCALES[loc].flag} ${LOCALES[loc].label}`}
                 accessibilityState={{ selected }}
-                className={`px-3 py-2 rounded-full border ${
+                className={`px-3 py-2 rounded-full border min-h-[48px] items-center justify-center ${
                   selected ? 'bg-primary border-primary' : 'bg-surface border-outline-variant'
                 }`}
               >
@@ -438,30 +455,6 @@ export default function ProfileScreen() {
           })}
         </View>
       </Card>
-
-      <Pressable
-        onPress={() => setAboutVisible(true)}
-        accessibilityRole="button"
-        accessibilityLabel="Sobre o Rangoo Universitário e o Hackathon InovaRU"
-      >
-        <LinearGradient
-          colors={gradients.hackathonBadge}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{ borderRadius: 12 }}
-        >
-          <View className="flex-row items-center gap-3 p-4">
-            <View className="w-10 h-10 rounded-full bg-primary items-center justify-center">
-              <Text className="text-sm font-bold text-text-inverse">R</Text>
-            </View>
-            <View className="flex-1">
-              <Text className="text-sm font-bold text-text-primary">Rangoo Universitário</Text>
-              <Text className="text-xs text-text-secondary">{t.profileHackathon}</Text>
-            </View>
-            <Ionicons name="logo-github" size={18} color={themeColors.textSecondary} />
-          </View>
-        </LinearGradient>
-      </Pressable>
 
       {USE_MOCK && (
         <View className="rounded-2xl border border-dashed border-outline p-4 gap-3">
@@ -506,7 +499,7 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      <Button label={t.logout} onPress={logout} variant="secondary" />
+      <Button label={t.logout} onPress={handleLogout} variant="secondary" />
 
       <View className="h-4" />
       <AboutAppModal visible={aboutVisible} onClose={() => setAboutVisible(false)} />

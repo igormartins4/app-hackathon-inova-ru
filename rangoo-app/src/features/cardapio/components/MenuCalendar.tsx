@@ -87,6 +87,11 @@ function buildMonthGrid(monthDate: Date): CalendarCell[][] {
   return weeks
 }
 
+// Limite de navegação: 12 meses pra trás/frente é mais do que suficiente pra
+// consultar ou planejar cardápio, e evita cliques desperdiçados navegando
+// anos sem nenhum dado disponível.
+const MONTH_RANGE = 12
+
 export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) {
   const themeColors = useThemeColors()
   const today = useMemo(() => new Date(), [])
@@ -101,8 +106,17 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
 
   const weeks = useMemo(() => buildMonthGrid(viewMonth), [viewMonth])
 
-  const handlePreviousMonth = () => setViewMonth((d) => addMonths(d, -1))
-  const handleNextMonth = () => setViewMonth((d) => addMonths(d, 1))
+  const minMonth = useMemo(() => addMonths(startOfMonth(today), -MONTH_RANGE), [today])
+  const maxMonth = useMemo(() => addMonths(startOfMonth(today), MONTH_RANGE), [today])
+  const atMin = viewMonth.getTime() <= minMonth.getTime()
+  const atMax = viewMonth.getTime() >= maxMonth.getTime()
+
+  const handlePreviousMonth = () => {
+    if (!atMin) setViewMonth((d) => addMonths(d, -1))
+  }
+  const handleNextMonth = () => {
+    if (!atMax) setViewMonth((d) => addMonths(d, 1))
+  }
 
   return (
     <View
@@ -112,10 +126,11 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
       <View className="flex-row items-center justify-between">
         <Pressable
           onPress={handlePreviousMonth}
+          disabled={atMin}
           accessibilityRole="button"
           accessibilityLabel="Mês anterior"
-          hitSlop={6}
-          className="w-10 h-10 rounded-full items-center justify-center"
+          accessibilityState={{ disabled: atMin }}
+          className={`w-12 h-12 rounded-full items-center justify-center ${atMin ? 'opacity-30' : ''}`}
         >
           <Ionicons name="chevron-back" size={20} color={themeColors.textSecondary} />
         </Pressable>
@@ -124,10 +139,11 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
         </Text>
         <Pressable
           onPress={handleNextMonth}
+          disabled={atMax}
           accessibilityRole="button"
           accessibilityLabel="Próximo mês"
-          hitSlop={6}
-          className="w-10 h-10 rounded-full items-center justify-center"
+          accessibilityState={{ disabled: atMax }}
+          className={`w-12 h-12 rounded-full items-center justify-center ${atMax ? 'opacity-30' : ''}`}
         >
           <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
         </Pressable>
@@ -156,7 +172,7 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
                 accessibilityRole="button"
                 accessibilityLabel={`Dia ${cell.date.getDate()} de ${MONTH_LABELS[cell.date.getMonth()]}${isToday ? ', hoje' : ''}`}
                 accessibilityState={{ selected: isSelected }}
-                hitSlop={6}
+                hitSlop={8}
                 className="items-center justify-center w-9 h-9"
               >
                 <View

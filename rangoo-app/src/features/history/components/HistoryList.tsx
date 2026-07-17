@@ -13,6 +13,8 @@ interface HistoryListProps {
   isLoading?: boolean
   isError?: boolean
   onRetry?: () => void
+  hasActiveFilter?: boolean
+  onClearFilter?: () => void
   isFetchingNextPage?: boolean
   hasNextPage?: boolean
   fetchNextPage?: () => void
@@ -112,6 +114,8 @@ export function HistoryList({
   isLoading,
   isError,
   onRetry,
+  hasActiveFilter,
+  onClearFilter,
   isFetchingNextPage,
   hasNextPage,
   fetchNextPage,
@@ -165,12 +169,19 @@ export function HistoryList({
   }
 
   if (data.length === 0) {
-    const emptyMsg = type === 'recharge' ? t.historyEmptyRecharge : t.historyEmptyMeal
+    const emptyMsg = hasActiveFilter
+      ? t.historyEmptyFiltered
+      : type === 'recharge'
+        ? t.historyEmptyRecharge
+        : t.historyEmptyMeal
     return (
-      <View className="flex-1 items-center justify-center py-12 px-4">
+      <View className="flex-1 items-center justify-center gap-3 py-12 px-4">
         <Text accessibilityRole="alert" className="text-center text-base text-text-secondary">
           {emptyMsg}
         </Text>
+        {hasActiveFilter && onClearFilter ? (
+          <Button label={t.historyClearFilters} onPress={onClearFilter} variant="secondary" />
+        ) : null}
       </View>
     )
   }
@@ -178,9 +189,14 @@ export function HistoryList({
   return (
     <FlatList
       data={data}
-      keyExtractor={(item, index) =>
-        type === 'recharge' ? String((item as RechargeRecord).id) : `${item.data_hora}-${index}`
-      }
+      keyExtractor={(item) => {
+        if (type === 'recharge') return String((item as RechargeRecord).id)
+        // A API não retorna id pra refeição (fora do contrato v2.0 mudar
+        // isso) — compõe uma chave estável com todos os campos que
+        // diferenciam um registro, em vez do índice do array.
+        const meal = item as MealRecord
+        return `${meal.data_hora}-${meal.filial.codigo}-${meal.tipo_consumidor}-${meal.quantidade}-${meal.valor_total}`
+      }}
       renderItem={renderItem}
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.5}

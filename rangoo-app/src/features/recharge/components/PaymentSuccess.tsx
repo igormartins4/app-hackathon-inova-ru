@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import * as Sharing from 'expo-sharing'
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Share, View } from 'react-native'
 import { captureRef } from 'react-native-view-shot'
 import { useThemeColors } from '@/config'
@@ -18,6 +18,7 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
   const themeColors = useThemeColors()
   const receiptRef = useRef<View>(null)
   const { t } = useI18n()
+  const [isSharing, setIsSharing] = useState(false)
 
   const shareAsText = useCallback(async () => {
     const now = new Date()
@@ -40,6 +41,7 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
   }, [amount, newBalance, t])
 
   const handleShare = useCallback(async () => {
+    setIsSharing(true)
     try {
       const uri = await captureRef(receiptRef, { format: 'png', quality: 1, result: 'tmpfile' })
       const canShare = await Sharing.isAvailableAsync()
@@ -53,6 +55,8 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
       }
     } catch {
       await shareAsText()
+    } finally {
+      setIsSharing(false)
     }
   }, [shareAsText])
 
@@ -105,7 +109,13 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
       </View>
 
       <View className="w-full max-w-sm gap-3">
-        <Button label={t.paymentSuccessCompartilhar} onPress={handleShare} variant="secondary" />
+        <Button
+          label={t.paymentSuccessCompartilhar}
+          onPress={handleShare}
+          loading={isSharing}
+          disabled={isSharing}
+          variant="secondary"
+        />
         <Button label={t.paymentSuccessVoltar} onPress={onBack} variant="primary" />
       </View>
     </View>

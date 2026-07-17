@@ -61,6 +61,14 @@ export default function HistoricoScreen() {
     activeQuery.refetch()
   }, [activeQuery])
 
+  const hasActiveFilter = selectedDays !== null || (activeTab === 'refeicoes' && filial !== null)
+
+  const handleClearFilter = useCallback(() => {
+    setSelectedDays(null)
+    setDateRange({ start: null, end: null })
+    setFilial(null)
+  }, [])
+
   return (
     <View className="flex-1 bg-background">
       <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
@@ -71,11 +79,16 @@ export default function HistoricoScreen() {
         <Pressable
           onPress={() => setShowFilter((v) => !v)}
           accessibilityRole="button"
-          accessibilityLabel={t.historicoFiltrarPeriodo}
+          accessibilityLabel={
+            hasActiveFilter ? `${t.historicoFiltrarPeriodo} (ativo)` : t.historicoFiltrarPeriodo
+          }
           accessibilityState={{ selected: showFilter }}
           className="w-12 h-12 rounded-full bg-surface items-center justify-center"
         >
           <Ionicons name="filter" size={20} color={themeColors.primary} />
+          {hasActiveFilter && (
+            <View className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-primary" />
+          )}
         </Pressable>
       </View>
 
@@ -120,12 +133,32 @@ export default function HistoricoScreen() {
         </View>
       )}
 
+      {!showFilter && hasActiveFilter && (
+        <View className="flex-row items-center justify-between px-4 mb-2 py-2 bg-primary/10 rounded-xl mx-4">
+          <Text className="text-xs font-medium text-primary flex-1" numberOfLines={1}>
+            {selectedDays ? `Últimos ${selectedDays} dias` : ''}
+            {selectedDays && filial ? ' · ' : ''}
+            {filial ? 'RU filtrado' : ''}
+          </Text>
+          <Pressable
+            onPress={handleClearFilter}
+            accessibilityRole="button"
+            accessibilityLabel={t.historyClearFilters}
+            className="py-1 px-2"
+          >
+            <Text className="text-xs font-bold text-primary">{t.historyClearFilters}</Text>
+          </Pressable>
+        </View>
+      )}
+
       <HistoryList
         data={items}
         type={activeTab === 'recargas' ? 'recharge' : 'meal'}
         isLoading={activeQuery.isLoading}
         isError={activeQuery.isError}
         onRetry={() => activeQuery.refetch()}
+        hasActiveFilter={hasActiveFilter}
+        onClearFilter={handleClearFilter}
         isFetchingNextPage={activeQuery.isFetchingNextPage}
         hasNextPage={activeQuery.hasNextPage}
         fetchNextPage={activeQuery.fetchNextPage}
