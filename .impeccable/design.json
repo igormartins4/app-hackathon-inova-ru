@@ -71,7 +71,7 @@
       "refersTo": "input",
       "description": "Campo de texto padrão — CPF, senha, valor de recarga.",
       "html": "<div class=\"ds-input-wrap\"><label class=\"ds-input-label\">CPF</label><input class=\"ds-input\" placeholder=\"000.000.000-00\" /></div>",
-      "css": ".ds-input-wrap { display: flex; flex-direction: column; gap: 6px; } .ds-input-label { font-size: 14px; font-weight: 500; color: #1a5c4a; } .ds-input { min-height: 48px; border-radius: 16px; border: 1px solid #d4e8df; padding: 12px 16px; font-size: 16px; color: #1a2e28; background: transparent; } .ds-input:focus-visible { outline: 2px solid #1a5c4a; outline-offset: 1px; } .ds-input.error { border-color: #c62828; }"
+      "css": ".ds-input-wrap { display: flex; flex-direction: column; gap: 6px; } .ds-input-label { font-size: 14px; font-weight: 500; color: #1a5c4a; } .ds-input { min-height: 48px; border-radius: 16px; border: 1px solid #6a8f80; padding: 12px 16px; font-size: 16px; color: #1a2e28; background: transparent; } .ds-input:focus-visible { outline: 2px solid #1a5c4a; outline-offset: 1px; } .ds-input.error { border-color: #c62828; }"
     },
     {
       "name": "Status Badge",

@@ -6,7 +6,6 @@
 // literal color instead of a className, so nothing here is re-hardcoded.
 
 import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
-import { getMaterialYouColors } from './materialYou'
 
 export const colors = {
   primary: '#1a5c4a',
@@ -16,11 +15,14 @@ export const colors = {
   surface: '#ffffff',
   surfaceVariant: '#f0faf6',
   background: '#f0faf6',
-  outline: '#d4e8df',
+  /* 3:1 min against surface (WCAG 1.4.11, meaningful UI boundary) */
+  outline: '#6a8f80',
   outlineVariant: '#e2f0e9',
   textPrimary: '#1a2e28',
-  textSecondary: '#5f7a70',
-  textDisabled: '#a0b5aa',
+  /* WCAG AA: #4d6b61 on #ffffff ≈ 5.85:1, on #f0faf6 ≈ 5.49:1 */
+  textSecondary: '#4d6b61',
+  /* WCAG AA: #5a6f65 on #ffffff ≈ 5.39:1 — also used as placeholder color */
+  textDisabled: '#5a6f65',
   textInverse: '#ffffff',
   success: '#2e7d4f',
   error: '#c62828',
@@ -39,12 +41,14 @@ export const darkColors = {
   surface: '#1a2e28',
   surfaceVariant: '#1f3830',
   background: '#0f1f1a',
-  outline: '#2d4a3e',
+  /* 3:1 min against surface (WCAG 1.4.11, meaningful UI boundary) */
+  outline: '#628a76',
   outlineVariant: '#1f3830',
   textPrimary: '#f0faf6',
   /* WCAG AA: #a8d5c5 on #1a2e28 ≈ 5.0:1 */
   textSecondary: '#a8d5c5',
-  textDisabled: '#6f9384',
+  /* WCAG AA: #82a597 on #1a2e28 ≈ 5.31:1 — also used as placeholder color */
+  textDisabled: '#82a597',
   textInverse: '#0f1f1a',
   success: '#4ade80',
   error: '#f87171',
@@ -135,7 +139,8 @@ const highContrastColors = {
   background: '#ffffff',
   success: '#006400',
   error: '#cc0000',
-  warning: '#cc8800',
+  /* #cc8800 measured 2.96:1 on white — worse than the non-high-contrast warning. Darkened to stay >= 4.5:1 */
+  warning: '#663f00',
   chipSelected: '#000000',
   chipUnselected: '#ffffff',
 } as const
@@ -166,12 +171,7 @@ const highContrastDarkColors = {
 export function useThemeColors() {
   const resolvedTheme = useResolvedTheme()
   const highContrast = useThemeStore((s) => s.highContrast)
-  const useSystemColors = useThemeStore((s) => s.useSystemColors)
-  const systemColors = useSystemColors && !highContrast ? getMaterialYouColors() : null
-  const base = {
-    ...(resolvedTheme === 'dark' ? darkColors : colors),
-    ...(systemColors && !highContrast ? systemColors : null),
-  }
+  const base = resolvedTheme === 'dark' ? darkColors : colors
   if (!highContrast) return base
   const overrides = resolvedTheme === 'dark' ? highContrastDarkColors : highContrastColors
   return { ...base, ...overrides }

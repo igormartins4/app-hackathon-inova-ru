@@ -44,7 +44,6 @@ const STORAGE_KEY_THEME = '@rangoo_theme'
 const STORAGE_KEY_FONT_SIZE = '@rangoo_font_size'
 const STORAGE_KEY_HIGH_CONTRAST = '@rangoo_high_contrast'
 const STORAGE_KEY_REDUCED_MOTION = '@rangoo_reduced_motion'
-const STORAGE_KEY_SYSTEM_COLORS = '@rangoo_system_colors'
 const STORAGE_KEY_FONT_FAMILY = '@rangoo_font_family'
 const STORAGE_KEY_HIDE_SENSITIVE = '@rangoo_hide_sensitive'
 
@@ -54,7 +53,6 @@ interface ThemeStoreState {
   fontFamily: number
   highContrast: boolean
   reducedMotion: boolean
-  useSystemColors: boolean
   hideSensitiveData: boolean
   setTheme: (theme: Theme) => void
   setFontSize: (index: number) => void
@@ -64,7 +62,6 @@ interface ThemeStoreState {
   decreaseFontSize: () => void
   toggleHighContrast: () => void
   toggleReducedMotion: () => void
-  toggleSystemColors: () => void
   toggleHideSensitiveData: () => void
   initialize: () => Promise<void>
 }
@@ -75,7 +72,6 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
   fontFamily: DEFAULT_FONT_FAMILY_INDEX,
   highContrast: false,
   reducedMotion: false,
-  useSystemColors: true,
   hideSensitiveData: false,
   setTheme: (theme) => {
     set({ theme })
@@ -122,11 +118,6 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
     set({ reducedMotion: next })
     AsyncStorage.setItem(STORAGE_KEY_REDUCED_MOTION, String(next))
   },
-  toggleSystemColors: () => {
-    const next = !get().useSystemColors
-    set({ useSystemColors: next })
-    AsyncStorage.setItem(STORAGE_KEY_SYSTEM_COLORS, String(next))
-  },
   toggleHideSensitiveData: () => {
     const next = !get().hideSensitiveData
     set({ hideSensitiveData: next })
@@ -139,7 +130,6 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
         savedFontSize,
         savedHighContrast,
         savedReducedMotion,
-        savedSystemColors,
         savedFontFamily,
         savedHideSensitive,
       ] = await Promise.all([
@@ -147,7 +137,6 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
         AsyncStorage.getItem(STORAGE_KEY_FONT_SIZE),
         AsyncStorage.getItem(STORAGE_KEY_HIGH_CONTRAST),
         AsyncStorage.getItem(STORAGE_KEY_REDUCED_MOTION),
-        AsyncStorage.getItem(STORAGE_KEY_SYSTEM_COLORS),
         AsyncStorage.getItem(STORAGE_KEY_FONT_FAMILY),
         AsyncStorage.getItem(STORAGE_KEY_HIDE_SENSITIVE),
       ])
@@ -176,11 +165,12 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
       if (savedReducedMotion === 'true') {
         updates.reducedMotion = true
       } else if (savedReducedMotion === null) {
-        // Sem preferência salva: herda "Remover animações" do Android (AccessibilityInfo)
-        updates.reducedMotion = await AccessibilityInfo.isReduceMotionEnabled()
-      }
-      if (savedSystemColors !== null) {
-        updates.useSystemColors = savedSystemColors === 'true'
+        // Sem preferência salva: herda "Remover animações" do Android (AccessibilityInfo).
+        // Isolado em try/catch próprio — se essa chamada falhar num device específico,
+        // não pode derrubar a restauração do tema/fonte/alto-contraste junto.
+        try {
+          updates.reducedMotion = await AccessibilityInfo.isReduceMotionEnabled()
+        } catch {}
       }
       if (savedFontFamily !== null) {
         const num = Number(savedFontFamily)

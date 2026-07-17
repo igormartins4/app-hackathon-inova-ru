@@ -17,15 +17,16 @@
   --color-surface-variant: #f0faf6;
   --color-background: #f0faf6;
 
-  /* Outline */
-  --color-outline: #d4e8df;
+  /* Outline — 3:1 min against surface (WCAG 1.4.11, meaningful UI boundary) */
+  --color-outline: #6a8f80;
   --color-outline-variant: #e2f0e9;
 
   /* Text */
   --color-text-primary: #1a2e28;
-  /* WCAG AA (4.5:1) confirmed: #5f7a70 on #ffffff measures ~4.66:1 */
-  --color-text-secondary: #5f7a70;
-  --color-text-disabled: #a0b5aa;
+  /* WCAG AA (4.5:1) confirmed: #4d6b61 on #ffffff measures ~5.85:1, on #f0faf6 ~5.49:1 */
+  --color-text-secondary: #4d6b61;
+  /* WCAG AA (4.5:1) confirmed: #5a6f65 on #ffffff measures ~5.39:1, on #f0faf6 ~5.06:1 — also used as placeholder color, never the muted-gray default */
+  --color-text-disabled: #5a6f65;
   --color-text-inverse: #ffffff;
 
   /* Status */
@@ -54,7 +55,8 @@
   --color-background: #ffffff;
   --color-success: #006400;
   --color-error: #cc0000;
-  --color-warning: #cc8800;
+  /* #cc8800 measured 2.96:1 on white — worse than the non-high-contrast warning. Darkened to stay >= 4.5:1 */
+  --color-warning: #663f00;
   --color-chip-selected: #000000;
   --color-chip-unselected: #ffffff;
 }
@@ -71,15 +73,16 @@
   --color-surface-variant: #1f3830;
   --color-background: #0f1f1a;
 
-  /* Outline */
-  --color-outline: #2d4a3e;
+  /* Outline — 3:1 min against surface (WCAG 1.4.11, meaningful UI boundary) */
+  --color-outline: #628a76;
   --color-outline-variant: #1f3830;
 
   /* Text */
   --color-text-primary: #f0faf6;
   /* WCAG AA (4.5:1) confirmed: #a8d5c5 on #1a2e28 measures ~5.0:1 */
   --color-text-secondary: #a8d5c5;
-  --color-text-disabled: #6f9384;
+  /* WCAG AA (4.5:1) confirmed: #82a597 on #1a2e28 measures ~5.31:1 — also used as placeholder color, never the muted-gray default */
+  --color-text-disabled: #82a597;
   --color-text-inverse: #0f1f1a;
 
   /* Status */

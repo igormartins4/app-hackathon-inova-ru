@@ -9,11 +9,11 @@ colors:
   surface: "#ffffff"
   surface-variant: "#f0faf6"
   background: "#f0faf6"
-  outline: "#d4e8df"
+  outline: "#6a8f80"
   outline-variant: "#e2f0e9"
   text-primary: "#1a2e28"
-  text-secondary: "#5f7a70"
-  text-disabled: "#a0b5aa"
+  text-secondary: "#4d6b61"
+  text-disabled: "#5a6f65"
   text-inverse: "#ffffff"
   status-success: "#2e7d4f"
   status-error: "#c62828"
@@ -120,20 +120,22 @@ Paleta de um único acento comprometido (teal institucional) sobre fundo neutro 
 ### Neutral
 - **Superfície** (`#ffffff` / `#1a2e28` no dark): fundo de cards e inputs.
 - **Superfície Variante** (`#f0faf6` / `#1f3830`): fundo de página e botões secundários — mesmo tom do background, discretamente mais escuro que a superfície.
-- **Contorno** (`#d4e8df` / `#2d4a3e`): bordas de input e divisores.
+- **Contorno** (`#6a8f80` / `#628a76`): bordas de input e divisores — medido e confirmado ≥3:1 contra a superfície real (WCAG 1.4.11, limite não-textual pra contornos de componente interativo).
 - **Texto Primário** (`#1a2e28` / `#f0faf6`): corpo de texto e labels.
-- **Texto Secundário** (`#5f7a70` / `#a8d5c5`): texto de apoio — medido e confirmado ≥4.5:1 contra o fundo real, nunca estimado.
-- **Texto Desabilitado** (`#a0b5aa` / `#6f9384`): placeholders e estados inativos.
+- **Texto Secundário** (`#4d6b61` / `#a8d5c5`): texto de apoio — medido e confirmado ≥4.5:1 contra o fundo real, nunca estimado.
+- **Texto Desabilitado** (`#5a6f65` / `#82a597`): placeholders e estados inativos — mesmo assim ≥4.5:1, porque também é usado como cor de placeholder de input.
 
 ### Status
 - **Sucesso** (`#2e7d4f` / `#4ade80`): conta ativa, pagamento aprovado.
 - **Erro** (`#c62828` / `#f87171`): bloqueio, falha de pagamento, validação.
-- **Aviso** (`#8a5a00` / `#fbbf24`): avisos informativos (ex.: banner de integração não-oficial do cardápio).
+- **Aviso** (`#8a5a00` / `#fbbf24`): avisos informativos (ex.: banner de integração não-oficial do cardápio). No modo alto contraste, vira `#663f00` (claro) / `#ffbb00` (escuro) — precisa ficar mais forte que o normal, nunca mais fraco.
 
 ### Named Rules
 **A Regra do Token Único.** Nenhuma cor literal (`#RRGGBB`) ou classe de paleta Tailwind crua (`bg-gray-500`, `bg-blue-600`) em componente. Toda cor vem de `global.css` (CSS vars) + `tailwind.config.js` (classes semânticas) via `className`, ou de `useThemeColors()` pra props nativas que não aceitam `className`. Mudou uma cor? Muda nos dois lugares (`global.css` e `src/config/theme.ts`) — eles espelham o mesmo valor.
 
-**A Regra do Contraste Medido.** Todo texto novo é calculado contra o fundo real antes de aprovar — não "parece escuro o suficiente". `--color-text-secondary` já foi corrigido uma vez por medir 4.497:1 (abaixo do mínimo AA de 4.5:1).
+**A Regra do Contraste Medido.** Todo texto novo é calculado contra o fundo real antes de aprovar — não "parece escuro o suficiente". Auditoria completa dos 4 modos (claro, escuro, alto contraste claro, alto contraste escuro) já corrigiu: `text-secondary` (4.38:1 → 5.49:1+), `text-disabled`/placeholder (2.17:1 → 5.06:1+), `outline` de borda (1.28:1 → 3.59:1+) e o `warning` do alto contraste claro, que media pior (2.96:1) que o modo normal — bug real, corrigido pra 9.23:1.
+
+**A Regra do Alto Contraste Sempre Mais Forte.** Nenhum token do modo alto contraste pode medir pior que o equivalente do modo normal. Se medir, é bug — não uma variação de gosto.
 
 ## 3. Typography
 

@@ -54,10 +54,8 @@ export default function ProfileScreen() {
     setFontFamily,
     highContrast,
     reducedMotion,
-    useSystemColors,
     toggleHighContrast,
     toggleReducedMotion,
-    toggleSystemColors,
   } = useThemeStore()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
@@ -229,7 +227,7 @@ export default function ProfileScreen() {
           accessibilityLabel={t.profileHighContrast}
           accessibilityHint={t.profileHighContrastHint}
           accessibilityState={{ checked: highContrast }}
-          className="flex-row items-center justify-between py-3 border-b border-outline-variant"
+          className="flex-row items-center justify-between py-3"
         >
           <View className="flex-row items-center gap-3">
             <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
@@ -245,37 +243,6 @@ export default function ProfileScreen() {
           >
             <View
               className={`w-6 h-6 rounded-full bg-text-inverse shadow ${highContrast ? 'ml-5' : 'ml-0'}`}
-            />
-          </View>
-        </Pressable>
-
-        <Pressable
-          onPress={() => !highContrast && toggleSystemColors()}
-          disabled={highContrast}
-          accessibilityRole="switch"
-          accessibilityLabel={t.profileSystemColors}
-          accessibilityHint={
-            highContrast ? t.profileSystemColorsDisabledHint : t.profileSystemColorsHint
-          }
-          accessibilityState={{ checked: useSystemColors, disabled: highContrast }}
-          className={`flex-row items-center justify-between py-3 ${highContrast ? 'opacity-40' : ''}`}
-        >
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
-              <Ionicons name="color-palette" size={20} color={themeColors.primary} />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-text-primary">{t.profileSystemColors}</Text>
-              <Text className="text-xs text-text-secondary">
-                {highContrast ? t.profileSystemColorsDisabledHint : t.profileSystemColorsHint}
-              </Text>
-            </View>
-          </View>
-          <View
-            className={`w-12 h-7 rounded-full p-0.5 ${useSystemColors ? 'bg-primary' : 'bg-outline'}`}
-          >
-            <View
-              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${useSystemColors ? 'ml-5' : 'ml-0'}`}
             />
           </View>
         </Pressable>
