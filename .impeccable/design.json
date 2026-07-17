@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-17T00:00:00Z",
+  "title": "Design System: Rangoo Universitário",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Verde Universitário",
+        "canonical": "#1a5c4a",
+        "tonalRamp": ["#0f3d31", "#134a3c", "#1a5c4a", "#256e5a", "#4e9e9e", "#7ab8b3", "#a8d4cd", "#d1e8e6"]
+      },
+      "surface-variant": {
+        "role": "neutral",
+        "displayName": "Verde Neblina",
+        "canonical": "#f0faf6",
+        "tonalRamp": ["#1f3830", "#2c4a40", "#3d5f53", "#6b8a7e", "#a8c9bd", "#cde3da", "#e2f0e9", "#f0faf6"]
+      },
+      "status-error": {
+        "role": "status",
+        "displayName": "Vermelho de Alerta",
+        "canonical": "#c62828",
+        "tonalRamp": ["#4a0f0f", "#6b1717", "#8f1f1f", "#c62828", "#e05555", "#f2908f", "#f7bcbb", "#fce4e3"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Valor de saldo em destaque na Home/Saldo." },
+      "headline": { "displayName": "Headline", "purpose": "Títulos de tela e valores secundários." },
+      "title": { "displayName": "Title", "purpose": "Cabeçalhos de seção e de card." },
+      "body": { "displayName": "Body", "purpose": "Texto corrido, labels, conteúdo padrão." },
+      "label": { "displayName": "Label", "purpose": "Status badges e rótulos em caixa alta." }
+    },
+    "shadows": [
+      { "name": "card-ambient", "value": "0 1px 2px rgba(0,0,0,0.05)", "purpose": "Sombra sutil única em todos os Card — separa conteúdo do fundo sem drama." }
+    ],
+    "motion": [
+      { "name": "duration-fast", "value": "150ms", "purpose": "Feedback imediato (opacity de botão)." },
+      { "name": "duration-normal", "value": "250ms", "purpose": "Transições padrão (FadeInView, banners)." },
+      { "name": "duration-slow", "value": "400ms", "purpose": "Entradas mais deliberadas." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal da tela — recarregar, confirmar, entrar.",
+      "html": "<button class=\"ds-btn-primary\">Recarregar</button>",
+      "css": ".ds-btn-primary { background: #1a5c4a; color: #ffffff; padding: 14px 24px; min-height: 48px; border: none; border-radius: 16px; font-weight: 600; font-size: 16px; transition: opacity 0.15s; } .ds-btn-primary:active { opacity: 0.8; } .ds-btn-primary:focus-visible { outline: 2px solid #4e9e9e; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação secundária — cancelar, ver detalhes.",
+      "html": "<button class=\"ds-btn-secondary\">Ver detalhes</button>",
+      "css": ".ds-btn-secondary { background: #f0faf6; color: #1a2e28; padding: 14px 24px; min-height: 48px; border: none; border-radius: 16px; font-weight: 600; font-size: 16px; transition: opacity 0.15s; } .ds-btn-secondary:active { opacity: 0.8; } .ds-btn-secondary:focus-visible { outline: 2px solid #1a5c4a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Container padrão de conteúdo — saldo, histórico, perfil.",
+      "html": "<div class=\"ds-card\">Conteúdo do card</div>",
+      "css": ".ds-card { background: #ffffff; border-radius: 24px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de texto padrão — CPF, senha, valor de recarga.",
+      "html": "<div class=\"ds-input-wrap\"><label class=\"ds-input-label\">CPF</label><input class=\"ds-input\" placeholder=\"000.000.000-00\" /></div>",
+      "css": ".ds-input-wrap { display: flex; flex-direction: column; gap: 6px; } .ds-input-label { font-size: 14px; font-weight: 500; color: #1a5c4a; } .ds-input { min-height: 48px; border-radius: 16px; border: 1px solid #d4e8df; padding: 12px 16px; font-size: 16px; color: #1a2e28; background: transparent; } .ds-input:focus-visible { outline: 2px solid #1a5c4a; outline-offset: 1px; } .ds-input.error { border-color: #c62828; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Rótulo textual de situação da conta (ATIVO/BLOQUEADO) — nunca ícone, valor literal do contrato.",
+      "html": "<span class=\"ds-status-badge ds-status-active\">ATIVO</span>",
+      "css": ".ds-status-badge { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; } .ds-status-active { color: #2e7d4f; } .ds-status-blocked { color: #c62828; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O RU Digital de Confiança",
+    "overview": "Rangoo é o guichê do RU virando app: precisa ter a seriedade de quem mexe com dado institucional (CPF, JWT, dinheiro) e a leveza de quem é feito pra estudante correndo entre aulas, não pra cliente de agência bancária. O teal profundo (#1a5c4a) carrega a confiança; o fundo verde-claro (#f0faf6) e a tipografia direta carregam a leveza universitária. O sistema rejeita explicitamente qualquer estética \"fintech corporativa fria\" — sem navy escuro solene, sem excesso de formalidade visual, sem distância entre o app e quem usa. Densidade é média-baixa: telas de fluxo crítico (login, recarga, PIX) priorizam poucos elementos por tela e hierarquia clara, porque o app é usado sob pressão de tempo e, com frequência, rede instável dentro do RU.",
+    "keyCharacteristics": [
+      "Verde-teal institucional como âncora de confiança, nunca decorativo",
+      "Cards com sombra suave (não flat, não dramática) — profundidade discreta",
+      "Estados de carregamento, erro e retry são cidadãos de primeira classe, não exceção",
+      "Cor nunca hardcoded — sempre token semântico, refletido em claro/escuro/alto-contraste"
+    ],
+    "rules": [
+      { "name": "A Regra do Token Único", "body": "Nenhuma cor literal ou classe de paleta Tailwind crua em componente. Toda cor vem de global.css + tailwind.config.js via className, ou de useThemeColors() pra props nativas.", "section": "colors" },
+      { "name": "A Regra do Contraste Medido", "body": "Todo texto novo é calculado contra o fundo real antes de aprovar — não 'parece escuro o suficiente'.", "section": "colors" },
+      { "name": "A Regra do Texto Escalável", "body": "Todo texto de conteúdo passa por ScaledText, nunca Text puro — respeita a escala de fonte do sistema.", "section": "typography" },
+      { "name": "A Regra da Sombra Única", "body": "Um nível de elevação para superfícies de conteúdo. Nada mais dramático.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar sempre token semântico ou useThemeColors() — nunca hex solto ou classe crua do Tailwind.",
+      "Do calcular contraste real (≥4.5:1) antes de aprovar qualquer cor de texto nova, inclusive placeholder.",
+      "Do manter alvo de toque mínimo 48x48dp em todo elemento interativo.",
+      "Do tratar rede instável como caso normal: loading, erro e retry explícitos sempre.",
+      "Do usar ScaledText em todo texto.",
+      "Do manter sombra shadow-sm única e sutil em cards."
+    ],
+    "donts": [
+      "Don't usar hex literal ou classe Tailwind crua de cor em componente.",
+      "Don't projetar telas com estética fintech corporativa fria.",
+      "Don't usar gradiente em texto ou glassmorphism decorativo.",
+      "Don't esconder estado de carregamento/erro atrás de tela em branco.",
+      "Don't substituir o texto de situacao/status por ícone ou emoji."
+    ]
+  }
+}
