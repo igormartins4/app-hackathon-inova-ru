@@ -110,6 +110,9 @@ export default {
   noticeHorarioTitle: 'Horaires des RU',
   noticeHorarioBody:
     "Déjeuner : 11h–14h · Dîner : 17h–20h. Consultez l'horaire de votre campus dans le menu.",
+  noticeNext: 'Avis suivant',
+  noticePause: 'Mettre les avis en pause',
+  noticeResume: 'Reprendre les avis',
   lowBalanceTitle: 'Solde bas',
   lowBalanceBody:
     'Votre solde est inférieur à 5,00 R$. Envisagez de recharger pour sécuriser votre repas.',

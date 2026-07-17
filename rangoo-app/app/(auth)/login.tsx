@@ -62,7 +62,7 @@ export default function LoginScreen() {
           style={{ flex: 1 }}
         >
           <View className="items-center justify-center pt-12 pb-20">
-            <View className="w-20 h-20 rounded-2xl bg-primary items-center justify-center mb-3 shadow-lg">
+            <View className="w-20 h-20 rounded-2xl bg-primary items-center justify-center mb-3 shadow-sm">
               <Text className="text-3xl font-bold text-text-inverse">R</Text>
             </View>
             <Text className="text-2xl font-bold text-primary-dark">{t.loginTitle}</Text>
@@ -80,7 +80,7 @@ export default function LoginScreen() {
           }}
         >
           <ScrollView contentContainerClassName="px-6" keyboardShouldPersistTaps="handled">
-            <View className="bg-surface rounded-2xl p-6 shadow-lg">
+            <View className="bg-surface rounded-2xl p-6 shadow-sm">
               <View className="gap-5">
                 <View className="gap-1">
                   <Text className="text-sm text-text-secondary">{t.loginSubtitle}</Text>

@@ -41,6 +41,7 @@ export function NoticeCarousel() {
   const { t } = useI18n()
   const [current, setCurrent] = useState(0)
   const [dismissed, setDismissed] = useState(false)
+  const [paused, setPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const restartTimer = useCallback(() => {
@@ -61,12 +62,12 @@ export function NoticeCarousel() {
   }, [restartTimer])
 
   useEffect(() => {
-    if (dismissed) return
+    if (dismissed || paused) return
     restartTimer()
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [dismissed, restartTimer])
+  }, [dismissed, paused, restartTimer])
 
   if (dismissed) return null
 
@@ -124,7 +125,7 @@ export function NoticeCarousel() {
           <Ionicons name="chevron-back" size={20} color={themeColors.textSecondary} />
         </Pressable>
 
-        <View className="flex-row gap-2">
+        <View className="flex-row items-center gap-2">
           {NOTICES.map((n) => (
             <View
               key={n.key}
@@ -137,12 +138,25 @@ export function NoticeCarousel() {
               }}
             />
           ))}
+          <Pressable
+            onPress={() => setPaused((p) => !p)}
+            accessibilityRole="button"
+            accessibilityLabel={paused ? t.noticeResume : t.noticePause}
+            hitSlop={16}
+            style={{ marginLeft: 4 }}
+          >
+            <Ionicons
+              name={paused ? 'play' : 'pause'}
+              size={14}
+              color={themeColors.textSecondary}
+            />
+          </Pressable>
         </View>
 
         <Pressable
           onPress={goNext}
           accessibilityRole="button"
-          accessibilityLabel={t.cardapioGoToday}
+          accessibilityLabel={t.noticeNext}
           hitSlop={16}
         >
           <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />

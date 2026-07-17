@@ -29,7 +29,7 @@ export default function TabLayout() {
   }
 
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1 }}>
+    <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-background">
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: themeColors.primary,

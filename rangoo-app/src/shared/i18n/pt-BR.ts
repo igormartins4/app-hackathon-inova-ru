@@ -110,6 +110,9 @@ export default {
   noticeHorarioTitle: 'Horário dos RUs',
   noticeHorarioBody:
     'Almoço: 11h às 14h · Jantar: 17h às 20h. Confira o horário do seu campus no cardápio.',
+  noticeNext: 'Próximo aviso',
+  noticePause: 'Pausar avisos',
+  noticeResume: 'Retomar avisos',
   lowBalanceTitle: 'Saldo baixo',
   lowBalanceBody:
     'Seu saldo está abaixo de R$ 10,00. Considere recarregar para garantir sua refeição.',

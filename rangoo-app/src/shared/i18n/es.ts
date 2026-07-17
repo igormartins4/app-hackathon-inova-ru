@@ -110,6 +110,9 @@ export default {
   noticeHorarioTitle: 'Horario de los RUs',
   noticeHorarioBody:
     'Almuerzo: 11h a 14h · Cena: 17h a 20h. Consulta el horario de tu campus en el menú.',
+  noticeNext: 'Siguiente aviso',
+  noticePause: 'Pausar avisos',
+  noticeResume: 'Reanudar avisos',
   lowBalanceTitle: 'Saldo bajo',
   lowBalanceBody:
     'Tu saldo está por debajo de R$ 10,00. Considera recargar para asegurar tu comida.',
