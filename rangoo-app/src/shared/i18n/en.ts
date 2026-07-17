@@ -191,6 +191,7 @@ export default {
   paymentErrorBack: 'Back to home',
   paymentErrorGeneric: 'An error occurred.',
   historyLoading: 'Loading history',
+  historyError: 'Could not load history right now.',
   historyDetailsRecharge: 'Recharge Details',
   historyDetailsMeal: 'Meal Details',
   historyRestaurant: 'Restaurant',

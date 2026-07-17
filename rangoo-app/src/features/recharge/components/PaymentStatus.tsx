@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Text } from '@/shared/components/ui'
+import { Button, Text } from '@/shared/components/ui'
 import { QrCodeDisplay } from './QrCodeDisplay'
 
 interface PaymentStatusProps {
@@ -11,6 +11,7 @@ interface PaymentStatusProps {
   amount: number
   expiration: string
   isTimedOut: boolean
+  onCancel: () => void
 }
 
 export function PaymentStatus({
@@ -20,8 +21,20 @@ export function PaymentStatus({
   amount,
   expiration,
   isTimedOut,
+  onCancel,
 }: PaymentStatusProps) {
   const themeColors = useThemeColors()
+
+  const handleCancelPress = () => {
+    Alert.alert(
+      'Cancelar recarga?',
+      'Se você já pagou o PIX, aguarde a confirmação em vez de cancelar — cancelar só some com este QR Code, não estorna nada.',
+      [
+        { text: 'Voltar', style: 'cancel' },
+        { text: 'Cancelar recarga', style: 'destructive', onPress: onCancel },
+      ],
+    )
+  }
 
   return (
     <View className="gap-5">
@@ -52,6 +65,8 @@ export function PaymentStatus({
           </Text>
         </View>
       )}
+
+      <Button label="Cancelar recarga" onPress={handleCancelPress} variant="secondary" />
     </View>
   )
 }

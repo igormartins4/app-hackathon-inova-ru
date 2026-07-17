@@ -157,7 +157,9 @@ const highContrastDarkColors = {
   textSecondary: '#ffff00',
   textDisabled: '#999999',
   textInverse: '#000000',
-  outline: '#ffffff',
+  // Não usar branco puro — colidiria com `primary` (também branco) em
+  // qualquer par visual on/off (ex.: trilha de switch ligado vs desligado).
+  outline: '#999999',
   outlineVariant: '#666666',
   surface: '#000000',
   surfaceVariant: '#111111',

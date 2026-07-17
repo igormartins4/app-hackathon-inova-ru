@@ -92,8 +92,8 @@ export default function HistoricoScreen() {
             accessibilityRole="tab"
             accessibilityLabel={tab.label}
             accessibilityState={{ selected: activeTab === tab.key }}
-            className={`flex-1 items-center py-3 min-h-[48px] ${
-              activeTab === tab.key ? 'border-b-2 border-primary' : ''
+            className={`flex-1 items-center py-3 min-h-[48px] rounded-xl ${
+              activeTab === tab.key ? 'bg-primary/10' : ''
             }`}
           >
             <Text
@@ -124,6 +124,8 @@ export default function HistoricoScreen() {
         data={items}
         type={activeTab === 'recargas' ? 'recharge' : 'meal'}
         isLoading={activeQuery.isLoading}
+        isError={activeQuery.isError}
+        onRetry={() => activeQuery.refetch()}
         isFetchingNextPage={activeQuery.isFetchingNextPage}
         hasNextPage={activeQuery.hasNextPage}
         fetchNextPage={activeQuery.fetchNextPage}

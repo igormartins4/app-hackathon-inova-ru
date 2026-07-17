@@ -1,7 +1,8 @@
+import { Ionicons } from '@expo/vector-icons'
 import { memo, useCallback } from 'react'
 import { ActivityIndicator, Alert, FlatList, Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Card, FadeInView, Text } from '@/shared/components/ui'
+import { Button, Card, FadeInView, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 import { formatCurrency, formatToLocalDate, formatToLocalTime } from '@/shared/utils'
 import type { MealRecord, RechargeRecord } from '../types/history.types'
@@ -10,6 +11,8 @@ interface HistoryListProps {
   data: (RechargeRecord | MealRecord)[]
   type: 'recharge' | 'meal'
   isLoading?: boolean
+  isError?: boolean
+  onRetry?: () => void
   isFetchingNextPage?: boolean
   hasNextPage?: boolean
   fetchNextPage?: () => void
@@ -107,6 +110,8 @@ export function HistoryList({
   data,
   type,
   isLoading,
+  isError,
+  onRetry,
   isFetchingNextPage,
   hasNextPage,
   fetchNextPage,
@@ -143,6 +148,18 @@ export function HistoryList({
         <Text accessibilityRole="text" className="text-sm text-text-secondary mt-2">
           {t.historyLoading}
         </Text>
+      </View>
+    )
+  }
+
+  if (isError) {
+    return (
+      <View className="flex-1 items-center justify-center gap-3 py-12 px-4">
+        <Ionicons name="cloud-offline-outline" size={28} color={themeColors.textSecondary} />
+        <Text accessibilityRole="alert" className="text-center text-base text-text-secondary">
+          {t.historyError}
+        </Text>
+        {onRetry ? <Button label={t.retry} onPress={onRetry} variant="secondary" /> : null}
       </View>
     )
   }

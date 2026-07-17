@@ -66,12 +66,6 @@ export default function LoginScreen() {
             <View className="bg-surface rounded-2xl p-6 shadow-lg">
               <View className="gap-5">
                 <View className="gap-1">
-                  <Text
-                    accessibilityLabel="Rangoo"
-                    className="text-2xl font-bold text-text-primary"
-                  >
-                    {t.loginTitle}
-                  </Text>
                   <Text className="text-sm text-text-secondary">{t.loginSubtitle}</Text>
                 </View>
 

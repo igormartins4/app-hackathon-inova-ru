@@ -107,7 +107,10 @@
   --color-text-secondary: #ffff00;
   --color-text-disabled: #999999;
   --color-text-inverse: #000000;
-  --color-outline: #ffffff;
+  /* Não usar branco puro aqui — colidiria com --color-primary (também
+     branco) em qualquer par visual on/off (ex.: trilha de switch ligado vs
+     desligado), tornando os dois estados indistinguíveis. */
+  --color-outline: #999999;
   --color-outline-variant: #666666;
   --color-surface: #000000;
   --color-surface-variant: #111111;

@@ -30,10 +30,22 @@ interface PaymentData {
   amount: number
   expiration: string
   createdAt: number
+  /** Presente só depois de aprovado — permite a tela de sucesso sobreviver a
+   * um refresh/app fechado, em vez de perder o comprovante e cair de volta
+   * pra tela de valor. Só é limpo quando o usuário sai da tela de sucesso. */
+  status?: 'approved'
+  newBalance?: number
 }
 
 async function savePendingPayment(data: PaymentData) {
   await AsyncStorage.setItem(PENDING_PAYMENT_KEY, JSON.stringify(data))
+}
+
+async function saveApprovedPayment(data: PaymentData, newBalance: number) {
+  await AsyncStorage.setItem(
+    PENDING_PAYMENT_KEY,
+    JSON.stringify({ ...data, status: 'approved', newBalance }),
+  )
 }
 
 async function clearPendingPayment() {
@@ -65,6 +77,12 @@ export default function RechargeScreen() {
       const raw = await AsyncStorage.getItem(PENDING_PAYMENT_KEY)
       if (!raw) return
       const pending = JSON.parse(raw) as PaymentData
+      if (pending.status === 'approved') {
+        setPaymentData(pending)
+        setNewBalance(pending.newBalance ?? 0)
+        setStep('success')
+        return
+      }
       const elapsed = Date.now() - pending.createdAt
       if (elapsed >= TIMEOUT_MS) {
         await clearPendingPayment()
@@ -79,12 +97,13 @@ export default function RechargeScreen() {
   }, [])
 
   const handleApproved = useCallback(async () => {
-    await clearPendingPayment()
     await queryClient.refetchQueries({ queryKey: ['balance'] })
     const latest = queryClient.getQueryData<BalanceResponse>(['balance'])
-    setNewBalance(latest?.saldo?.credito_disponivel ?? 0)
+    const balance = latest?.saldo?.credito_disponivel ?? 0
+    setNewBalance(balance)
+    if (paymentData) await saveApprovedPayment(paymentData, balance)
     setStep('success')
-  }, [queryClient])
+  }, [queryClient, paymentData])
 
   const handleTerminal = useCallback((status: PaymentStatusResponse['status']) => {
     clearPendingPayment()
@@ -146,6 +165,7 @@ export default function RechargeScreen() {
   }, [])
 
   const handleBack = useCallback(() => {
+    clearPendingPayment()
     setStep('amount')
     setPaymentData(null)
   }, [])
@@ -200,6 +220,7 @@ export default function RechargeScreen() {
               ),
             ).toISOString()}
             isTimedOut={false}
+            onCancel={handleBack}
           />
         )}
 

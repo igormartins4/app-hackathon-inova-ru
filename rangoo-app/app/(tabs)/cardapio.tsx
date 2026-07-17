@@ -5,7 +5,7 @@ import { Pressable, ScrollView, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import type { FilialCode } from '@/features/cardapio'
 import { MenuCalendar, RESTAURANTES_CARDAPIO, useCardapio } from '@/features/cardapio'
-import { Card, LoadingSpinner, Text } from '@/shared/components/ui'
+import { Button, Card, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 import { isToday } from '@/shared/utils'
 
@@ -79,7 +79,7 @@ export default function CardapioScreen() {
     ? RESTAURANTES_CARDAPIO
     : RESTAURANTES_CARDAPIO.filter((r) => favorites.includes(r.key))
 
-  const { data, isLoading, isError } = useCardapio({
+  const { data, isLoading, isError, refetch } = useCardapio({
     restaurante,
     tipoRefeicao,
     data: selectedDate,
@@ -288,12 +288,13 @@ export default function CardapioScreen() {
       </View>
 
       {isError && (
-        <Card className="items-center gap-2 py-6">
+        <Card className="items-center gap-3 py-6">
           <Ionicons name="cloud-offline-outline" size={28} color={themeColors.textSecondary} />
           <Text className="text-sm font-medium text-text-primary text-center">
             {t.cardapioErro}
           </Text>
           <Text className="text-xs text-text-secondary text-center">{t.cardapioErroDetalhe}</Text>
+          <Button label={t.retry} onPress={() => refetch()} variant="secondary" />
         </Card>
       )}
 

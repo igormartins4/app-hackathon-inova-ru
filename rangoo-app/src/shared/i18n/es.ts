@@ -197,6 +197,7 @@ export default {
   paymentErrorBack: 'Volver al inicio',
   paymentErrorGeneric: 'Ocurrió un error.',
   historyLoading: 'Cargando historial',
+  historyError: 'No se pudo cargar el historial ahora.',
   historyDetailsRecharge: 'Detalles de la Recarga',
   historyDetailsMeal: 'Detalles de la Comida',
   historyRestaurant: 'Restaurante',
