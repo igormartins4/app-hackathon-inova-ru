@@ -49,6 +49,7 @@ export default function CardapioScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [favorites, setFavorites] = useState<FilialCode[]>([])
   const [showAll, setShowAll] = useState(true)
+  const [showSourceBanner, setShowSourceBanner] = useState(true)
 
   useEffect(() => {
     AsyncStorage.getItem(FAVORITES_KEY).then((val) => {
@@ -120,6 +121,37 @@ export default function CardapioScreen() {
         <Text className="text-2xl font-bold text-text-primary">{t.cardapioTitle}</Text>
         <Text className="text-xs text-text-secondary mt-0.5">{t.cardapioSubtitleConsulte}</Text>
       </View>
+
+      {showSourceBanner && (
+        <View
+          accessibilityRole="summary"
+          accessibilityLabel={t.cardapioFonteNaoOficial}
+          className="rounded-xl p-3"
+          style={{ backgroundColor: `${themeColors.warning}15` }}
+        >
+          <View className="flex-row items-start gap-3">
+            <Ionicons name="information-circle" size={20} color={themeColors.warning} />
+            <View className="flex-1 gap-1">
+              <Text
+                className="text-xs font-bold uppercase tracking-wider"
+                style={{ color: themeColors.warning }}
+              >
+                {t.cardapioFonteNaoOficial}
+              </Text>
+              <Text className="text-sm text-text-secondary">{t.cardapioFonteNaoOficialBody}</Text>
+            </View>
+            <Pressable
+              onPress={() => setShowSourceBanner(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t.close}
+              hitSlop={16}
+              className="mt-0.5"
+            >
+              <Ionicons name="close" size={16} color={themeColors.textSecondary} />
+            </Pressable>
+          </View>
+        </View>
+      )}
 
       <View className="gap-2">
         <View className="flex-row items-center justify-between">
@@ -218,7 +250,6 @@ export default function CardapioScreen() {
         <View className="flex-row bg-surface-variant rounded-full p-1">
           {meals.map((m) => {
             const disabled =
-              !showAll &&
               !RESTAURANTES_CARDAPIO.find((r) => r.key === restaurante)?.hasDinner &&
               m.key === 'jantar'
             return (
@@ -280,9 +311,12 @@ export default function CardapioScreen() {
 
       {!isError && !isLoading && !ruWithoutDinner && secoes.length === 0 && (
         <Card className="items-center gap-2 py-6">
-          <Ionicons name="restaurant-outline" size={28} color={themeColors.textSecondary} />
+          <Ionicons name="calendar-outline" size={28} color={themeColors.textSecondary} />
           <Text className="text-sm font-medium text-text-primary text-center">
             {t.cardapioIndisponivel}
+          </Text>
+          <Text className="text-xs text-text-secondary text-center">
+            {t.cardapioIndisponivelDetalhe}
           </Text>
         </Card>
       )}

@@ -22,6 +22,7 @@ interface RechargeFormProps {
   currentBalance: number
   limiteRecarga?: number
   disabled?: boolean
+  isSubmitting?: boolean
   onSubmit: (valor: number) => void
   onAmountChange?: (valor: number) => void
   /** Erro 422 vindo da API ao criar o pagamento — renderizado inline, abaixo do input. */
@@ -32,6 +33,7 @@ export function RechargeForm({
   currentBalance,
   limiteRecarga,
   disabled,
+  isSubmitting,
   onSubmit,
   onAmountChange,
   serverError,
@@ -165,7 +167,12 @@ export function RechargeForm({
         </View>
       </LinearGradient>
 
-      <Button label="Gerar QR Code PIX" onPress={handleSubmit} disabled={!isValid || disabled} />
+      <Button
+        label="Gerar QR Code PIX"
+        onPress={handleSubmit}
+        disabled={!isValid || disabled}
+        loading={isSubmitting}
+      />
     </View>
   )
 }

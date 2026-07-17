@@ -5,12 +5,22 @@ import { getNextDelay, shouldTimeout } from '../utils/polling'
 
 interface UsePollingOptions {
   paymentId: number | null
+  /** Timestamp (ms) when this payment was originally created — pass this when
+   * resuming polling for a payment restored from storage, so the 120s ceiling
+   * is measured from creation, not from remount. Defaults to Date.now(). */
+  startedAt?: number
   onApproved: () => void
   onTerminal: (status: PaymentStatusResponse['status']) => void
   onTimeout: () => void
 }
 
-export function usePolling({ paymentId, onApproved, onTerminal, onTimeout }: UsePollingOptions) {
+export function usePolling({
+  paymentId,
+  startedAt,
+  onApproved,
+  onTerminal,
+  onTimeout,
+}: UsePollingOptions) {
   const startRef = useRef<number>(Date.now())
   const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const callbacksRef = useRef({ onApproved, onTerminal, onTimeout })
@@ -62,11 +72,11 @@ export function usePolling({ paymentId, onApproved, onTerminal, onTimeout }: Use
   useEffect(() => {
     if (!paymentId) return
 
-    startRef.current = Date.now()
+    startRef.current = startedAt ?? Date.now()
     poll()
 
     return () => {
       if (intervalRef.current) clearTimeout(intervalRef.current)
     }
-  }, [paymentId, poll])
+  }, [paymentId, startedAt, poll])
 }

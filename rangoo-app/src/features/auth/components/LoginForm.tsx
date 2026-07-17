@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
@@ -29,6 +29,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const themeColors = useThemeColors()
   const inputTextStyle = useScaledFontStyle(16)
+  const passwordInputRef = useRef<TextInput>(null)
 
   const handleCpfChange = (text: string) => {
     setCpf(maskCpf(sanitizeDigits(text, 11)))
@@ -68,11 +69,19 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
           maxLength={CPF_MAX_LENGTH}
           accessibilityLabel="Campo de CPF"
           accessibilityHint="Digite os 11 números do seu CPF institucional"
+          autoComplete="username"
+          textContentType="username"
+          returnKeyType="next"
+          onSubmitEditing={() => passwordInputRef.current?.focus()}
           style={inputTextStyle}
           className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
         />
         {cpfError ? (
-          <Text accessibilityRole="alert" className="text-xs text-status-error">
+          <Text
+            accessibilityRole="alert"
+            accessibilityLiveRegion="assertive"
+            className="text-xs text-status-error"
+          >
             {cpfError}
           </Text>
         ) : null}
@@ -82,6 +91,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
         <Text className="text-xs font-bold text-primary uppercase tracking-wider">Senha</Text>
         <View className="relative">
           <TextInput
+            ref={passwordInputRef}
             value={password}
             onChangeText={handlePasswordChange}
             placeholder="minhaSenha"
@@ -91,6 +101,10 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
             maxLength={PASSWORD_MAX_LENGTH}
             accessibilityLabel="Campo de senha"
             accessibilityHint="Digite sua senha institucional"
+            autoComplete="password"
+            textContentType="password"
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit}
             style={inputTextStyle}
             className="bg-surface border border-outline rounded-xl px-4 py-3.5 pr-12 text-base text-text-primary min-h-[48px]"
           />
@@ -109,7 +123,11 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
           </Pressable>
         </View>
         {passwordError ? (
-          <Text accessibilityRole="alert" className="text-xs text-status-error">
+          <Text
+            accessibilityRole="alert"
+            accessibilityLiveRegion="assertive"
+            className="text-xs text-status-error"
+          >
             {passwordError}
           </Text>
         ) : null}

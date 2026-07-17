@@ -92,6 +92,7 @@ export default function LoginScreen() {
                     {biometricError ? (
                       <Text
                         accessibilityRole="alert"
+                        accessibilityLiveRegion="assertive"
                         className="text-xs text-status-error text-center"
                       >
                         {biometricError}
@@ -114,6 +115,7 @@ export default function LoginScreen() {
                 onPress={() => Linking.openURL('https://fump.ufmg.br')}
                 accessibilityRole="link"
                 accessibilityLabel={t.loginRegister}
+                accessibilityHint="Abre o site da FUMP em outro app pra você se cadastrar"
                 className="items-center py-2"
               >
                 <Text className="text-sm text-primary">
@@ -125,6 +127,7 @@ export default function LoginScreen() {
                 onPress={() => Linking.openURL('https://fump.ufmg.br')}
                 accessibilityRole="link"
                 accessibilityLabel={t.loginFumpLink}
+                accessibilityHint="Abre o site da FUMP em outro app pra você recuperar sua senha"
                 className="items-center py-2"
               >
                 <Text className="text-sm text-text-secondary">

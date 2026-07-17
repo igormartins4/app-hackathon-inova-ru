@@ -25,6 +25,7 @@ export default function HistoricoScreen() {
     params.tab === 'refeicoes' ? 'refeicoes' : 'recargas',
   )
   const [showFilter, setShowFilter] = useState(false)
+  const [selectedDays, setSelectedDays] = useState<number | null>(null)
   const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
     start: null,
     end: null,
@@ -108,8 +109,14 @@ export default function HistoricoScreen() {
 
       {showFilter && (
         <View className="px-4 mb-2 gap-2">
-          <DateFilter onFilter={(start, end) => setDateRange({ start, end })} />
-          {activeTab === 'refeicoes' && <FilialFilter onFilter={setFilial} />}
+          <DateFilter
+            selected={selectedDays}
+            onFilter={(days, start, end) => {
+              setSelectedDays(days)
+              setDateRange({ start, end })
+            }}
+          />
+          {activeTab === 'refeicoes' && <FilialFilter selected={filial} onFilter={setFilial} />}
         </View>
       )}
 

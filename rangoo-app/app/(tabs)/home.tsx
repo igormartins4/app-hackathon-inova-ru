@@ -148,12 +148,10 @@ export default function HomeScreen() {
               onPress={() => router.push('/(tabs)/recharge')}
               accessibilityRole="button"
               accessibilityLabel={t.homeRechargeButton}
-              className="flex-row items-center gap-2 bg-text-inverse/20 rounded-full px-4 py-2.5 mt-4 self-start min-h-[48px]"
+              className="flex-row items-center gap-2 bg-surface rounded-full px-5 py-3 mt-4 self-start min-h-[48px] active:opacity-80"
             >
-              <Ionicons name="add" size={18} color={themeColors.textInverse} />
-              <Text className="text-sm font-semibold text-text-inverse">
-                {t.homeRechargeButton}
-              </Text>
+              <Ionicons name="add" size={18} color={themeColors.primary} />
+              <Text className="text-sm font-bold text-primary">{t.homeRechargeButton}</Text>
             </Pressable>
           </View>
         </LinearGradient>

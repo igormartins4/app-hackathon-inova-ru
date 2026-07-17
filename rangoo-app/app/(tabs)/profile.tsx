@@ -25,6 +25,11 @@ import {
 import { formatCurrency } from '@/shared/utils'
 import { FONT_FAMILIES, FONT_STEPS, useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
+// Chaves de cenário de demonstração só existem enquanto o app roda contra o
+// mock local — nunca contra a API real da FUMP, onde não fariam sentido
+// misturadas com dados reais de conta.
+const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
+
 const DEMO_SCENARIOS: Array<{ key: DemoScenario; label: string; hint: string }> = [
   { key: 'normal', label: 'Normal', hint: 'Saldo, PIX aprovado e históricos funcionando' },
   { key: 'blocked', label: 'Bloqueado', hint: 'Recarga desabilitada por situação B' },
@@ -187,49 +192,11 @@ export default function ProfileScreen() {
       )}
 
       <Card>
-        <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-          {t.profileDemoMode}
-        </Text>
-        <Text className="text-xs text-text-secondary mb-3">{t.profileDemoDescription}</Text>
-        <View className="flex-row flex-wrap gap-2">
-          {DEMO_SCENARIOS.map((scenario) => {
-            const selected = demoScenario === scenario.key
-            return (
-              <Pressable
-                key={scenario.key}
-                onPress={() => handleDemoScenario(scenario.key)}
-                accessibilityRole="button"
-                accessibilityLabel={`Cenário ${scenario.label}`}
-                accessibilityHint={scenario.hint}
-                accessibilityState={{ selected }}
-                className={`px-3 py-2 rounded-full border ${
-                  selected ? 'bg-primary border-primary' : 'bg-surface border-outline-variant'
-                }`}
-              >
-                <Text
-                  className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
-                >
-                  {scenario.label}
-                </Text>
-              </Pressable>
-            )
-          })}
-        </View>
-        <Pressable
-          onPress={handleResetDemo}
-          accessibilityRole="button"
-          accessibilityLabel="Resetar dados da demonstração"
-          accessibilityHint="Restaura saldo, pagamentos e históricos do cenário atual"
-          className="flex-row items-center justify-between pt-4 mt-4 border-t border-outline-variant"
+        <Text
+          accessibilityRole="header"
+          className="text-xs font-bold text-primary mb-3 uppercase tracking-wider"
         >
-          <Text className="text-sm font-medium text-primary">{t.profileResetDemo}</Text>
-          <Ionicons name="refresh" size={18} color={themeColors.primary} />
-        </Pressable>
-      </Card>
-
-      <Card>
-        <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-          {t.profileAccessibility}
+          {t.profileThemeGroup}
         </Text>
 
         <Pressable
@@ -283,6 +250,46 @@ export default function ProfileScreen() {
         </Pressable>
 
         <Pressable
+          onPress={() => !highContrast && toggleSystemColors()}
+          disabled={highContrast}
+          accessibilityRole="switch"
+          accessibilityLabel={t.profileSystemColors}
+          accessibilityHint={
+            highContrast ? t.profileSystemColorsDisabledHint : t.profileSystemColorsHint
+          }
+          accessibilityState={{ checked: useSystemColors, disabled: highContrast }}
+          className={`flex-row items-center justify-between py-3 ${highContrast ? 'opacity-40' : ''}`}
+        >
+          <View className="flex-row items-center gap-3">
+            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+              <Ionicons name="color-palette" size={20} color={themeColors.primary} />
+            </View>
+            <View>
+              <Text className="text-sm font-medium text-text-primary">{t.profileSystemColors}</Text>
+              <Text className="text-xs text-text-secondary">
+                {highContrast ? t.profileSystemColorsDisabledHint : t.profileSystemColorsHint}
+              </Text>
+            </View>
+          </View>
+          <View
+            className={`w-12 h-7 rounded-full p-0.5 ${useSystemColors ? 'bg-primary' : 'bg-outline'}`}
+          >
+            <View
+              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${useSystemColors ? 'ml-5' : 'ml-0'}`}
+            />
+          </View>
+        </Pressable>
+      </Card>
+
+      <Card>
+        <Text
+          accessibilityRole="header"
+          className="text-xs font-bold text-primary mb-3 uppercase tracking-wider"
+        >
+          {t.profileReadingGroup}
+        </Text>
+
+        <Pressable
           onPress={toggleReducedMotion}
           accessibilityRole="switch"
           accessibilityLabel={t.profileReducedMotion}
@@ -306,32 +313,6 @@ export default function ProfileScreen() {
           >
             <View
               className={`w-6 h-6 rounded-full bg-text-inverse shadow ${reducedMotion ? 'ml-5' : 'ml-0'}`}
-            />
-          </View>
-        </Pressable>
-
-        <Pressable
-          onPress={toggleSystemColors}
-          accessibilityRole="switch"
-          accessibilityLabel={t.profileSystemColors}
-          accessibilityHint={t.profileSystemColorsHint}
-          accessibilityState={{ checked: useSystemColors }}
-          className="flex-row items-center justify-between py-3 border-b border-outline-variant"
-        >
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
-              <Ionicons name="color-palette" size={20} color={themeColors.primary} />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-text-primary">{t.profileSystemColors}</Text>
-              <Text className="text-xs text-text-secondary">{t.profileSystemColorsHint}</Text>
-            </View>
-          </View>
-          <View
-            className={`w-12 h-7 rounded-full p-0.5 ${useSystemColors ? 'bg-primary' : 'bg-outline'}`}
-          >
-            <View
-              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${useSystemColors ? 'ml-5' : 'ml-0'}`}
             />
           </View>
         </Pressable>
@@ -435,10 +416,15 @@ export default function ProfileScreen() {
         </Text>
 
         <View className="gap-0">
-          <View className="flex-row items-center justify-between py-3 border-b border-outline-variant">
-            <Text className="text-sm text-text-primary">{t.profilePrivacy}</Text>
+          <Pressable
+            onPress={() => Linking.openURL('https://fump.ufmg.br')}
+            accessibilityRole="link"
+            accessibilityLabel={t.profilePrivacy}
+            className="flex-row items-center justify-between py-3 border-b border-outline-variant"
+          >
+            <Text className="text-sm text-primary">{t.profilePrivacy}</Text>
             <Ionicons name="open-outline" size={16} color={themeColors.primary} />
-          </View>
+          </Pressable>
 
           <View className="flex-row items-center justify-between py-3 border-b border-outline-variant">
             <Text className="text-sm text-text-primary">{t.version}</Text>
@@ -509,6 +495,49 @@ export default function ProfileScreen() {
           </View>
         </LinearGradient>
       </Pressable>
+
+      {USE_MOCK && (
+        <View className="rounded-2xl border border-dashed border-outline p-4 gap-3">
+          <Text className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+            🛠 {t.profileDemoMode}
+          </Text>
+          <Text className="text-xs text-text-secondary">{t.profileDemoDescription}</Text>
+          <View className="flex-row flex-wrap gap-2">
+            {DEMO_SCENARIOS.map((scenario) => {
+              const selected = demoScenario === scenario.key
+              return (
+                <Pressable
+                  key={scenario.key}
+                  onPress={() => handleDemoScenario(scenario.key)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Cenário ${scenario.label}`}
+                  accessibilityHint={scenario.hint}
+                  accessibilityState={{ selected }}
+                  className={`px-3 py-2 rounded-full border ${
+                    selected ? 'bg-primary border-primary' : 'bg-surface border-outline-variant'
+                  }`}
+                >
+                  <Text
+                    className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
+                  >
+                    {scenario.label}
+                  </Text>
+                </Pressable>
+              )
+            })}
+          </View>
+          <Pressable
+            onPress={handleResetDemo}
+            accessibilityRole="button"
+            accessibilityLabel="Resetar dados da demonstração"
+            accessibilityHint="Restaura saldo, pagamentos e históricos do cenário atual"
+            className="flex-row items-center justify-between pt-3 border-t border-outline-variant"
+          >
+            <Text className="text-sm font-medium text-primary">{t.profileResetDemo}</Text>
+            <Ionicons name="refresh" size={18} color={themeColors.primary} />
+          </Pressable>
+        </View>
+      )}
 
       <Button label={t.logout} onPress={logout} variant="secondary" />
 

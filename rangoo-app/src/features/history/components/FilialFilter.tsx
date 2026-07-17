@@ -1,17 +1,16 @@
-import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { RESTAURANTES_OFICIAIS } from '@/config'
 import { Text } from '@/shared/components/ui'
 
 interface FilialFilterProps {
+  /** Código do RU atualmente aplicado no pai (null = "Todos"), pra este
+   * componente nunca divergir do filtro que a query realmente usa. */
+  selected: string | null
   onFilter: (codigo: string | null) => void
 }
 
-export function FilialFilter({ onFilter }: FilialFilterProps) {
-  const [selected, setSelected] = useState<string | null>(null)
-
+export function FilialFilter({ selected, onFilter }: FilialFilterProps) {
   const handlePress = (codigo: string | null) => {
-    setSelected(codigo)
     onFilter(codigo)
   }
 

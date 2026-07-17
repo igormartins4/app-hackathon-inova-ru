@@ -1,5 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import type { BalanceResponse } from '@/features/balance'
 import { useBalance, useConsumerStatus } from '@/features/balance'
@@ -11,12 +12,33 @@ import { RechargeForm } from '@/features/recharge/components/RechargeForm'
 import { usePolling } from '@/features/recharge/hooks/usePolling'
 import { createPayment } from '@/features/recharge/services/rechargeApi'
 import type { PaymentStatusResponse } from '@/features/recharge/types/recharge.types'
+import { TIMEOUT_MS } from '@/features/recharge/utils/polling'
 import { Text } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { useI18n } from '@/shared/i18n'
 import { getErrorMessage } from '@/shared/utils'
 
 type FlowStep = 'amount' | 'polling' | 'success' | 'error'
+
+const PENDING_PAYMENT_KEY = '@rangoo_pending_payment'
+
+interface PaymentData {
+  paymentId: number
+  qrCode: string
+  qrCodeBase64: string
+  ticketUrl: string
+  amount: number
+  expiration: string
+  createdAt: number
+}
+
+async function savePendingPayment(data: PaymentData) {
+  await AsyncStorage.setItem(PENDING_PAYMENT_KEY, JSON.stringify(data))
+}
+
+async function clearPendingPayment() {
+  await AsyncStorage.removeItem(PENDING_PAYMENT_KEY)
+}
 
 export default function RechargeScreen() {
   const queryClient = useQueryClient()
@@ -27,14 +49,7 @@ export default function RechargeScreen() {
 
   const [step, setStep] = useState<FlowStep>('amount')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [paymentData, setPaymentData] = useState<{
-    paymentId: number
-    qrCode: string
-    qrCodeBase64: string
-    ticketUrl: string
-    amount: number
-    expiration: string
-  } | null>(null)
+  const [paymentData, setPaymentData] = useState<PaymentData | null>(null)
   const [errorStatus, setErrorStatus] = useState<PaymentStatusResponse['status'] | 'timeout'>(
     'timeout',
   )
@@ -42,7 +57,29 @@ export default function RechargeScreen() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [selectedAmount, setSelectedAmount] = useState(0)
 
+  // Retoma um pagamento pendente (app fechado/tela trocada em pleno polling)
+  // em vez de perder a referência ao payment_id e deixar o usuário achar que
+  // nada estava em andamento.
+  useEffect(() => {
+    ;(async () => {
+      const raw = await AsyncStorage.getItem(PENDING_PAYMENT_KEY)
+      if (!raw) return
+      const pending = JSON.parse(raw) as PaymentData
+      const elapsed = Date.now() - pending.createdAt
+      if (elapsed >= TIMEOUT_MS) {
+        await clearPendingPayment()
+        setErrorStatus('timeout')
+        setStep('error')
+        return
+      }
+      setPaymentData(pending)
+      setStep('polling')
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleApproved = useCallback(async () => {
+    await clearPendingPayment()
     await queryClient.refetchQueries({ queryKey: ['balance'] })
     const latest = queryClient.getQueryData<BalanceResponse>(['balance'])
     setNewBalance(latest?.saldo?.credito_disponivel ?? 0)
@@ -50,17 +87,20 @@ export default function RechargeScreen() {
   }, [queryClient])
 
   const handleTerminal = useCallback((status: PaymentStatusResponse['status']) => {
+    clearPendingPayment()
     setErrorStatus(status)
     setStep('error')
   }, [])
 
   const handleTimeout = useCallback(() => {
+    clearPendingPayment()
     setErrorStatus('timeout')
     setStep('error')
   }, [])
 
   usePolling({
     paymentId: paymentData?.paymentId ?? null,
+    startedAt: paymentData?.createdAt,
     onApproved: handleApproved,
     onTerminal: handleTerminal,
     onTimeout: handleTimeout,
@@ -75,25 +115,24 @@ export default function RechargeScreen() {
       setSubmitError(null)
       try {
         const res = await createPayment({ valor })
-        setPaymentData({
+        const data: PaymentData = {
           paymentId: res.payment_id,
           qrCode: res.qr_code,
           qrCodeBase64: res.qr_code_base64,
           ticketUrl: res.ticket_url,
           amount: valor,
           expiration: res.expiration,
-        })
+          createdAt: Date.now(),
+        }
+        await savePendingPayment(data)
+        setPaymentData(data)
         setStep('polling')
       } catch (err: unknown) {
-        const status = (err as { response?: { status?: number } })?.response?.status
-        if (status === 422) {
-          // Validação de valor (422) fica inline, ao lado do input — não é um
-          // estado terminal de pagamento, então não navega para PaymentError.
-          setSubmitError(getErrorMessage(err))
-        } else {
-          setErrorStatus('timeout')
-          setStep('error')
-        }
+        // Nenhuma falha de criação (rede, 429, 500 ou 422) chega a gerar um
+        // pagamento de verdade — todas ficam inline, ao lado do input, nunca
+        // navegam pra PaymentError (que implica um pagamento que existiu e
+        // falhou depois).
+        setSubmitError(getErrorMessage(err))
       } finally {
         setIsSubmitting(false)
       }
@@ -137,6 +176,7 @@ export default function RechargeScreen() {
               currentBalance={currentBalance}
               limiteRecarga={limiteRecarga}
               disabled={consumerDisabled || isSubmitting}
+              isSubmitting={isSubmitting}
               onAmountChange={setSelectedAmount}
               onSubmit={handleSubmit}
               serverError={submitError}
@@ -150,7 +190,15 @@ export default function RechargeScreen() {
             qrCodeBase64={paymentData.qrCodeBase64}
             ticketUrl={paymentData.ticketUrl}
             amount={paymentData.amount}
-            expiration={paymentData.expiration}
+            // O app desiste do polling em TIMEOUT_MS independente do prazo real
+            // do PIX no banco — mostrar a contagem real do servidor faria o
+            // relógio contradizer o corte abrupto de "tempo esgotado".
+            expiration={new Date(
+              Math.min(
+                new Date(paymentData.expiration).getTime(),
+                paymentData.createdAt + TIMEOUT_MS,
+              ),
+            ).toISOString()}
             isTimedOut={false}
           />
         )}

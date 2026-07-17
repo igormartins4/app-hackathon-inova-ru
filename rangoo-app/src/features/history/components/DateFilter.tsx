@@ -1,10 +1,12 @@
-import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { Text } from '@/shared/components/ui'
 import { toDateParam } from '@/shared/utils'
 
 interface DateFilterProps {
-  onFilter: (start: string | null, end: string | null) => void
+  /** Dias do preset atualmente aplicado no pai (null = "Todos"), pra este
+   * componente nunca divergir do filtro que a query realmente usa. */
+  selected: number | null
+  onFilter: (days: number | null, start: string | null, end: string | null) => void
 }
 
 const QUICK_OPTIONS = [
@@ -13,18 +15,15 @@ const QUICK_OPTIONS = [
   { label: 'Todos', days: null },
 ] as const
 
-export function DateFilter({ onFilter }: DateFilterProps) {
-  const [selected, setSelected] = useState<number | null>(null)
-
+export function DateFilter({ selected, onFilter }: DateFilterProps) {
   const handlePress = (days: number | null) => {
-    setSelected(days)
     if (days === null) {
-      onFilter(null, null)
+      onFilter(null, null, null)
     } else {
       const end = new Date()
       const start = new Date()
       start.setDate(start.getDate() - days)
-      onFilter(toDateParam(start), toDateParam(end))
+      onFilter(days, toDateParam(start), toDateParam(end))
     }
   }
 

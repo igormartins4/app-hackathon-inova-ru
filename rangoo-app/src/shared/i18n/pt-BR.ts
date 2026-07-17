@@ -75,6 +75,9 @@ export default {
     'Simula a API FUMP v2.0 dentro do app para testar o APK sem servidor externo.',
   profileResetDemo: 'Resetar dados demo',
   profileAccessibility: 'Acessibilidade',
+  profileThemeGroup: 'Tema',
+  profileReadingGroup: 'Leitura',
+  profileSystemColorsDisabledHint: 'Desativado enquanto Alto Contraste estiver ligado',
   profileDarkMode: 'Tema escuro',
   profileDarkModeHint: 'Segue o sistema por padrão',
   profileHighContrast: 'Alto contraste',
@@ -168,7 +171,12 @@ export default {
     'O cardápio vem direto do site da FUMP e pode estar temporariamente indisponível.',
   cardapioSemJantar: '{ru} não serve janta',
   cardapioSemJantarDetalhe: 'Selecione outro restaurante para ver o cardápio do jantar.',
-  cardapioIndisponivel: 'Cardápio não disponível para este RU nesta data',
+  cardapioIndisponivel: 'Cardápio não publicado para este RU nesta data',
+  cardapioIndisponivelDetalhe:
+    'Não é um erro — a fonte simplesmente ainda não publicou o cardápio deste dia.',
+  cardapioFonteNaoOficial: 'Fonte não-oficial',
+  cardapioFonteNaoOficialBody:
+    'Este cardápio vem de um scraper do site da FUMP, fora do contrato oficial da API. Cobre 4 dos 5 RUs e pode sair do ar sem aviso.',
   historicoFiltrarPeriodo: 'Filtrar por período',
   historicoRecargasTab: 'Recargas',
   historicoRefeicoesTab: 'Refeições',
@@ -184,7 +192,8 @@ export default {
   paymentErrorRejected: 'Pagamento não autorizado pelo banco.',
   paymentErrorCancelled: 'Pagamento cancelado.',
   paymentErrorExpired: 'Código PIX expirou. Gere um novo QR Code.',
-  paymentErrorTimeout: 'Tempo esgotado. O pagamento não foi confirmado.',
+  paymentErrorTimeout:
+    'Tempo esgotado. Confira seu saldo antes de gerar um novo QR Code — o pagamento pode ter sido confirmado depois do prazo.',
   paymentErrorTitle: 'Pagamento Não Confirmado',
   paymentErrorRetry: 'Tentar novamente',
   paymentErrorBack: 'Voltar ao início',

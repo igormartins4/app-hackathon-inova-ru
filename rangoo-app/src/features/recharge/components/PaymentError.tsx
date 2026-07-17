@@ -38,8 +38,7 @@ export function PaymentError({ status, onRetry }: PaymentErrorProps) {
       <Card className="w-full max-w-sm">
         <View className="items-center gap-4">
           <View className="w-full gap-3">
-            <Button label={t.paymentErrorRetry} onPress={onRetry} variant="primary" />
-            <Button label={t.paymentErrorBack} onPress={onRetry} variant="secondary" />
+            <Button label={t.paymentErrorBack} onPress={onRetry} variant="primary" />
           </View>
         </View>
       </Card>

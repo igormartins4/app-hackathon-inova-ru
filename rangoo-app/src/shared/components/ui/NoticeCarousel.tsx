@@ -43,21 +43,30 @@ export function NoticeCarousel() {
   const [dismissed, setDismissed] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const restartTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % TOTAL)
+    }, 8000)
+  }, [])
+
   const goNext = useCallback(() => {
     setCurrent((prev) => (prev + 1) % TOTAL)
-  }, [])
+    restartTimer()
+  }, [restartTimer])
 
   const goPrev = useCallback(() => {
     setCurrent((prev) => (prev - 1 + TOTAL) % TOTAL)
-  }, [])
+    restartTimer()
+  }, [restartTimer])
 
   useEffect(() => {
     if (dismissed) return
-    timerRef.current = setInterval(goNext, 8000)
+    restartTimer()
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [dismissed, goNext])
+  }, [dismissed, restartTimer])
 
   if (dismissed) return null
 
