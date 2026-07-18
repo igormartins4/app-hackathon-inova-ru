@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Modal, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeColors } from '@/config'
-import { useThemeStore } from '@/store/themeStore'
+import { useEffectiveReducedMotion } from '@/store/themeStore'
 import { Button } from './Button'
 import { ScaledText as Text } from './ScaledText'
 
@@ -37,7 +37,7 @@ export function AppDialog({
   onClose,
   actions,
 }: AppDialogProps) {
-  const reducedMotion = useThemeStore((state) => state.reducedMotion)
+  const reducedMotion = useEffectiveReducedMotion()
   const themeColors = useThemeColors()
 
   return (

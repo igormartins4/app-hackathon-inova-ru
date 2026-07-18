@@ -4,7 +4,7 @@ import { Linking, Modal, Pressable, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeColors } from '@/config'
 import { useI18n } from '@/shared/i18n'
-import { useResolvedTheme } from '@/store/themeStore'
+import { useEffectiveReducedMotion, useResolvedTheme } from '@/store/themeStore'
 import { Button } from './Button'
 import { ScaledText as Text } from './ScaledText'
 
@@ -17,11 +17,12 @@ export function AboutAppModal({ visible, onClose }: AboutAppModalProps) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
   const resolvedTheme = useResolvedTheme()
+  const reducedMotion = useEffectiveReducedMotion()
 
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType={reducedMotion ? 'none' : 'slide'}
       presentationStyle="pageSheet"
       statusBarTranslucent
       onRequestClose={onClose}
