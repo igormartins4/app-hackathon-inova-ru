@@ -36,9 +36,7 @@ export default function LoginScreen() {
     const result = await authenticateWithBiometrics()
     if (!result.success) {
       setBiometricError(
-        result.reason === 'unavailable'
-          ? 'Biometria não configurada neste aparelho.'
-          : 'Não foi possível confirmar sua identidade.',
+        result.reason === 'unavailable' ? t.loginBiometricUnavailable : t.loginBiometricFailed,
       )
     }
   }
@@ -47,9 +45,9 @@ export default function LoginScreen() {
     // Cadastro e "site da FUMP" apontavam pra mesma URL — o app não cria
     // conta própria, então a única ação real pra quem esqueceu a senha ou
     // nunca se cadastrou é ir direto pro site institucional.
-    Alert.alert('Precisa de ajuda?', undefined, [
+    Alert.alert(t.loginHelpTitle, undefined, [
       { text: t.loginFumpLink, onPress: () => Linking.openURL('https://fump.ufmg.br') },
-      { text: 'Sobre o projeto', onPress: () => setAboutVisible(true) },
+      { text: t.loginHelpAbout, onPress: () => setAboutVisible(true) },
       { text: t.cancel, style: 'cancel' },
     ])
   }
@@ -93,12 +91,12 @@ export default function LoginScreen() {
                     <Pressable
                       onPress={handleBiometricLogin}
                       accessibilityRole="button"
-                      accessibilityLabel="Entrar com biometria"
+                      accessibilityLabel={t.loginBiometricButton}
                       className="flex-row items-center justify-center gap-2 bg-surface-variant border border-outline rounded-xl py-3.5 min-h-[48px]"
                     >
                       <Ionicons name="finger-print" size={20} color={themeColors.primary} />
                       <Text className="text-sm font-semibold text-primary">
-                        Entrar com biometria
+                        {t.loginBiometricButton}
                         {pendingUserName ? ` (${pendingUserName.split(' ')[0]})` : ''}
                       </Text>
                     </Pressable>
@@ -113,7 +111,7 @@ export default function LoginScreen() {
                     ) : null}
                     <View className="flex-row items-center gap-2">
                       <View className="flex-1 h-px bg-outline-variant" />
-                      <Text className="text-xs text-text-secondary">ou entre com CPF e senha</Text>
+                      <Text className="text-xs text-text-secondary">{t.loginOrCpf}</Text>
                       <View className="flex-1 h-px bg-outline-variant" />
                     </View>
                   </View>
@@ -127,10 +125,10 @@ export default function LoginScreen() {
               <Pressable
                 onPress={handleHelp}
                 accessibilityRole="button"
-                accessibilityLabel="Precisa de ajuda? Cadastro, recuperar senha ou sobre o projeto"
+                accessibilityLabel={t.loginHelpA11y}
                 className="items-center py-2 min-h-[48px] justify-center"
               >
-                <Text className="text-sm font-semibold text-primary">Precisa de ajuda?</Text>
+                <Text className="text-sm font-semibold text-primary">{t.loginHelpTitle}</Text>
               </Pressable>
 
               <Text className="text-center text-xs text-text-secondary">

@@ -18,15 +18,15 @@ export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardPro
   const toggleHideSensitiveData = useThemeStore((s) => s.toggleHideSensitiveData)
 
   return (
-    <Card accessibilityLabel="Cartão de saldo" accessibilityRole="summary" className="bg-primary">
+    <Card accessibilityLabel={t.balanceCardA11y} accessibilityRole="summary" className="bg-primary">
       <View className="gap-3">
         <View className="flex-row items-center justify-between">
           <Text
-            accessibilityLabel={`Saldo disponível: ${hideSensitiveData ? t.hideSensitiveData : formatCurrency(creditoDisponivel)}`}
+            accessibilityLabel={`${t.homeBalanceTitle}: ${hideSensitiveData ? t.hideSensitiveData : formatCurrency(creditoDisponivel)}`}
             accessibilityRole="text"
-            className="text-sm font-medium text-text-inverse opacity-80"
+            className="text-sm font-medium text-text-inverse opacity-80 uppercase tracking-wider"
           >
-            SALDO DISPONÍVEL
+            {t.homeBalanceTitle}
           </Text>
           <Pressable
             onPress={toggleHideSensitiveData}
@@ -55,7 +55,7 @@ export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardPro
         </Text>
         <View className="flex-row gap-4">
           <View className="flex-1 bg-text-inverse/20 rounded-lg p-3">
-            <Text className="text-xs text-text-inverse opacity-70">Limite de recarga</Text>
+            <Text className="text-xs text-text-inverse opacity-70">{t.balanceCardLimit}</Text>
             <Text className="text-sm font-semibold text-text-inverse">
               {hideSensitiveData ? '••••' : formatCurrency(limiteRecarga)}
             </Text>

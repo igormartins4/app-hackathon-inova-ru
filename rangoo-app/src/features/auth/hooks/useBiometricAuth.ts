@@ -1,5 +1,6 @@
 import * as LocalAuthentication from 'expo-local-authentication'
 import { useCallback } from 'react'
+import { useI18n } from '@/shared/i18n'
 import { useAuth } from './useAuth'
 
 type BiometricResult = { success: true } | { success: false; reason: 'unavailable' | 'cancelled' }
@@ -9,6 +10,7 @@ type BiometricResult = { success: true } | { success: false; reason: 'unavailabl
 // o campo de senha (Especificacao Tecnica v2.0, secao 11.1).
 export function useBiometricAuth() {
   const { pendingUser, confirmPendingSession } = useAuth()
+  const { t } = useI18n()
 
   const authenticateWithBiometrics = useCallback(async (): Promise<BiometricResult> => {
     const hasHardware = await LocalAuthentication.hasHardwareAsync()
@@ -18,8 +20,8 @@ export function useBiometricAuth() {
     }
 
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: 'Entrar com biometria',
-      cancelLabel: 'Cancelar',
+      promptMessage: t.loginBiometricPromptMessage,
+      cancelLabel: t.cancel,
     })
 
     if (!result.success) {
@@ -28,7 +30,7 @@ export function useBiometricAuth() {
 
     confirmPendingSession()
     return { success: true }
-  }, [confirmPendingSession])
+  }, [confirmPendingSession, t])
 
   return {
     hasPendingSession: !!pendingUser,

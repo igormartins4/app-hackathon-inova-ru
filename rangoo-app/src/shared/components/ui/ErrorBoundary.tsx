@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react'
 import { View } from 'react-native'
+import { useI18n } from '@/shared/i18n'
 import { Button } from './Button'
 import { ScaledText as Text } from './ScaledText'
 
@@ -29,6 +30,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render() {
     if (this.state.hasError) {
+      // Class component — can't use the useI18n() hook, so read the zustand
+      // store directly via getState(). Won't reactively update mid-crash if
+      // the locale changes, an acceptable tradeoff for a fallback screen.
+      const { t } = useI18n.getState()
       return (
         <View
           accessibilityRole="alert"
@@ -36,12 +41,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           className="flex-1 items-center justify-center bg-background px-6"
         >
           <Text accessibilityRole="text" className="text-lg font-semibold text-text-primary mb-2">
-            Algo deu errado
+            {t.errorBoundaryTitle}
           </Text>
           <Text accessibilityRole="text" className="text-center text-base text-text-secondary mb-6">
-            {this.props.fallbackMessage ?? 'Ocorreu um erro. Tente novamente em instantes.'}
+            {this.props.fallbackMessage ?? t.errorBoundaryMessage}
           </Text>
-          <Button label="Tentar novamente" onPress={this.handleRetry} />
+          <Button label={t.retry} onPress={this.handleRetry} />
         </View>
       )
     }
