@@ -17,7 +17,9 @@ import {
 } from '@/shared/utils'
 import { useScaledFontStyle } from '@/store/themeStore'
 
-const PRESET_AMOUNTS = [5, 10, 20, 30, 50]
+// 4 presets, not 5 — stays within the working-memory limit for a single
+// decision point (Miller's Law / cognitive load guidance).
+const PRESET_AMOUNTS = [5, 10, 20, 50]
 
 interface RechargeFormProps {
   currentBalance: number

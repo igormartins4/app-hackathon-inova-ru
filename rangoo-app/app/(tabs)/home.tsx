@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -12,6 +12,7 @@ import {
   Card,
   ErrorMessage,
   FadeInView,
+  LOW_BALANCE_THRESHOLD,
   LoadingSpinner,
   LowBalanceBanner,
   NoticeCarousel,
@@ -45,6 +46,7 @@ export default function HomeScreen() {
   const { t } = useI18n()
   const hideSensitiveData = useThemeStore((s) => s.hideSensitiveData)
   const toggleHideSensitiveData = useThemeStore((s) => s.toggleHideSensitiveData)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
   const recentRecharges = useMemo(
     () => rechargeHistory?.pages[0]?.data.slice(0, 3) ?? [],
     [rechargeHistory],
@@ -111,9 +113,15 @@ export default function HomeScreen() {
         <Text className="text-xs text-text-secondary mt-0.5">{phrase}!</Text>
       </View>
 
-      <NoticeCarousel />
-
-      <LowBalanceBanner />
+      {/* One attention slot, not two stacked — the low-balance warning is
+          actionable and takes priority over informational notices when both
+          would otherwise apply. */}
+      {!bannerDismissed &&
+        (saldo < LOW_BALANCE_THRESHOLD ? (
+          <LowBalanceBanner onDismiss={() => setBannerDismissed(true)} />
+        ) : (
+          <NoticeCarousel onDismiss={() => setBannerDismissed(true)} />
+        ))}
 
       <View className="px-4 mb-4">
         <LinearGradient

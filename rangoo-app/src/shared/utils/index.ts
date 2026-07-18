@@ -7,6 +7,7 @@ export {
   formatToLocalDate,
   formatToLocalDateTime,
   formatToLocalTime,
+  getCountdownUrgency,
   getFriendlyRelativeDate,
   getGreetingPeriod,
   getMonthName,

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
-import { TextInput, View } from 'react-native'
+import { Alert, TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Button, ErrorMessage, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
@@ -57,7 +57,18 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
       setAmountError(firstFieldError(errors, 'amount') ?? '')
       return
     }
-    onSubmit(destinatario.trim(), value)
+
+    const recipient = destinatario.trim()
+    Alert.alert(
+      t.transferConfirmTitle,
+      t.transferConfirmBody
+        .replace('{amount}', formatCurrency(value))
+        .replace('{recipient}', recipient),
+      [
+        { text: t.transferConfirmBack, style: 'cancel' },
+        { text: t.transferConfirmSend, onPress: () => onSubmit(recipient, value) },
+      ],
+    )
   }
 
   return (

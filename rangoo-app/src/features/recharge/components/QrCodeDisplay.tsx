@@ -6,7 +6,7 @@ import QRCode from 'react-native-qrcode-svg'
 import { useThemeColors } from '@/config'
 import { Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
-import { formatCurrency, getTimeLeft } from '@/shared/utils'
+import { formatCurrency, getCountdownUrgency, getTimeLeft } from '@/shared/utils'
 
 interface QrCodeDisplayProps {
   qrCode: string
@@ -18,19 +18,40 @@ interface QrCodeDisplayProps {
 
 // ponytail: isolated countdown so its 1s ticker doesn't re-render the parent
 // (and the expensive QR SVG) on every tick.
+//
+// Urgency escalates instead of alarming from second one: a 2-minute PIX wait
+// is the expected happy path, not an emergency — see product principle
+// "reduzir ansiedade de espera". Only the final minute (and expiry) read as
+// warning/error; the rest of the wait reads calm.
+const URGENCY_STYLES = {
+  calm: { container: 'bg-surface-variant', icon: 'time-outline' as const },
+  urgent: { container: 'bg-warning/10', icon: 'time' as const },
+  expired: { container: 'bg-status-error/10', icon: 'time' as const },
+}
+
 function CountdownText({ expiration }: { expiration: string }) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(expiration))
+  const [urgency, setUrgency] = useState(() => getCountdownUrgency(expiration))
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeLeft(getTimeLeft(expiration)), 1000)
+    const timer = setInterval(() => {
+      setTimeLeft(getTimeLeft(expiration))
+      setUrgency(getCountdownUrgency(expiration))
+    }, 1000)
     return () => clearInterval(timer)
   }, [expiration])
 
+  const style = URGENCY_STYLES[urgency]
+  const iconColor =
+    urgency === 'calm'
+      ? themeColors.textSecondary
+      : themeColors[urgency === 'urgent' ? 'warning' : 'error']
+
   return (
-    <View className="flex-row items-center gap-3 bg-status-error/10 rounded-xl px-4 py-3">
-      <Ionicons name="time" size={20} color={themeColors.error} />
+    <View className={`flex-row items-center gap-3 rounded-xl px-4 py-3 ${style.container}`}>
+      <Ionicons name={style.icon} size={20} color={iconColor} />
       <Text className="text-sm text-text-secondary flex-1">{t.qrExpiresIn}</Text>
       <Text className="text-lg font-bold text-text-primary">{timeLeft}</Text>
     </View>

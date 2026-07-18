@@ -13,12 +13,20 @@ type TipoRefeicao = 'almoco' | 'jantar'
 
 const FAVORITES_KEY = '@rangoo_favorite_rus'
 
+// Almoço nos RUs normalmente vai até meio da tarde; depois disso é mais
+// provável que o estudante que abrir o cardápio esteja pensando na janta.
+// Só um default — o toggle continua trocável a qualquer momento.
+function defaultMealForNow(): TipoRefeicao {
+  return new Date().getHours() < 15 ? 'almoco' : 'jantar'
+}
+
 export default function CardapioScreen() {
   const themeColors = useThemeColors()
   const { t, locale } = useI18n()
   const [restaurante, setRestaurante] = useState<FilialCode>('0003')
-  const [tipoRefeicao, setTipoRefeicao] = useState<TipoRefeicao>('almoco')
+  const [tipoRefeicao, setTipoRefeicao] = useState<TipoRefeicao>(defaultMealForNow)
   const [selectedDate, setSelectedDate] = useState(new Date())
+  const [showCalendar, setShowCalendar] = useState(false)
   const [favorites, setFavorites] = useState<FilialCode[]>([])
   const [showAll, setShowAll] = useState(true)
   const [showSourceBanner, setShowSourceBanner] = useState(true)
@@ -198,22 +206,44 @@ export default function CardapioScreen() {
         <Text className="text-xs font-bold text-primary uppercase tracking-wider">
           {t.cardapioData}
         </Text>
-        <MenuCalendar selectedDate={selectedDate} onSelectDate={setSelectedDate} />
         <Pressable
-          onPress={() => !today && setSelectedDate(new Date())}
+          onPress={() => setShowCalendar((v) => !v)}
           accessibilityRole="button"
-          accessibilityLabel={today ? t.cardapioHoje : t.cardapioVoltarParaHoje}
-          className="flex-row items-center gap-1"
+          accessibilityLabel={`${formatFullWeekdayDate(selectedDate, locale)}${today ? ` · ${t.cardapioHoje}` : ''}`}
+          accessibilityState={{ expanded: showCalendar }}
+          className="flex-row items-center justify-between bg-surface border border-outline rounded-xl px-4 py-3 min-h-[48px]"
         >
-          <Text className="text-sm font-medium text-text-primary">
-            {formatFullWeekdayDate(selectedDate, locale)}
-          </Text>
-          {today ? (
-            <Text className="text-success text-xs font-bold"> · {t.cardapioHoje}</Text>
-          ) : (
-            <Text className="text-primary text-xs font-bold"> · {t.cardapioVoltarParaHoje}</Text>
-          )}
+          <View className="flex-row items-center gap-1">
+            <Text className="text-sm font-medium text-text-primary">
+              {formatFullWeekdayDate(selectedDate, locale)}
+            </Text>
+            {today && <Text className="text-success text-xs font-bold"> · {t.cardapioHoje}</Text>}
+          </View>
+          <Ionicons
+            name={showCalendar ? 'chevron-up' : 'chevron-down'}
+            size={18}
+            color={themeColors.textSecondary}
+          />
         </Pressable>
+        {!today && !showCalendar && (
+          <Pressable
+            onPress={() => setSelectedDate(new Date())}
+            accessibilityRole="button"
+            accessibilityLabel={t.cardapioVoltarParaHoje}
+            className="self-start min-h-[44px] justify-center"
+          >
+            <Text className="text-primary text-xs font-bold">{t.cardapioVoltarParaHoje}</Text>
+          </Pressable>
+        )}
+        {showCalendar && (
+          <MenuCalendar
+            selectedDate={selectedDate}
+            onSelectDate={(date) => {
+              setSelectedDate(date)
+              setShowCalendar(false)
+            }}
+          />
+        )}
       </View>
 
       <View className="gap-2">

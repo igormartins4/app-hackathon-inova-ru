@@ -146,6 +146,11 @@ export default {
   transferAmountA11yHint: 'Indiquez un montant entre {min} et {max}',
   transferAvailableBalance: 'Solde disponible : {balance}',
   transferMockNotice: "Cet écran est simulé et ne fait pas partie de l'API FUMP v2.0 signée.",
+  transferConfirmTitle: 'Confirmer le transfert',
+  transferConfirmBody:
+    'Envoyer {amount} au destinataire {recipient} ?\n\nVérifiez le numéro avant de confirmer — ce transfert est irréversible.',
+  transferConfirmBack: 'Vérifier',
+  transferConfirmSend: "Confirmer l'envoi",
   noticeTitle: 'Avis',
   noticePixTitle: 'Attendez la confirmation du PIX',
   noticePixBody:

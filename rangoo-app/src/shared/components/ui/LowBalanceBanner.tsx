@@ -1,24 +1,21 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useI18n } from '@/shared/i18n'
 import { RECHARGE_LIMITS } from '@/shared/utils'
 import { ScaledText as Text } from './ScaledText'
 
-const LOW_BALANCE_THRESHOLD = RECHARGE_LIMITS.MIN * 2
+export const LOW_BALANCE_THRESHOLD = RECHARGE_LIMITS.MIN * 2
 
-export function LowBalanceBanner() {
+interface LowBalanceBannerProps {
+  onDismiss: () => void
+}
+
+export function LowBalanceBanner({ onDismiss }: LowBalanceBannerProps) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
-  const { data } = useBalance()
   const router = useRouter()
-  const [dismissed, setDismissed] = useState(false)
-
-  const saldo = data?.saldo?.credito_disponivel ?? 0
-  if (dismissed || saldo >= LOW_BALANCE_THRESHOLD) return null
 
   return (
     <View
@@ -50,7 +47,7 @@ export function LowBalanceBanner() {
           </Pressable>
         </View>
         <Pressable
-          onPress={() => setDismissed(true)}
+          onPress={onDismiss}
           accessibilityRole="button"
           accessibilityLabel={t.close}
           hitSlop={16}

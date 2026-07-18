@@ -146,6 +146,11 @@ export default {
   transferAmountA11yHint: 'Enter an amount between {min} and {max}',
   transferAvailableBalance: 'Available balance: {balance}',
   transferMockNotice: "This screen is mocked and isn't part of the signed FUMP API v2.0.",
+  transferConfirmTitle: 'Confirm transfer',
+  transferConfirmBody:
+    "Send {amount} to recipient {recipient}?\n\nDouble-check the number before confirming — this transfer can't be undone.",
+  transferConfirmBack: 'Review',
+  transferConfirmSend: 'Confirm send',
   noticeTitle: 'Notices',
   noticePixTitle: 'Wait for PIX confirmation',
   noticePixBody:

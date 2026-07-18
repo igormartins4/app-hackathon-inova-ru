@@ -79,6 +79,20 @@ export function getTimeLeft(expiration: string): string {
   return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
 }
 
+const COUNTDOWN_URGENT_THRESHOLD_MS = 60_000
+
+/**
+ * Countdown urgency band — 'calm' for most of the wait, escalating to
+ * 'urgent' only in the final minute and 'expired' once the deadline passes.
+ * Keeps waiting screens from reading as an alarm from second one.
+ */
+export function getCountdownUrgency(expiration: string): 'calm' | 'urgent' | 'expired' {
+  const diff = new Date(expiration).getTime() - Date.now()
+  if (diff <= 0) return 'expired'
+  if (diff <= COUNTDOWN_URGENT_THRESHOLD_MS) return 'urgent'
+  return 'calm'
+}
+
 /** Time-of-day bucket for the greeting — caller resolves the translated string. */
 export function getGreetingPeriod(): 'morning' | 'afternoon' | 'evening' {
   const hour = new Date().getHours()

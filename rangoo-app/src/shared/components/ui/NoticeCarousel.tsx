@@ -36,11 +36,14 @@ const NOTICES: NoticeItem[] = [
 
 const TOTAL = NOTICES.length
 
-export function NoticeCarousel() {
+interface NoticeCarouselProps {
+  onDismiss: () => void
+}
+
+export function NoticeCarousel({ onDismiss }: NoticeCarouselProps) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
   const [current, setCurrent] = useState(0)
-  const [dismissed, setDismissed] = useState(false)
   const [paused, setPaused] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -62,14 +65,12 @@ export function NoticeCarousel() {
   }, [restartTimer])
 
   useEffect(() => {
-    if (dismissed || paused) return
+    if (paused) return
     restartTimer()
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [dismissed, paused, restartTimer])
-
-  if (dismissed) return null
+  }, [paused, restartTimer])
 
   const notice = NOTICES[current]
   const { title, body } = notice.getText(t)
@@ -105,7 +106,7 @@ export function NoticeCarousel() {
           </Text>
         </View>
         <Pressable
-          onPress={() => setDismissed(true)}
+          onPress={onDismiss}
           accessibilityRole="button"
           accessibilityLabel={t.close}
           hitSlop={16}
