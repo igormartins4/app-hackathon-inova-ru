@@ -151,7 +151,7 @@ import { useAuth } from '@/features/auth';  // FROM features/balance
 User enters CPF + password
   → useAuth().login() mutation
     → authApi.login() calls FUMP API
-      → Response: { usuario: { token, nome, email, isAluno, isColaborador } } (token dentro de usuario, v2.0 §7.1)
+      → Response: { token, usuario: { nome, email, isAluno, isColaborador } } (token na raiz, PDF assinado v2.0 §7.1)
         → useTokenStorage().saveToken() → expo-secure-store (Keystore)
         → useAuth().setUser() → Zustand store
         → TanStack Query cache invalidated
@@ -190,11 +190,12 @@ User selects amount → taps "Pagar com PIX"
           - GET /status/{id}
           - Status handling:
             - pending → continue polling
-            - approved → invalidate balance query, navigate to balance, show success
+            - approved + creditado === true → invalidate balance query, navigate to balance, show success
+            - approved + creditado !== true → keep polling (webhook pending)
             - rejected → show error, allow retry
             - cancelled → show message, allow retry
             - expired → show "PIX expirado", allow retry
-          - Timeout: 2 minutes → show friendly message + retry button
+          - Timeout: 2 minutes → show friendly message + retry button; if last status was `approved` (credit still processing), show distinct "aprovado, aguardando crédito" state instead — defensive decision, PDF doesn't literally define this case (see AGENTS.md §3.3)
 ```
 
 **Key rule:** App NEVER generates PIX code server-side. QR code string comes from FUMP/MercadoPago. App only renders it.

@@ -10,10 +10,11 @@ export interface User {
   isColaborador: number
 }
 
-// Wire shape per Especificação Técnica API InovaRU v2.0, seção 7.1 — o token
-// vem DENTRO de `usuario`, não na raiz da resposta.
+// Wire shape per Especificação Técnica API InovaRU v2.0 (PDF assinado), seção
+// 7.1 — o token vem NA RAIZ da resposta, ao lado de `usuario`.
 export interface LoginResponse {
-  usuario: User & { token: string }
+  token: string
+  usuario: User
 }
 
 export interface AuthState {

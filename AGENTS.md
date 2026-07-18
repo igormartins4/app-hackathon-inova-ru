@@ -126,8 +126,8 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 
 ```json
 {
+  "token": "eyJhbGciOiJIUzI1NiIsIn...",
   "usuario": {
-    "token": "eyJhbGciOiJIUzI1NiIsIn...",
     "nome": "JOÃO DA SILVA",
     "email": "joao@ufmg.br",
     "isAluno": 1,
@@ -136,7 +136,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 }
 ```
 
-> **ATENÇÃO — erro comum já cometido neste projeto:** o `token` vem DENTRO de `usuario`, NÃO no nível raiz da resposta. `src/features/auth/types/auth.types.ts` (`LoginResponse`) e `src/features/auth/hooks/useAuth.ts` já implementam isso corretamente (`const { token, ...profile } = response.usuario`) — não reverta para `{ token, usuario }` na raiz.
+> **ATENÇÃO — erro comum já cometido neste projeto:** o `token` vem NA RAIZ da resposta, ao lado de `usuario` (conforme PDF assinado da Especificação Técnica, página 8) — NÃO dentro de `usuario`. `src/features/auth/types/auth.types.ts` (`LoginResponse`) e `src/features/auth/hooks/useAuth.ts` já implementam isso corretamente (`const { token, usuario: profile } = response`) — não reverta para `{ usuario: { token, ... } }`.
 
 **Resposta 401 (credenciais inválidas):** `{ "message": "Usuário ou senha inválidos" }`
 
@@ -166,7 +166,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 | Código | Situação | Efeito |
 |---|---|---|
 | `"A"` | Ativo | Uso normal |
-| `"1"` | Inativo | Nunca aparece num `200` — o próprio endpoint responde `404` para consumidor inativo. Não codifique um caso `situacao === "1"` esperando um 200; a detecção de inatividade é pelo status HTTP 404, não pelo campo. |
+| `"I"` | Inativo | Nunca aparece num `200` — o próprio endpoint responde `404` para consumidor inativo. Não codifique um caso `situacao === "I"` esperando um 200; a detecção de inatividade é pelo status HTTP 404, não pelo campo. |
 | `"B"` | Bloqueado | Recarga desabilitada, aviso pedindo para procurar a FUMP |
 
 `limite_recarga` é **dinâmico** — nunca hardcode R$ 500,00 como teto fixo; sempre leia o valor retornado por este endpoint.
@@ -266,7 +266,7 @@ Ao exibir a tela de pagamento do PIX, o agente deve disparar imediatamente o mec
 
 - **Janela Base Crescente**: Sequência de atrasos de 3s, 5s, 8s, 13s.
 - **Jitter Obrigatório**: Aplique ruído aleatório de ±1s sobre o tempo base calculado.
-- **Teto de Execução (Timeout)**: O polling possui tempo limite máximo de **2 minutos (120 segundos)**. Se atingir esse tempo sem alteração de estado, pare o loop e force o redirecionamento para a tela de Falha/Timeout.
+- **Teto de Execução (Timeout)**: O polling possui tempo limite máximo de **2 minutos (120 segundos)**. Se atingir esse tempo sem alteração de estado, pare o loop.
 
 ### 3.2 Comportamento por Status do Gateway
 
@@ -277,6 +277,17 @@ Ao exibir a tela de pagamento do PIX, o agente deve disparar imediatamente o mec
 | `rejected` | Terminal | Para o loop e redireciona para Falha detalhando rejeição |
 | `cancelled` | Terminal | Para o loop e trata como expiração |
 | `expired` | Terminal | Para o loop e exibe alerta de tempo esgotado |
+
+### 3.3 Timeout com `approved` + `creditado !== true` — decisão defensiva (não é fato contratual)
+
+O PDF assinado não define explicitamente o que fazer se o teto de 2 minutos for atingido enquanto o último status visto era `approved` com `creditado !== true`. Há uma tensão real na especificação: a tabela de status trata `approved` como terminal, mas o texto e o diagrama condicionam sucesso a `creditado === true`. Como a integração **não confirmou explicitamente esse caso com o contato técnico da Fump**, adotamos a seguinte implementação defensiva (não confundir com regra do contrato):
+
+- Se o timeout ocorrer e o último status recebido foi `approved` (mesmo com `creditado !== true`), a tela final **não** deve dizer "Pagamento Não Confirmado" nem "Pagamento não detectado" — o pagamento *foi* detectado e aprovado.
+- Em vez disso, mostrar um estado neutro/de aviso: "Pagamento Aprovado — crédito no saldo ainda em processamento", com atalho para conferir o saldo/histórico.
+- Reservar "Pagamento Não Confirmado" apenas para timeout genuíno sem nenhuma confirmação de aprovação (`pending` até o fim, ou erro de rede).
+- Implementado em `usePolling.ts` (`onTimeout(pendingCredit: boolean)`), `app/(tabs)/recharge.tsx` (`errorStatus: 'pendingCredit'`) e `PaymentError.tsx` (título/ícone/cor distintos para esse caso).
+
+Idealmente, este comportamento deve ser confirmado com o contato técnico da Fump; até lá, é a interpretação mais segura das duas leituras possíveis do PDF.
 
 ---
 

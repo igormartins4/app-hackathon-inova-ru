@@ -123,7 +123,7 @@ pnpm start
 | Rota | Cenários simulados |
 |------|---------------------|
 | `POST /usuarios/login` | 200 com `password=senha_do_usuario`; 401 (default) qualquer outra senha |
-| `GET /creditos/saldo` | 200 ativo (default); `?situacao=B` → bloqueado; `?situacao=1` → 404 inativo |
+| `GET /creditos/saldo` | 200 ativo (default); `?situacao=B` → bloqueado; `?situacao=I` → 404 inativo |
 | `POST /creditos/pagamento` | 201 (default, com `expiration` real +30min); 422 se `valor` fora de R\$5–500; `?force=429` → 429 com header `Retry-After: 30` |
 | `GET /creditos/pagamento/:id/status` | **Sequencial**: 1ª–3ª consulta `pending`, 4ª+ `approved`+`creditado:true`, depois reinicia o ciclo — testa o polling/backoff de verdade |
 | `GET /creditos/recargas` | 200 lista paginada |

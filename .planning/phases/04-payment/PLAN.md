@@ -10,8 +10,8 @@
 2. QR Code image is displayed and PIX code (copia-e-cola) can be copied with one tap
 3. App polls payment status with exponential backoff (3s→5s→8s→13s ± jitter)
 4. All payment statuses are handled: pending, approved, rejected, cancelled, expired
-5. After 2 minutes, polling stops with a friendly timeout message; user can retry
-6. approved + creditado==true → success; approved + creditado==false → keep polling
+5. After 2 minutes, polling stops. If last status was `approved` (regardless of `creditado`), show a distinct "payment approved, credit processing" state — never the generic "not confirmed" message, since the payment WAS detected and approved (defensive decision, not literally specified in the signed PDF — see AGENTS.md §3.3). Otherwise show the generic timeout message; user can retry
+6. approved + creditado==true → success; approved + creditado==false → keep polling until timeout, then land on the distinct pending-credit state above
 
 ## Plans
 
@@ -47,7 +47,7 @@
 - Status handling:
   - pending → continue polling
   - approved + creditado==true → SUCCESS, stop polling, navigate to confirmation
-  - approved + creditado==false → continue polling (webhook pending)
+  - approved + creditado==false → continue polling (webhook pending); if timeout hits in this state, land on distinct "pendingCredit" screen (not the generic timeout/failure message)
   - rejected → show error, allow retry
   - cancelled → show message, allow retry
   - expired → show "PIX expirado", allow retry
@@ -61,6 +61,7 @@
 
 ### 04-06: Timeout handling and retry flow
 - After 2 min timeout: show friendly message
+- If last known status was `approved` (creditado still false): show distinct "pendingCredit" state instead — approved, not failed, credit still processing (defensive decision, see AGENTS.md §3.3)
 - "Tentar novamente" button → back to amount selection
 - Never retry POST automatically (no idempotency)
 

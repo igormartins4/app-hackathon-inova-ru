@@ -17,7 +17,7 @@
       "responses": [
         {
           "uuid": "a1e6c1b0-1f1a-4b1a-9c1a-000000000011",
-          "body": "{\n  \"usuario\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-token-rangoo\",\n    \"nome\": \"GERSON SANTOS\",\n    \"email\": \"gerson@ufmg.br\",\n    \"isAluno\": 1,\n    \"isColaborador\": 0\n  }\n}",
+          "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-token-rangoo\",\n  \"usuario\": {\n    \"nome\": \"GERSON SANTOS\",\n    \"email\": \"gerson@ufmg.br\",\n    \"isAluno\": 1,\n    \"isColaborador\": 0\n  }\n}",
           "latency": 0,
           "statusCode": 200,
           "label": "200 sucesso",
@@ -145,7 +145,7 @@
           "body": "{ \"message\": \"Consumidor nao encontrado ou inativo.\" }",
           "latency": 0,
           "statusCode": 404,
-          "label": "404 inativo (?situacao=1)",
+          "label": "404 inativo (?situacao=I)",
           "headers": [
             {
               "key": "Content-Type",
@@ -160,7 +160,7 @@
             {
               "target": "query",
               "modifier": "situacao",
-              "value": "1",
+              "value": "I",
               "operator": "equals",
               "invert": false
             }

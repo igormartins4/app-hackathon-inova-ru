@@ -303,7 +303,7 @@ As entidades abaixo descrevem os objetos trafegados pela API. Os endpoints da se
 | **nome** | string | Nome completo do consumidor. |
 | **tipo_consumidor** | object | Categoria: `{ codigo, descricao }` (ex.: `01` - "Estudante Regular"). |
 | **centro_custo** | object | Vínculo acadêmico: `{ tipo, descricao }` (ex.: Graduação - "Ciência da Computação"). |
-| **situacao** | string | `"A"` = Ativo, `"1"` = Inativo, `"B"` = Bloqueado. |
+| **situacao** | string | `"A"` = Ativo, `"I"` = Inativo, `"B"` = Bloqueado. |
 
 ### 6.2. Saldo
 
@@ -427,8 +427,8 @@ Autentica o usuário com CPF e senha institucional e retorna o token JWT.
 
 ```json
 {
+  "token": "eyJhbGciOiJIUzI1Nils...",
   "usuario": {
-    "token": "eyJhbGciOiJIUzI1Nils...",
     "nome": "JOÃO DA SILVA",
     "email": "joao@ufmg.br",
     "isAluno": 1,
@@ -437,6 +437,8 @@ Autentica o usuário com CPF e senha institucional e retorna o token JWT.
 }
 
 ```
+
+> Nota: corrigido em 2026-07-18 conforme PDF assinado (página 8) — o `token` está na raiz da resposta, não dentro de `usuario`. Esta transcrição Markdown é auxiliar; o PDF assinado é a fonte de verdade.
 
 #### Resposta 401 (credenciais inválidas)
 
@@ -690,6 +692,8 @@ O campo `status` retornado no polling (seção 7.4) evolui conforme o pagamento 
 > **Nota:** O Mercado Pago pode retornar `cancelled` ou `expired` em situações de expiração. O app deve tratar ambos da mesma forma: informar o usuário e oferecer a opção de gerar um novo pagamento.
 > Quando o status for `approved` e `creditado == true`, o saldo já está disponível para uso nos RUs.
 
+> **Ambiguidade conhecida (não resolvida no PDF assinado):** esta tabela trata `approved` como terminal por si só, mas a seção 7 e o diagrama de sequência condicionam sucesso a `approved` **e** `creditado === true`. O PDF não define o que fazer se o timeout de 2 minutos (seção 3) for atingido enquanto o status ainda é `approved` com `creditado !== true`. O app trata isso como uma **decisão defensiva de implementação**, não como fato contratual: nesse caso, não continua o polling indefinidamente nem exibe mensagem de falha — mostra um estado neutro de "aprovado, aguardando crédito" (ver AGENTS.md §3.3). Recomenda-se confirmar esse caso com o contato técnico da Fump.
+
 ## 9. Códigos de erro
 
 As respostas de erro seguem um envelope único com o campo `message`:
@@ -850,7 +854,7 @@ Este documento adota o paradigma de **contract-first**: as interfaces e regras d
 | Código | Situação | Efeito |
 | --- | --- | --- |
 | **A** | Ativo | Uso perfeitamente normal do saldo e das rotinas de recarga. |
-| **1** | Inativo | Consultas retornarão erro `404`; operações de crédito/venda desabilitadas. |
+| **I** | Inativo | Consultas retornarão erro `404`; operações de crédito/venda desabilitadas. |
 | **B** | Bloqueado | Operação de recarga temporariamente suspensa pelo sistema, exibindo tela de aviso. |
 
 ### Anexo D - Limites de requisição

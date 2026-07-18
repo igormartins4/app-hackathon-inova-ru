@@ -1,6 +1,6 @@
 import { ScaledText as Text } from './ScaledText'
 
-type Situacao = 'A' | '1' | 'B' | string
+type Situacao = 'A' | 'I' | 'B' | string
 
 interface StatusBadgeProps {
   situacao: Situacao

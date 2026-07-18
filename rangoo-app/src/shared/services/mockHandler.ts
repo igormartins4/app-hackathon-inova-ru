@@ -238,7 +238,7 @@ export function getMockResponse(config: AxiosRequestConfig): MockResponse {
     if (body.user === '00000000000' || body.password === 'errada') {
       return error(401, 'Usuário ou senha inválidos')
     }
-    return ok({ usuario: { token: 'mock-jwt-token-fake-expo-ru-2026', ...DEMO_USER } })
+    return ok({ token: 'mock-jwt-token-fake-expo-ru-2026', usuario: DEMO_USER })
   }
 
   if (path.includes('/creditos/saldo') && method === 'get') {

@@ -9,7 +9,7 @@ interface ConsumerStatus {
 }
 
 // Per the FUMP v2.0 contract (Anexo C), an inactive consumer never comes back
-// as situacao "1" (Inativo) on a successful /creditos/saldo response — the
+// as situacao "I" (Inativo) on a successful /creditos/saldo response — the
 // endpoint responds 404 instead. Only "A" (Ativo) and "B" (Bloqueado) are ever
 // seen in a 200 response, so inactivity must be read from the query error.
 export function useConsumerStatus(): ConsumerStatus {
