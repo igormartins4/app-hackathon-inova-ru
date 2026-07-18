@@ -74,6 +74,7 @@ function AuthGate() {
           >
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="restaurante/[codigo]" />
           </Stack>
         )}
         <StatusBar style={resolvedTheme === 'dark' ? 'light' : 'dark'} />

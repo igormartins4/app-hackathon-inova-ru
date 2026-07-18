@@ -15,6 +15,14 @@ describe('form schemas', () => {
     expect(transferSchema(50).safeParse({ destination: '12345', amount: 10 }).success).toBe(true)
     expect(transferSchema(50).safeParse({ destination: 'ab', amount: 60 }).success).toBe(false)
   })
+
+  it('accepts the minimum and current balance but rejects amounts outside them', () => {
+    const schema = transferSchema(45.5)
+    expect(schema.safeParse({ destination: '12345', amount: 5 }).success).toBe(true)
+    expect(schema.safeParse({ destination: '12345', amount: 45.5 }).success).toBe(true)
+    expect(schema.safeParse({ destination: '12345', amount: 4.99 }).success).toBe(false)
+    expect(schema.safeParse({ destination: '12345', amount: 45.51 }).success).toBe(false)
+  })
 })
 
 describe('firstFieldError', () => {

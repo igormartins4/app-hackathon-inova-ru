@@ -1,6 +1,7 @@
 import {
   maskCpf,
   maskMoneyInput,
+  maskRecipientDocument,
   parseMoneyInput,
   sanitizeCurrencyInput,
   sanitizeDigits,
@@ -42,6 +43,14 @@ describe('Mask utils', () => {
 
     it('handles empty string', () => {
       expect(unmask('')).toBe('')
+    })
+  })
+
+  describe('maskRecipientDocument', () => {
+    it('keeps only the final four digits for CPF and matrícula values', () => {
+      expect(maskRecipientDocument('12345678901')).toBe('***8901')
+      expect(maskRecipientDocument('12345')).toBe('***2345')
+      expect(maskRecipientDocument('12')).toBe('***12')
     })
   })
 

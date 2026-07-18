@@ -61,7 +61,7 @@ export default function BalanceScreen() {
           }
           className="mx-4"
         >
-          <Text accessibilityRole="text" className="text-center text-xs text-warning">
+          <Text accessibilityRole="text" className="text-center text-xs text-status-warning">
             {isOffline
               ? t.balanceOffline
               : t.balanceCache.replace(

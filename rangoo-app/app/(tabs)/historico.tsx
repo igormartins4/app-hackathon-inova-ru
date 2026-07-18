@@ -144,7 +144,7 @@ export default function HistoricoScreen() {
             onPress={handleClearFilter}
             accessibilityRole="button"
             accessibilityLabel={t.historyClearFilters}
-            className="py-1 px-2"
+            className="min-h-[48px] justify-center px-2"
           >
             <Text className="text-xs font-bold text-primary">{t.historyClearFilters}</Text>
           </Pressable>

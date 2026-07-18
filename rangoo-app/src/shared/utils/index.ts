@@ -24,6 +24,7 @@ export {
   MONEY_MAX_LENGTH,
   maskCpf,
   maskMoneyInput,
+  maskRecipientDocument,
   PASSWORD_MAX_LENGTH,
   parseMoneyInput,
   sanitizeCurrencyInput,

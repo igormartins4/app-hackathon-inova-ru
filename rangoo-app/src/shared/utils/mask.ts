@@ -14,6 +14,13 @@ export const MONEY_MAX_LENGTH = 12
 /** Apply CPF visual mask (000.000.000-00) progressively as user types. */
 export const maskCpf = formatCpf
 
+/** Mask sensitive recipient identifiers in receipts while retaining a recognition suffix. */
+export function maskRecipientDocument(value: string): string {
+  const digits = unmask(value)
+  if (!digits) return ''
+  return `***${digits.slice(-4)}`
+}
+
 /** Remove all non-numeric characters from a string. */
 export function unmask(value: string): string {
   return value.replace(/\D/g, '')
