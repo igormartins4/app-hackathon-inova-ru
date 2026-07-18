@@ -190,10 +190,10 @@ export default {
     'Rangoo was created to reduce queues and friction at UFMG University Restaurants. It allows students to check their balance, recharge credits via PIX, and track their RU usage on their phone — with a fast, accessible, and secure experience.',
   aboutTeam: 'Team',
   aboutTeamBody:
-    'Developed by the Rangoo Universitário team during Hackathon InovaRU 2026/01, following the FUMP API v2.0 technical contract and documented product decisions.',
+    'Developed by Igor de Oliveira Martins dos Santos, Ítalo Leal Lana Santos, and Vitor Hugo Dias Santos during Hackathon InovaRU 2026/01, following the FUMP API v2.0 technical contract and documented product decisions.',
   aboutFeatures: 'What the app does',
   aboutFeaturesBody:
-    'Login with CPF and FUMP password, current balance, consumer data, PIX recharge with QR Code, payment polling, recharge and meal history, daily menu, and accessibility features like high contrast, reduced motion, adjustable font, and dark theme.',
+    'Login with CPF and FUMP password, current balance, consumer data, PIX recharge with QR Code, payment polling, recharge and meal history, daily menu, restaurant details (schedules, notices, status, directions), favorites on Home, balance transfer with shareable receipt, and accessibility features like high contrast, reduced motion, adjustable font, and dark theme.',
   aboutTechNotes: 'Technical notes',
   aboutTechNotesBody:
     'The main integration follows the InovaRU API Technical Specification v2.0. The menu uses an unofficial public FUMP source, and balance transfer is a bonus demo outside the signed contract.',

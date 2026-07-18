@@ -194,10 +194,10 @@ export default {
     "Rangoo a été créé pour réduire les files d'attente et la friction dans les Restaurants Universitaires de l'UFMG. Il permet aux étudiants de consulter leur solde, recharger des crédits via PIX et suivre leur utilisation du RU sur leur téléphone — avec une expérience rapide, accessible et sécurisée.",
   aboutTeam: 'Équipe',
   aboutTeamBody:
-    "Développé par l'équipe Rangoo Universitário lors du Hackathon InovaRU 2026/01, en suivant le contrat technique de l'API FUMP v2.0 et les décisions produit documentées dans le dépôt.",
+    "Développé par Igor de Oliveira Martins dos Santos, Ítalo Leal Lana Santos et Vitor Hugo Dias Santos lors du Hackathon InovaRU 2026/01, en suivant le contrat technique de l'API FUMP v2.0 et les décisions produit documentées dans le dépôt.",
   aboutFeatures: "Ce que fait l'app",
   aboutFeaturesBody:
-    "Connexion avec CPF et mot de passe FUMP, solde actuel, données du consommateur, rechargement PIX avec QR Code, suivi de paiement, historique des rechargements et repas, menu du jour, et fonctionnalités d'accessibilité comme le contraste élevé, la réduction de mouvement, la police ajustable et le thème sombre.",
+    "Connexion avec CPF et mot de passe FUMP, solde actuel, données du consommateur, rechargement PIX avec QR Code, suivi de paiement, historique des rechargements et repas, menu du jour, détails des restaurants (horaires, avis, état, comment y accéder), favoris sur l'accueil, transfert de solde avec reçu partageable et fonctionnalités d'accessibilité comme le contraste élevé, la réduction de mouvement, la police ajustable et le thème sombre.",
   aboutTechNotes: 'Notes techniques',
   aboutTechNotesBody:
     "L'intégration principale suit la Spécification Technique API InovaRU v2.0. Le menu utilise une source publique non officielle de la FUMP, et le transfert de solde est une démo bonus en dehors du contrat signé.",

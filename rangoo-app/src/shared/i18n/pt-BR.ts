@@ -194,10 +194,10 @@ export default {
     'O Rangoo nasceu para reduzir filas e fricção nos Restaurantes Universitários da UFMG. A proposta é permitir que estudantes consultem saldo, recarreguem créditos via PIX e acompanhem o uso no RU pelo celular, com uma experiência rápida, acessível e segura.',
   aboutTeam: 'Equipe',
   aboutTeamBody:
-    'Desenvolvido pela equipe Rangoo Universitário durante o Hackathon InovaRU 2026/01, seguindo o contrato técnico da API FUMP v2.0 e decisões de produto documentadas no repositório.',
+    'Desenvolvido por Igor de Oliveira Martins dos Santos, Ítalo Leal Lana Santos e Vitor Hugo Dias Santos durante o Hackathon InovaRU 2026/01, seguindo o contrato técnico da API FUMP v2.0 e decisões de produto documentadas no repositório.',
   aboutFeatures: 'O que o app faz',
   aboutFeaturesBody:
-    'Login com CPF e senha FUMP, saldo atual, dados do consumidor, recarga PIX com QR Code, polling de pagamento, histórico de recargas e refeições, cardápio do dia e recursos de acessibilidade como alto contraste, redução de movimento, fonte ajustável e tema escuro.',
+    'Login com CPF e senha FUMP, saldo atual, dados do consumidor, recarga PIX com QR Code, polling de pagamento, histórico de recargas e refeições, cardápio do dia, detalhes dos restaurantes (horários, avisos, status, como chegar), favoritos na Home, transferência de saldo com comprovante compartilhável e recursos de acessibilidade como alto contraste, redução de movimento, fonte ajustável e tema escuro.',
   aboutTechNotes: 'Notas técnicas',
   aboutTechNotesBody:
     'A integração principal segue a Especificação Técnica API InovaRU v2.0. O cardápio usa uma fonte pública não-oficial da FUMP, e a transferência de saldo é uma demonstração bônus fora do contrato assinado.',
