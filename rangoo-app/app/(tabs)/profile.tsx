@@ -29,7 +29,10 @@ import { FONT_FAMILIES, FONT_STEPS, useResolvedTheme, useThemeStore } from '@/st
 // Chaves de cenário de demonstração só existem enquanto o app roda contra o
 // mock local — nunca contra a API real da FUMP, onde não fariam sentido
 // misturadas com dados reais de conta.
-const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
+// __DEV__ is always false in a compiled release bundle regardless of env
+// vars — the demo-scenario picker must never reach real students even if
+// EXPO_PUBLIC_USE_MOCK is misconfigured (unset/typo'd) in a production build.
+const USE_MOCK = __DEV__ && process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
 
 const DEMO_SCENARIOS: Array<{ key: DemoScenario; label: string; hint: string }> = [
   { key: 'normal', label: 'Normal', hint: 'Saldo, PIX aprovado e históricos funcionando' },

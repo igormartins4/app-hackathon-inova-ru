@@ -119,6 +119,7 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
             accessibilityRole="button"
             accessibilityLabel={showPassword ? t.loginHidePassword : t.loginShowPassword}
             accessibilityHint={t.loginTogglePasswordHint}
+            hitSlop={8}
             className="absolute right-2 top-2 w-10 h-10 items-center justify-center"
           >
             <Ionicons

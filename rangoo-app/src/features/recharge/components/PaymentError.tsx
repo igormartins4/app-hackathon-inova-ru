@@ -8,9 +8,12 @@ import type { PaymentStatusResponse } from '../types/recharge.types'
 interface PaymentErrorProps {
   status: PaymentStatusResponse['status'] | 'timeout'
   onRetry: () => void
+  /** Só usado quando status === 'timeout' — o app desistiu de esperar, mas o
+   * PIX pode ter sido confirmado no servidor depois do corte client-side. */
+  onCheckHistory?: () => void
 }
 
-export function PaymentError({ status, onRetry }: PaymentErrorProps) {
+export function PaymentError({ status, onRetry, onCheckHistory }: PaymentErrorProps) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
 
@@ -38,6 +41,13 @@ export function PaymentError({ status, onRetry }: PaymentErrorProps) {
       <Card className="w-full max-w-sm">
         <View className="items-center gap-4">
           <View className="w-full gap-3">
+            {status === 'timeout' && onCheckHistory && (
+              <Button
+                label={t.paymentErrorCheckHistory}
+                onPress={onCheckHistory}
+                variant="secondary"
+              />
+            )}
             <Button label={t.paymentErrorBack} onPress={onRetry} variant="primary" />
           </View>
         </View>

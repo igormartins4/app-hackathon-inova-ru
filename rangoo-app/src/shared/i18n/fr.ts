@@ -40,6 +40,7 @@ export default {
   homeCardapio: 'Menu',
   homeHistorico: 'Historique',
   homeTransferTitle: 'Transférer du crédit',
+  homeTransferQuickAction: 'Transférer',
   homeTransferDescription:
     'Transférer des crédits de votre compte à une autre personne (simulation de démonstration)',
   rechargeTitle: 'Recharger',
@@ -266,6 +267,7 @@ export default {
   paymentErrorTitle: 'Paiement Non Confirmé',
   paymentErrorRetry: 'Réessayer',
   paymentErrorBack: "Retour à l'accueil",
+  paymentErrorCheckHistory: "Voir l'historique des recharges",
   paymentErrorGeneric: "Une erreur s'est produite.",
   historyLoading: "Chargement de l'historique",
   historyError: "Impossible de charger l'historique pour le moment.",

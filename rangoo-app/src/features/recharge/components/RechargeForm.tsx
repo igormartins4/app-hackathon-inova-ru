@@ -30,6 +30,10 @@ interface RechargeFormProps {
   onAmountChange?: (valor: number) => void
   /** Erro 422 vindo da API ao criar o pagamento — renderizado inline, abaixo do input. */
   serverError?: string | null
+  /** Reidrata a seleção depois de um retry — o passo 'amount' remonta este
+   * componente ao voltar de 'polling'/'error', o que perderia o valor
+   * escolhido sem isso (recharge.tsx guarda o último valor no pai). */
+  initialAmount?: number
 }
 
 export function RechargeForm({
@@ -40,13 +44,19 @@ export function RechargeForm({
   onSubmit,
   onAmountChange,
   serverError,
+  initialAmount,
 }: RechargeFormProps) {
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
   const { t } = useI18n()
   const inputTextStyle = useScaledFontStyle(16)
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
-  const [customAmount, setCustomAmount] = useState('')
+  const initialIsPreset = initialAmount != null && PRESET_AMOUNTS.includes(initialAmount)
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(
+    initialIsPreset ? (initialAmount as number) : null,
+  )
+  const [customAmount, setCustomAmount] = useState(
+    initialAmount && !initialIsPreset ? String(initialAmount).replace('.', ',') : '',
+  )
   const [amountError, setAmountError] = useState('')
 
   const customValue = parseMoneyInput(customAmount)

@@ -68,6 +68,7 @@ export const gradientColors = {
     ruBanner: ['#d4f0e7', '#e8f7f0'] as const,
     quickActionCardapio: '#dbeafe',
     quickActionHistorico: '#fef9c3',
+    quickActionTransfer: '#ede9fe',
   },
   dark: {
     loginHeader: ['#0f3d31', '#1a5c4a', '#0f3d31'] as const,
@@ -79,6 +80,7 @@ export const gradientColors = {
     ruBanner: ['#1a3a34', '#0f2e28'] as const,
     quickActionCardapio: '#1e3a5f',
     quickActionHistorico: '#713f12',
+    quickActionTransfer: '#3b2f5e',
   },
 } as const
 
@@ -165,6 +167,7 @@ const highContrastGradientColors = {
     ruBanner: ['#f0f0f0', '#ffffff'] as const,
     quickActionCardapio: '#e0e0e0',
     quickActionHistorico: '#e0e0e0',
+    quickActionTransfer: '#e0e0e0',
   },
   dark: {
     loginHeader: ['#000000', '#1a1a1a', '#000000'] as const,
@@ -176,6 +179,7 @@ const highContrastGradientColors = {
     ruBanner: ['#111111', '#0a0a0a'] as const,
     quickActionCardapio: '#222222',
     quickActionHistorico: '#222222',
+    quickActionTransfer: '#222222',
   },
 } as const
 

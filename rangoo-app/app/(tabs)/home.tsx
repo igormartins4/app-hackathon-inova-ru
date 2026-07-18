@@ -31,6 +31,11 @@ import { useThemeStore } from '@/store/themeStore'
 const QUICK_ACTIONS = [
   { key: 'cardapio', labelKey: 'homeCardapio' as const, icon: 'book' as const },
   { key: 'historico', labelKey: 'homeHistorico' as const, icon: 'time' as const },
+  {
+    key: 'transfer',
+    labelKey: 'homeTransferQuickAction' as const,
+    icon: 'swap-horizontal' as const,
+  },
 ]
 
 const GREETING_PHRASES = ['homePhrase'] as const
@@ -62,6 +67,9 @@ export default function HomeScreen() {
         case 'historico':
           router.push('/(tabs)/historico')
           break
+        case 'transfer':
+          router.push('/(tabs)/transfer')
+          break
       }
     },
     [router],
@@ -89,7 +97,11 @@ export default function HomeScreen() {
 
   const saldo = data?.saldo?.credito_disponivel ?? 0
 
-  const QUICK_ACTION_COLORS = [gradients.quickActionCardapio, gradients.quickActionHistorico]
+  const QUICK_ACTION_COLORS = [
+    gradients.quickActionCardapio,
+    gradients.quickActionHistorico,
+    gradients.quickActionTransfer,
+  ]
 
   const firstName = user?.nome ? toTitleCase(user.nome).split(' ')[0] : t.defaultStudentLabel
   const GREETING_KEYS = {
@@ -176,12 +188,17 @@ export default function HomeScreen() {
             key={action.key}
             onPress={() => handleQuickAction(action.key)}
             accessibilityRole="button"
-            accessibilityLabel={t[action.labelKey]}
+            accessibilityLabel={
+              action.key === 'transfer' ? t.homeTransferTitle : t[action.labelKey]
+            }
+            accessibilityHint={action.key === 'transfer' ? t.homeTransferDescription : undefined}
             className="flex-1 items-center justify-center gap-2 rounded-xl py-4 min-h-[80px]"
             style={{ backgroundColor: QUICK_ACTION_COLORS[index] }}
           >
             <Ionicons name={action.icon} size={28} color={themeColors.primary} />
-            <Text className="text-sm font-medium text-text-primary">{t[action.labelKey]}</Text>
+            <Text className="text-sm font-medium text-text-primary text-center" numberOfLines={1}>
+              {t[action.labelKey]}
+            </Text>
           </Pressable>
         ))}
       </View>
@@ -250,22 +267,6 @@ export default function HomeScreen() {
           </View>
         </Card>
       )}
-
-      <Pressable
-        onPress={() => router.push('/(tabs)/transfer')}
-        accessibilityRole="button"
-        accessibilityLabel={t.homeTransferTitle}
-        accessibilityHint={t.homeTransferDescription}
-        className="mx-4 mb-4 opacity-70"
-      >
-        <View className="flex-row items-center gap-3 py-2">
-          <Ionicons name="swap-horizontal" size={18} color={themeColors.textSecondary} />
-          <View className="flex-1">
-            <Text className="text-xs font-medium text-text-secondary">{t.homeTransferTitle}</Text>
-            <Text className="text-xs text-text-secondary">{t.homeTransferDescription}</Text>
-          </View>
-        </View>
-      </Pressable>
 
       <View className="h-4" />
     </ScrollView>

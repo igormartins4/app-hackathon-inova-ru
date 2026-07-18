@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import type { BalanceResponse } from '@/features/balance'
@@ -54,6 +55,7 @@ async function clearPendingPayment() {
 
 export default function RechargeScreen() {
   const queryClient = useQueryClient()
+  const router = useRouter()
   const { t } = useI18n()
   const { data: balanceData } = useBalance()
   const { isBlocked, isInactive, message: consumerMessage } = useConsumerStatus()
@@ -170,6 +172,11 @@ export default function RechargeScreen() {
     setPaymentData(null)
   }, [])
 
+  const handleCheckHistory = useCallback(() => {
+    clearPendingPayment()
+    router.push('/(tabs)/historico?tab=recargas')
+  }, [router])
+
   const currentBalance = balanceData?.saldo?.credito_disponivel ?? 0
   const limiteRecarga = balanceData?.saldo?.limite_recarga
 
@@ -200,6 +207,7 @@ export default function RechargeScreen() {
               onAmountChange={setSelectedAmount}
               onSubmit={handleSubmit}
               serverError={submitError}
+              initialAmount={selectedAmount || undefined}
             />
           </>
         )}
@@ -232,7 +240,13 @@ export default function RechargeScreen() {
           />
         )}
 
-        {step === 'error' && <PaymentError status={errorStatus} onRetry={handleRetry} />}
+        {step === 'error' && (
+          <PaymentError
+            status={errorStatus}
+            onRetry={handleRetry}
+            onCheckHistory={handleCheckHistory}
+          />
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   )

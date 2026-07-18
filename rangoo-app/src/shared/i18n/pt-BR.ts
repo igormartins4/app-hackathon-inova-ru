@@ -40,6 +40,7 @@ export default {
   homeCardapio: 'Cardápio',
   homeHistorico: 'Histórico',
   homeTransferTitle: 'Transferir crédito',
+  homeTransferQuickAction: 'Transferir',
   homeTransferDescription:
     'Transfira créditos da sua conta para outra pessoa (simulação para demonstração)',
   rechargeTitle: 'Recarregar',
@@ -265,6 +266,7 @@ export default {
   paymentErrorTitle: 'Pagamento Não Confirmado',
   paymentErrorRetry: 'Tentar novamente',
   paymentErrorBack: 'Voltar ao início',
+  paymentErrorCheckHistory: 'Ver histórico de recargas',
   paymentErrorGeneric: 'Ocorreu um erro.',
   historyLoading: 'Carregando histórico',
   historyError: 'Não foi possível carregar o histórico agora.',

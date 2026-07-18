@@ -154,7 +154,7 @@ export default function CardapioScreen() {
           {visibleRestaurantes.map((r) => {
             const isFav = favorites.includes(r.key)
             return (
-              <View key={r.key} className="flex-row items-center gap-1">
+              <View key={r.key} className="flex-row items-center gap-2">
                 <Pressable
                   onPress={() => setRestaurante(r.key)}
                   accessibilityRole="button"
@@ -184,7 +184,7 @@ export default function CardapioScreen() {
                       ? `${t.back} ${r.label} ${t.cardapioFavoritos}`
                       : `${t.cardapioFavoritos} ${r.label}`
                   }
-                  hitSlop={10}
+                  hitSlop={{ top: 12, bottom: 12, left: 4, right: 12 }}
                   className="w-8 h-8 rounded-full items-center justify-center"
                 >
                   <Ionicons
@@ -230,7 +230,8 @@ export default function CardapioScreen() {
             onPress={() => setSelectedDate(new Date())}
             accessibilityRole="button"
             accessibilityLabel={t.cardapioVoltarParaHoje}
-            className="self-start min-h-[44px] justify-center"
+            hitSlop={8}
+            className="self-start min-h-[48px] justify-center"
           >
             <Text className="text-primary text-xs font-bold">{t.cardapioVoltarParaHoje}</Text>
           </Pressable>
