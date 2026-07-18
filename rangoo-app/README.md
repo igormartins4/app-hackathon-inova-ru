@@ -2,6 +2,14 @@
 
 App Android para estudantes da UFMG que permite consultar saldo e recarregar créditos para uso nos Restaurantes Universitários (RUs) via PIX. Desenvolvido para o Hackathon InovaRU 2026/01.
 
+## Equipe
+
+| Nome | Papel |
+|------|-------|
+| Igor de Oliveira Martins dos Santos | Desenvolvimento |
+| Ítalo Leal Lana Santos | Desenvolvimento |
+| Vitor Hugo Dias Santos | Desenvolvimento |
+
 ## Stack Tecnológica
 
 - **Runtime:** Expo SDK 57 (React Native 0.86, React 19.2)
@@ -22,24 +30,26 @@ Estrutura de pastas por domínio com isolamento estrito:
 ```
 src/
 ├── app/                    # Expo Router — rotas baseadas em arquivos
-│   ├── _layout.tsx         # Layout raiz: autenticação + tema
+│   ├── _layout.tsx         # Layout raiz: autenticação + tema + splash
 │   ├── (auth)/             # Rotas não autenticadas (login)
-│   └── (tabs)/             # Rotas autenticadas (início, saldo, recarga, cardápio, histórico, perfil)
+│   ├── (tabs)/             # Rotas autenticadas (início, saldo, recarga, cardápio, histórico, perfil, transferência)
+│   └── restaurante/        # Detalhes do restaurante (/[codigo])
 ├── features/
 │   ├── auth/               # Login, gerenciamento de token
 │   ├── balance/            # Exibição de saldo, dados do consumidor
 │   ├── recharge/           # Fluxo PIX, QR Code, polling
 │   ├── history/            # Histórico de recargas e refeições
 │   ├── cardapio/           # Cardápio do dia (integração pública não-oficial)
+│   ├── restaurantes/       # Info dos RUs: horários, avisos, status, directions
+│   ├── transfer/           # Transferência de saldo (mock, bônus)
 │   └── profile/            # Perfil do usuário (reutiliza dados do balance)
 ├── shared/
 │   ├── components/
-│   │   ├── ui/             # Button, Card, Input, ErrorMessage, etc.
-│   │   └── accessibility/  # AccessibleText
-│   ├── hooks/              # useNetworkStatus, useAccessibility
+│   │   └── ui/             # Button, Card, Input, AppDialog, ScaledText, etc.
+│   ├── hooks/              # useNetworkStatus
 │   ├── services/           # Cliente API, armazenamento seguro, cache, mock
 │   └── utils/              # CPF, máscaras, Zod, validação e formatação
-├── store/                  # Stores Zustand
+├── store/                  # Zustand stores (authStore, themeStore, favoriteRUsStore)
 └── config/                 # Constantes, tema, mensagens de erro
 ```
 
@@ -163,10 +173,13 @@ Os testes unitários cobrem polling, CPF, máscaras, validação de formulários
 | `features/recharge/` | Fluxo de pagamento PIX, QR Code, polling |
 | `features/history/` | Histórico de recargas e refeições |
 | `features/cardapio/` | Cardápio do dia (integração pública não-oficial, fora da spec v2.0) |
+| `features/restaurantes/` | Info dos RUs: horários, avisos, status em tempo real, directions |
+| `features/transfer/` | Transferência de saldo entre estudantes (mock, bônus) |
 | `features/profile/` | Perfil do usuário (dados do consumidor) |
-| `shared/components/ui/` | Componentes reutilizáveis |
+| `shared/components/ui/` | Componentes reutilizáveis (Button, Card, AppDialog, ScaledText, etc.) |
 | `shared/hooks/` | Hooks React customizados |
 | `shared/services/` | Cliente API, armazenamento, handler de mock |
+| `store/` | Zustand stores (auth, tema, favoritos) |
 | `config/` | Constantes, tokens de tema, erros |
 | `mock/` | Ambiente Mockoon (`pnpm mock`) — ver seção "Modos de execução" |
 
@@ -186,10 +199,15 @@ Conecta na API FUMP v2.0. Veja `src/config/constants.ts` para os endpoints.
 ## Acessibilidade e UX
 
 - Alto contraste claro/escuro com tokens dedicados em `global.css` e `src/config/theme.ts`.
-- Tamanho de fonte ajustável no Perfil; textos usam `ScaledText` e campos de formulário escalam junto.
-- Reduzir movimento remove animações de navegação e troca `FadeInView` por `View` comum.
+- Tamanho de fonte ajustável no Perfil; textos usam `ScaledText` com scaling de fontSize e lineHeight.
+- Reduzir movimento respeita tanto a preferência do app quanto a do sistema (Android AccessibilityInfo), com listener em tempo real.
 - Cores do sistema usam Material You em props nativas quando disponível; alto contraste tem prioridade e desativa cores dinâmicas.
 - Todos os campos têm máscara, sanitização e limite por contexto.
+- Dialogs nativos (`Alert.alert`) substituídos por `AppDialog` acessível e consistente com a marca.
+- Tab bar expande para sidebar lateral em tablets (>= 768px).
+- Calendário do cardápio scrollável horizontalmente em telas estreitas.
+- Restaurantes favoritos exibidos na Home com status e horários em tempo real.
+- Comprovantes de transferência compartilháveis via expo-sharing.
 
 ## Manutenção Rápida
 
@@ -199,7 +217,10 @@ Conecta na API FUMP v2.0. Veja `src/config/constants.ts` para os endpoints.
 - Tema/contraste/Material You: `global.css`, `tailwind.config.js`, `src/config/theme.ts`, `src/config/materialYou.ts`.
 - Componentes base: `src/shared/components/ui/`.
 - Fluxo PIX: `src/features/recharge/`.
+- Restaurantes: `src/features/restaurantes/` — dados, horários, avisos, status.
 - Cardápio: `src/features/cardapio/`; integração pública não-oficial, fora do contrato v2.0.
+- Transferência: `src/features/transfer/`; mock local, bônus visual.
+- Favoritos: `src/store/favoriteRUsStore.ts` — Zustand store compartilhada entre Home e Cardápio.
 
 Antes de enviar mudanças, rode:
 
@@ -219,3 +240,5 @@ $env:NODE_TLS_REJECT_UNAUTHORIZED='0'; pnpm dlx expo-doctor --verbose
 ## Licença
 
 MIT License — Hackathon InovaRU 2026/01
+
+**Equipe:** Igor de Oliveira Martins dos Santos · Ítalo Leal Lana Santos · Vitor Hugo Dias Santos
