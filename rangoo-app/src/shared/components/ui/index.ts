@@ -1,4 +1,5 @@
 export { AboutAppModal } from './AboutAppModal'
+export { AppDialog } from './AppDialog'
 export { Button } from './Button'
 export { Card } from './Card'
 export { ErrorBoundary } from './ErrorBoundary'

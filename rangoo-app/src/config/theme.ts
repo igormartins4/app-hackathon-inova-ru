@@ -55,6 +55,7 @@ export const darkColors = {
   warning: '#fbbf24',
   chipSelected: '#34d399',
   chipUnselected: '#1f3830',
+  black: '#000000',
 } as const
 
 export const gradientColors = {
