@@ -33,8 +33,8 @@ export function BalanceCard({ creditoDisponivel, limiteRecarga }: BalanceCardPro
             accessibilityRole="switch"
             accessibilityLabel={hideSensitiveData ? t.showSensitiveData : t.hideSensitiveData}
             accessibilityState={{ checked: hideSensitiveData }}
-            hitSlop={8}
-            className="p-1"
+            hitSlop={10}
+            className="p-2"
           >
             <Ionicons
               name={hideSensitiveData ? 'eye-off' : 'eye'}
