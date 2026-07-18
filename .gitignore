@@ -1,0 +1,5 @@
+# Local agent configuration and planning artifacts
+.claude/
+.impeccable/
+.opencode/
+.planning/
