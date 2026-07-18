@@ -6,9 +6,19 @@ App mobile para recarga de créditos e gestão de uso nos Restaurantes Universit
 
 ---
 
+## Equipe
+
+| Nome | Papel |
+|------|-------|
+| Igor de Oliveira Martins dos Santos | Desenvolvimento |
+| Ítalo Leal Lana Santos | Desenvolvimento |
+| Vitor Hugo Dias Santos | Desenvolvimento |
+
+---
+
 ## Visão Geral
 
-O Rangoo Universitário resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes recarreguem créditos, consultem saldos e acompanhem refeições diretamente pelo celular. A autenticação utiliza CPF + senha do sistema institucional da FUMP, sem necessidade de criar contas.
+O Rangoo Universitário resolve os gargalos de fila nos RUs da UFMG ao permitir que estudantes recarreguem créditos, consultem saldos, acompanhem refeições e vejam informações dos restaurantes (horários, avisos, cardápio) diretamente pelo celular. A autenticação utiliza CPF + senha do sistema institucional da FUMP, sem necessidade de criar contas.
 
 ---
 
@@ -18,15 +28,17 @@ O Rangoo Universitário resolve os gargalos de fila nos RUs da UFMG ao permitir 
 
 | Tela | Descrição |
 |------|-----------|
-| **Login** | Autenticação via CPF + senha FUMP. Token JWT armazenado com Expo Secure Store. |
-| **Início** | Dashboard com saldo disponível, ações rápidas (Saldo, Cardápio, Histórico) e últimas recargas. |
+| **Login** | Autenticação via CPF + senha FUMP. Token JWT armazenado com Expo Secure Store. Logo Rangoo e dialog de ajuda acessível. |
+| **Início** | Dashboard com saldo disponível, ações rápidas, restaurantes favoritos com status em tempo real, card de baixo saldo e carousel de avisos. |
 | **Saldo** | Detalhes do saldo atual, limite de recarga, dados do consumidor (nome, tipo, centro de custo, situação). |
 | **Recarga** | Seleção de valor (R$ 5,00 a R$ 500,00) com opções predefinidas e campo personalizado. |
 | **PIX QR Code** | Exibição do QR Code PIX com código copia-e-cola, timer de expiração e botão de compartilhamento. Polling de status com backoff exponencial. |
 | **Sucesso** | Confirmação da recarga com valor adicionado, novo saldo e horário. |
-| **Histórico** | Abas de Recargas e Refeições com filtros por data. Paginação e scroll infinito. |
-| **Cardápio** | Cardápio do dia por restaurante, com calendário semanal (bônus fora do contrato v2.0 — integração não-oficial com a API pública da FUMP, ver AGENTS.md). |
-| **Perfil** | Dados do consumidor, tipo, centro de custo e situação da conta. |
+| **Histórico** | Abas de Recargas e Refeições com filtros por data. Detalhes em dialog acessível. Paginação e scroll infinito. |
+| **Cardápio** | Cardápio do dia por restaurante, com calendário semanal scrollável e favoritos via Zustand (bônus fora do contrato v2.0 — integração não-oficial com a API pública da FUMP). |
+| **Restaurantes** | Detalhes de cada RU: horários, avisos de férias, status em tempo real, como chegar (Google Maps). |
+| **Transferência** | Transferência de saldo entre estudantes com comprovante compartilhável (bônus fora do contrato v2.0). |
+| **Perfil** | Dados do consumidor, tipo, centro de custo, situação da conta. Dialog de logout acessível. |
 
 ---
 
@@ -75,24 +87,28 @@ O app consome a API RESTful fornecida pela FUMP. Todos os dados são extraídos 
 ```
 rangoo-app/
 ├── app/                         # Expo Router — file-based routes
-│   ├── _layout.tsx              # Root layout: auth gate + tema
+│   ├── _layout.tsx              # Root layout: auth gate + tema + splash
 │   ├── (auth)/                  # Login
-│   └── (tabs)/                  # Início, Saldo, Recarga, Cardápio, Histórico, Perfil
+│   ├── (tabs)/                  # Início, Saldo, Recarga, Cardápio, Histórico, Perfil, Transferência
+│   └── restaurante/             # Detalhes do restaurante (/[codigo])
 ├── src/
 │   ├── features/
 │   │   ├── auth/                # Login, JWT management
 │   │   ├── balance/             # Saldo, dados do consumidor
 │   │   ├── recharge/            # Fluxo PIX, QR Code, polling
 │   │   ├── history/             # Histórico de recargas e refeições (API real)
-│   │   ├── cardapio/            # Cardápio do dia (integração não-oficial, fora do contrato v2.0)
+│   │   ├── cardapio/            # Cardápio do dia (integração não-oficial)
+│   │   ├── restaurantes/        # Info dos RUs: horários, avisos, status, directions
+│   │   ├── transfer/            # Transferência de saldo (mock, bônus)
 │   │   └── profile/             # Perfil do usuário
 │   ├── shared/
-│   │   ├── components/ui/       # Button, Card, Input, ErrorMessage
+│   │   ├── components/ui/       # Button, Card, Input, AppDialog, ScaledText, etc.
 │   │   ├── hooks/               # useNetworkStatus
 │   │   ├── services/            # API client, secure storage, mock
-│   │   └── utils/               # CPF, erros, validação de recarga
+│   │   └── utils/               # CPF, erros, validação, máscaras
+│   ├── store/                   # Zustand stores (authStore, themeStore, favoriteRUsStore)
 │   └── config/                  # Constantes, tema, mensagens de erro
-├── mock/                        # Ambiente Mockoon (servidor mock real, ver rangoo-app/README.md)
+├── mock/                        # Ambiente Mockoon (servidor mock real)
 └── .env                         # Variáveis de ambiente (modo mock)
 ```
 
@@ -103,13 +119,16 @@ rangoo-app/
 | Camada | Tecnologia |
 |--------|------------|
 | Runtime | Expo SDK 57 (React Native 0.86, React 19.2) |
-| Navegação | Expo Router 6 (file-based) |
+| Navegação | Expo Router 6 (file-based) + React Navigation 7 |
 | State | TanStack Query 5 + Zustand 5 |
 | Estilo | NativeWind 4 (Tailwind CSS 3.4) |
 | HTTP | Axios |
 | QR Code | react-native-qrcode-svg |
 | Armazenamento | AsyncStorage + expo-secure-store |
 | Segurança | Expo Secure Store (Android Keystore) |
+| Animações | React Native Reanimated 4 |
+| Validação | Zod 4 + máscaras locais |
+| Compartilhamento | expo-sharing (comprovantes) |
 
 ---
 
@@ -122,6 +141,8 @@ pnpm start
 ```
 
 O app roda em **modo mock** por padrão — não precisa de servidor. Use CPF válido como `52998224725` e qualquer senha para logar.
+
+O Perfil inclui um seletor de cenários demo para simular bloqueio, inatividade, PIX expirado/rejeitado, rate limit e erro 500.
 
 Pra testar o fluxo de pagamento contra rede real (polling, erros, rate limit), tem um servidor [Mockoon](https://mockoon.com) pronto — `pnpm mock` num segundo terminal. Passo a passo completo em [`rangoo-app/README.md`](rangoo-app/README.md#modos-de-execução).
 
@@ -141,3 +162,5 @@ Pra testar o fluxo de pagamento contra rede real (polling, erros, rate limit), t
 ## Licença
 
 MIT License — Software Livre conforme exigido pelo edital (Seção 8.1).
+
+**Equipe:** Igor de Oliveira Martins dos Santos · Ítalo Leal Lana Santos · Vitor Hugo Dias Santos
