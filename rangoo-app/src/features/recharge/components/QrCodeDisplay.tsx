@@ -25,7 +25,7 @@ interface QrCodeDisplayProps {
 // warning/error; the rest of the wait reads calm.
 const URGENCY_STYLES = {
   calm: { container: 'bg-surface-variant', icon: 'time-outline' as const },
-  urgent: { container: 'bg-warning/10', icon: 'time' as const },
+  urgent: { container: 'bg-status-warning/10', icon: 'time' as const },
   expired: { container: 'bg-status-error/10', icon: 'time' as const },
 }
 

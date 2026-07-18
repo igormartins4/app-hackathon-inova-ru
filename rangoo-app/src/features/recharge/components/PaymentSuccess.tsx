@@ -63,7 +63,7 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
   return (
     <View className="flex-1 items-center justify-center bg-background p-4 gap-5">
       <View className="items-center gap-3">
-        <View className="w-20 h-20 rounded-full bg-success/15 items-center justify-center">
+        <View className="w-20 h-20 rounded-full bg-status-success/15 items-center justify-center">
           <Ionicons name="checkmark-circle" size={56} color={themeColors.success} />
         </View>
         <Text className="text-2xl font-bold text-text-primary text-center">
@@ -79,7 +79,7 @@ export function PaymentSuccess({ newBalance, amount, onBack }: PaymentSuccessPro
               <Text className="text-xs text-text-secondary text-center">
                 {t.paymentSuccessValorRecarregado}
               </Text>
-              <Text className="text-4xl font-bold text-success text-center mt-1">
+              <Text className="text-4xl font-bold text-status-success text-center mt-1">
                 +{formatCurrency(amount)}
               </Text>
             </View>

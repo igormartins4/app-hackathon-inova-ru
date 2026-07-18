@@ -178,7 +178,7 @@ export function RechargeForm({
         <View className="flex-row items-start gap-3 p-4">
           <Ionicons name="flash" size={22} color={themeColors.warning} />
           <View className="flex-1">
-            <Text className="text-sm font-bold text-success">{t.rechargeApprovalTime}</Text>
+            <Text className="text-sm font-bold text-status-success">{t.rechargeApprovalTime}</Text>
             <Text className="text-xs text-text-secondary mt-1">{t.rechargeApprovalDetail}</Text>
           </View>
         </View>

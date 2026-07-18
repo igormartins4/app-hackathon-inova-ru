@@ -301,8 +301,11 @@ export function getMockResponse(config: AxiosRequestConfig): MockResponse {
   // Bônus fora da API FUMP v2.0; mantido isolado e documentado.
   if (path.includes('/creditos/transferir') && method === 'post') {
     const body = parseBody(config)
+    const destinatario = String(body.destinatario ?? '')
     const valor = Number(body.valor ?? 0)
-    if (valor < 5 || valor > saldo) return error(422, 'Valor fora do saldo disponível.')
+    if (!/^\d{3,14}$/.test(destinatario) || valor < 5 || valor > saldo) {
+      return error(422, 'Dados da transferência fora do limite permitido.')
+    }
     transferId++
     saldo = Number((saldo - valor).toFixed(2))
     return ok({
@@ -310,6 +313,9 @@ export function getMockResponse(config: AxiosRequestConfig): MockResponse {
       status: 'approved',
       saldo_atualizado: saldo,
       destinatario_nome: 'AMIGO UFMG',
+      destinatario_documento: destinatario,
+      valor,
+      data_hora: toBrasiliaIso(),
     })
   }
 

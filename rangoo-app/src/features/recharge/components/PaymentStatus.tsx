@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
-import { Alert, View } from 'react-native'
+import { useState } from 'react'
+import { View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Button, Text } from '@/shared/components/ui'
+import { AppDialog, Button, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 import { QrCodeDisplay } from './QrCodeDisplay'
 
@@ -26,13 +27,9 @@ export function PaymentStatus({
 }: PaymentStatusProps) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
+  const [cancelDialogVisible, setCancelDialogVisible] = useState(false)
 
-  const handleCancelPress = () => {
-    Alert.alert(t.qrCancelConfirmTitle, t.qrCancelConfirmBody, [
-      { text: t.qrCancelConfirmBack, style: 'cancel' },
-      { text: t.qrCancelRecharge, style: 'destructive', onPress: onCancel },
-    ])
-  }
+  const handleCancelPress = () => setCancelDialogVisible(true)
 
   return (
     <View className="gap-5">
@@ -61,6 +58,28 @@ export function PaymentStatus({
       )}
 
       <Button label={t.qrCancelRecharge} onPress={handleCancelPress} variant="secondary" />
+      <AppDialog
+        visible={cancelDialogVisible}
+        title={t.qrCancelConfirmTitle}
+        body={t.qrCancelConfirmBody}
+        accessibilityLabel={t.qrCancelConfirmTitle}
+        onClose={() => setCancelDialogVisible(false)}
+        actions={[
+          {
+            label: t.qrCancelConfirmBack,
+            style: 'cancel',
+            onPress: () => setCancelDialogVisible(false),
+          },
+          {
+            label: t.qrCancelRecharge,
+            style: 'destructive',
+            onPress: () => {
+              setCancelDialogVisible(false)
+              onCancel()
+            },
+          },
+        ]}
+      />
     </View>
   )
 }
