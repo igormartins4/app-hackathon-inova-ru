@@ -29,13 +29,22 @@
       "expo-router",
       "expo-secure-store",
       [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "backgroundColor": "#0F3D31",
+          "imageWidth": 200
+        }
+      ],
+      [
         "expo-local-authentication",
         {
           "faceIDPermission": "Permitir que o Rangoo Universitário use Face ID para entrar."
         }
       ],
       "./plugins/withNetworkSecurityConfig",
-      "./plugins/withForceDarkDisabled"
+      "./plugins/withForceDarkDisabled",
+      "expo-sharing"
     ],
     "extra": {
       "router": {},
