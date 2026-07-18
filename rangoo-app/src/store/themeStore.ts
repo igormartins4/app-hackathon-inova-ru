@@ -10,6 +10,8 @@ import { create } from 'zustand'
 
 type Theme = 'light' | 'dark' | 'system'
 
+let reduceMotionSubscription: { remove: () => void } | undefined
+
 export const FONT_STEPS = [
   { scale: 0.8, label: 'Pequena' },
   { scale: 0.9, label: 'Média' },
@@ -59,6 +61,8 @@ interface ThemeStoreState {
   fontFamily: number
   highContrast: boolean
   reducedMotion: boolean
+  systemReducedMotion: boolean
+  isInitialized: boolean
   hideSensitiveData: boolean
   setTheme: (theme: Theme) => void
   setFontSize: (index: number) => void
@@ -78,6 +82,8 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
   fontFamily: DEFAULT_FONT_FAMILY_INDEX,
   highContrast: false,
   reducedMotion: false,
+  systemReducedMotion: false,
+  isInitialized: false,
   hideSensitiveData: false,
   setTheme: (theme) => {
     set({ theme })
@@ -168,16 +174,7 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
       if (savedHighContrast === 'true') {
         updates.highContrast = true
       }
-      if (savedReducedMotion === 'true') {
-        updates.reducedMotion = true
-      } else if (savedReducedMotion === null) {
-        // Sem preferência salva: herda "Remover animações" do Android (AccessibilityInfo).
-        // Isolado em try/catch próprio — se essa chamada falhar num device específico,
-        // não pode derrubar a restauração do tema/fonte/alto-contraste junto.
-        try {
-          updates.reducedMotion = await AccessibilityInfo.isReduceMotionEnabled()
-        } catch {}
-      }
+      if (savedReducedMotion === 'true') updates.reducedMotion = true
       if (savedFontFamily !== null) {
         const num = Number(savedFontFamily)
         if (!Number.isNaN(num) && num >= 0 && num < FONT_FAMILIES.length) {
@@ -191,6 +188,18 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
         set(updates)
       }
     } catch {}
+    try {
+      set({ systemReducedMotion: Boolean(await AccessibilityInfo.isReduceMotionEnabled()) })
+    } catch {}
+    if (!reduceMotionSubscription && typeof AccessibilityInfo.addEventListener === 'function') {
+      reduceMotionSubscription = AccessibilityInfo.addEventListener(
+        'reduceMotionChanged',
+        (enabled) => {
+          set({ systemReducedMotion: enabled })
+        },
+      )
+    }
+    set({ isInitialized: true })
   },
 }))
 
@@ -235,6 +244,17 @@ export function useFontScale(): number {
 export function useFontFamily(): string | undefined {
   const fontFamily = useThemeStore((s) => s.fontFamily)
   return getFontFamily(fontFamily)
+}
+
+export function resolveReducedMotion(
+  reducedMotion: boolean,
+  systemReducedMotion: boolean,
+): boolean {
+  return reducedMotion || systemReducedMotion
+}
+
+export function useEffectiveReducedMotion(): boolean {
+  return useThemeStore((s) => resolveReducedMotion(s.reducedMotion, s.systemReducedMotion))
 }
 
 export function useScaledFontStyle(baseFontSize = 16) {

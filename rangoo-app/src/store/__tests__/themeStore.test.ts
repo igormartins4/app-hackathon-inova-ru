@@ -6,6 +6,7 @@ jest.mock('react-native', () => ({
   useColorScheme: () => 'light',
   AccessibilityInfo: {
     isReduceMotionEnabled: jest.fn(),
+    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
   },
 }))
 
@@ -27,6 +28,7 @@ import {
   getFontFamily,
   getFontScale,
   getScaledFontStyle,
+  resolveReducedMotion,
   resolveTheme,
   useThemeStore,
 } from '@/store/themeStore'
@@ -37,6 +39,8 @@ const INITIAL_STATE = {
   fontFamily: 0,
   highContrast: false,
   reducedMotion: false,
+  systemReducedMotion: false,
+  isInitialized: false,
   hideSensitiveData: false,
 }
 
@@ -198,17 +202,17 @@ describe('themeStore', () => {
       expect(useThemeStore.getState().hideSensitiveData).toBe(true)
     })
 
-    it('restores a saved reducedMotion preference without consulting the OS', async () => {
+    it('restores a saved reducedMotion preference while retaining the OS preference', async () => {
       mockAsyncStorage['@rangoo_reduced_motion'] = 'true'
       await useThemeStore.getState().initialize()
       expect(useThemeStore.getState().reducedMotion).toBe(true)
-      expect(AccessibilityInfo.isReduceMotionEnabled).not.toHaveBeenCalled()
+      expect(AccessibilityInfo.isReduceMotionEnabled).toHaveBeenCalled()
     })
 
-    it('falls back to the OS reduce-motion setting when nothing is saved', async () => {
+    it('reads the OS reduce-motion setting when nothing is saved', async () => {
       ;(AccessibilityInfo.isReduceMotionEnabled as jest.Mock).mockResolvedValue(true)
       await useThemeStore.getState().initialize()
-      expect(useThemeStore.getState().reducedMotion).toBe(true)
+      expect(useThemeStore.getState().systemReducedMotion).toBe(true)
       expect(AccessibilityInfo.isReduceMotionEnabled).toHaveBeenCalled()
     })
 
@@ -268,6 +272,14 @@ describe('getFontFamily', () => {
   it('returns the family for a given index', () => {
     expect(getFontFamily(0)).toBe(FONT_FAMILIES[0].family)
     expect(getFontFamily(1)).toBe(FONT_FAMILIES[1].family)
+  })
+})
+
+describe('resolveReducedMotion', () => {
+  it('honors either the app or system preference', () => {
+    expect(resolveReducedMotion(false, false)).toBe(false)
+    expect(resolveReducedMotion(true, false)).toBe(true)
+    expect(resolveReducedMotion(false, true)).toBe(true)
   })
 })
 
