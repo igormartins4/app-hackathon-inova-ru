@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
-import { memo, useCallback } from 'react'
-import { ActivityIndicator, Alert, FlatList, Pressable, View } from 'react-native'
+import { memo, useCallback, useState } from 'react'
+import { ActivityIndicator, FlatList, Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Button, Card, FadeInView, Text } from '@/shared/components/ui'
+import { AppDialog, Button, Card, FadeInView, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 import { formatCurrency, formatToLocalDate, formatToLocalTime } from '@/shared/utils'
 import type { MealRecord, RechargeRecord } from '../types/history.types'
@@ -21,6 +21,10 @@ interface HistoryListProps {
   onRefresh?: () => void
   refreshing?: boolean
 }
+
+type SelectedRecord =
+  | { type: 'recharge'; item: RechargeRecord }
+  | { type: 'meal'; item: MealRecord }
 
 function useTranslations() {
   const { t } = useI18n()
@@ -124,21 +128,22 @@ export function HistoryList({
 }: HistoryListProps) {
   const themeColors = useThemeColors()
   const { t } = useI18n()
+  const [selectedRecord, setSelectedRecord] = useState<SelectedRecord | null>(null)
 
   const renderItem = useCallback(
     ({ item }: { item: RechargeRecord | MealRecord }) =>
       type === 'recharge' ? (
         <RechargeItem
           item={item as RechargeRecord}
-          onPress={() => showRechargeDetails(item as RechargeRecord, t)}
+          onPress={() => setSelectedRecord({ type: 'recharge', item: item as RechargeRecord })}
         />
       ) : (
         <MealItem
           item={item as MealRecord}
-          onPress={() => showMealDetails(item as MealRecord, t)}
+          onPress={() => setSelectedRecord({ type: 'meal', item: item as MealRecord })}
         />
       ),
-    [type, t],
+    [type],
   )
 
   const handleEndReached = useCallback(() => {
@@ -186,52 +191,66 @@ export function HistoryList({
     )
   }
 
+  const detail = selectedRecord ? getDetails(selectedRecord, t) : null
+
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => {
-        if (type === 'recharge') return String((item as RechargeRecord).id)
-        // A API não retorna id pra refeição (fora do contrato v2.0 mudar
-        // isso) — compõe uma chave estável com todos os campos que
-        // diferenciam um registro, em vez do índice do array.
-        const meal = item as MealRecord
-        return `${meal.data_hora}-${meal.filial.codigo}-${meal.tipo_consumidor}-${meal.quantidade}-${meal.valor_total}`
-      }}
-      renderItem={renderItem}
-      onEndReached={handleEndReached}
-      onEndReachedThreshold={0.5}
-      ListFooterComponent={
-        isFetchingNextPage ? (
-          <View className="py-4">
-            <ActivityIndicator size="small" color={themeColors.primary} />
-          </View>
-        ) : null
-      }
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-      contentContainerClassName="p-4"
-    />
+    <View className="flex-1">
+      <FlatList
+        data={data}
+        keyExtractor={(item) => {
+          if (type === 'recharge') return String((item as RechargeRecord).id)
+          // A API não retorna id pra refeição (fora do contrato v2.0 mudar
+          // isso) — compõe uma chave estável com todos os campos que
+          // diferenciam um registro, em vez do índice do array.
+          const meal = item as MealRecord
+          return `${meal.data_hora}-${meal.filial.codigo}-${meal.tipo_consumidor}-${meal.quantidade}-${meal.valor_total}`
+        }}
+        renderItem={renderItem}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View className="py-4">
+              <ActivityIndicator size="small" color={themeColors.primary} />
+            </View>
+          ) : null
+        }
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        contentContainerClassName="p-4"
+      />
+      <AppDialog
+        visible={selectedRecord !== null}
+        title={detail?.title ?? ''}
+        body={detail?.body}
+        accessibilityLabel={detail?.title ?? ''}
+        onClose={() => setSelectedRecord(null)}
+        actions={[{ label: t.close, style: 'cancel', onPress: () => setSelectedRecord(null) }]}
+      />
+    </View>
   )
 }
 
-function showRechargeDetails(item: RechargeRecord, t: Record<string, string>) {
-  Alert.alert(
-    t.historyDetailsRecharge,
-    [
-      `${t.historyDate}: ${formatCurrency(item.valor)}`,
-      `${t.historyDate}: ${formatToLocalDate(item.data_hora)}`,
-      `${t.historyTime}: ${formatToLocalTime(item.data_hora)}`,
-      `${t.historyMethod}: ${item.metodo.toUpperCase()}`,
-      `${t.historyStatus}: ${item.status === 'aprovado' ? t.historyApproved : item.status}`,
-      `${t.historyId}: #${item.id}`,
-    ].join('\n'),
-  )
-}
+function getDetails(record: SelectedRecord, t: Record<string, string>) {
+  if (record.type === 'recharge') {
+    const { item } = record
+    return {
+      title: t.historyDetailsRecharge,
+      body: [
+        `${t.historyDate}: ${formatCurrency(item.valor)}`,
+        `${t.historyDate}: ${formatToLocalDate(item.data_hora)}`,
+        `${t.historyTime}: ${formatToLocalTime(item.data_hora)}`,
+        `${t.historyMethod}: ${item.metodo.toUpperCase()}`,
+        `${t.historyStatus}: ${item.status === 'aprovado' ? t.historyApproved : item.status}`,
+        `${t.historyId}: #${item.id}`,
+      ].join('\n'),
+    }
+  }
 
-function showMealDetails(item: MealRecord, t: Record<string, string>) {
-  Alert.alert(
-    t.historyDetailsMeal,
-    [
+  const { item } = record
+  return {
+    title: t.historyDetailsMeal,
+    body: [
       `${t.historyRestaurant}: ${item.filial.nome}`,
       `${t.historyDate}: ${formatToLocalDate(item.data_hora)}`,
       `${t.historyTime}: ${formatToLocalTime(item.data_hora)}`,
@@ -241,5 +260,5 @@ function showMealDetails(item: MealRecord, t: Record<string, string>) {
         : `${t.historyDate}: ${formatCurrency(item.valor_total)}`,
       `${t.historyType}: ${item.tipo_consumidor}`,
     ].join('\n'),
-  )
+  }
 }
