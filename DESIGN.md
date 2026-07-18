@@ -1,6 +1,10 @@
 ---
 name: Rangoo Universitário
 description: App de recarga PIX e saldo pros RUs da UFMG — rápido, confiável, sem cara de banco
+team:
+  - Igor de Oliveira Martins dos Santos
+  - Ítalo Leal Lana Santos
+  - Vitor Hugo Dias Santos
 colors:
   primary: "#1a5c4a"
   primary-light: "#4e9e9e"
@@ -151,7 +155,7 @@ Paleta de um único acento comprometido (teal institucional) sobre fundo neutro 
 - **Label** (700, 12px/16px, tracking 0.05em, uppercase): rótulos de status (`StatusBadge`, badges de aviso) — sempre caixa alta, nunca ícone/emoji substituindo o texto (regra do Anexo C: `situacao` é renderizado como texto puro).
 
 ### Named Rules
-**A Regra do Texto Escalável.** Todo texto de conteúdo passa por `ScaledText`, nunca `Text` puro do React Native — o app respeita a escala de fonte do sistema (Android font scale) sem quebrar layout.
+**A Regra do Texto Escalável.** Todo texto de conteúdo passa por `ScaledText`, nunca `Text` puro do React Native — o app respeita a escala de fonte do sistema (Android font scale) sem quebrar layout. `ScaledText` escala tanto `fontSize` quanto `lineHeight` proporcionalmente, usando o mapa `CLASS_LINE_HEIGHTS` para alinhar com as classes Tailwind.
 
 ## 4. Elevation
 
@@ -189,9 +193,18 @@ Sistema usa sombra ambiente sutil, não flat. Cards (`shadow-sm`) flutuam discre
 - **Focus/Error:** borda troca pra `status-error` quando há erro; mensagem de erro abaixo com `accessibilityRole="alert"` e `accessibilityLiveRegion="assertive"`.
 - **Placeholder:** cor `text-disabled` — mas sempre conferida contra 4.5:1, nunca o cinza padrão "porque é placeholder".
 
+### Dialogs (AppDialog)
+- **Estilo:** fundo `surface`, borda `outline-variant`, cantos 24px (`rounded-2xl`), padding 20px.
+- **Overlay:** preto 80% de opacidade (`${themeColors.black}CC`) — escurece o fundo sem esconder completamente.
+- **Ações:** botões empilhados verticalmente, cada um com `min-h-[48px]`. Variante `cancel` (texto), `destructive` (vermelho), ou padrão (primário).
+- **Acessibilidade:** `accessibilityLabel` no Modal, `accessibilityRole="dialog"`, foco gerenciado.
+- **Substitui:** todos os `Alert.alert` nativos — consistência visual e acessibilidade garantidas.
+
 ### Banners (Notice / Offline / Low Balance)
-- **Style:** fundo em tom semântico com baixa opacidade (`${themeColors.warning}15`), ícone + texto, rounded-xl, dismissable com botão de fechar acessível.
-- **Uso:** avisos informativos (cardápio não-oficial), estado offline, saldo baixo — sempre com `accessibilityLabel` e possibilidade de dispensar.
+- **Style:** fundo em tom semântico com baixa opacidade (`${themeColors.warning}15`), ícone + texto, rounded-xl.
+- **LowBalanceBanner:** self-contained (gerencia estado de dismiss internamente), botão de fechar com `min-h-[48px]`.
+- **NoticeCarousel:** auto-rotate com timer, controles de navegação e pausa, todos com `min-h-[48px]`.
+- **Uso:** avisos informativos (cardápio não-oficial), estado offline, saldo baixo — sempre com `accessibilityLabel`.
 
 ## 6. Do's and Don'ts
 
@@ -202,6 +215,9 @@ Sistema usa sombra ambiente sutil, não flat. Cards (`shadow-sm`) flutuam discre
 - **Do** tratar rede instável como caso normal: todo fluxo precisa de loading, erro e retry explícitos, nunca uma tela travada sem feedback.
 - **Do** usar `ScaledText` em todo texto, pra respeitar escala de fonte do sistema.
 - **Do** manter sombra `shadow-sm` única e sutil em cards — não escalar pra elevações mais dramáticas.
+- **Do** usar `AppDialog` em vez de `Alert.alert` pra qualquer confirmação ou informação que o app precisa mostrar ao usuário.
+- **Do** respeitar a redução de movimento do sistema via `useEffectiveReducedMotion()` — não só a preferência do app.
+- **Do** usar `ScaledText` que escala lineHeight proporcionalmente ao fontSize.
 
 ### Don't:
 - **Don't** usar hex literal ou classe Tailwind crua de cor em componente (`#006A6A` direto, `bg-blue-600`) — quebra dark mode e alto contraste.
@@ -209,3 +225,4 @@ Sistema usa sombra ambiente sutil, não flat. Cards (`shadow-sm`) flutuam discre
 - **Don't** usar gradiente em texto ou glassmorphism decorativo — não faz parte do vocabulário visual do app.
 - **Don't** esconder estado de carregamento/erro atrás de tela em branco — rede ruim no RU é o caso comum.
 - **Don't** substituir o texto de `situacao`/status por ícone ou emoji — o contrato exige o valor textual exato (Anexo C).
+- **Don't** usar `Alert.alert` nativo — usar `AppDialog` que é acessível e consistente com a marca.
