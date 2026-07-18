@@ -1,13 +1,19 @@
 import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useConsumerStatus } from '@/features/balance/hooks/useConsumerStatus'
 import { useRechargeHistory } from '@/features/history'
+import { AVISOS_FUNCIONAMENTO } from '@/features/restaurantes/data/avisosFuncionamento'
+import { RU_INFO } from '@/features/restaurantes/data/ruInfo'
+import type { Refeicao } from '@/features/restaurantes/types/restaurante.types'
+import { getAvisoAtivo } from '@/features/restaurantes/utils/avisoAtivo'
+import { getAvisoTexto } from '@/features/restaurantes/utils/avisoTexto'
+import { getRUStatus } from '@/features/restaurantes/utils/ruStatus'
 import {
   Card,
   ErrorMessage,
@@ -21,11 +27,14 @@ import {
 import { useI18n } from '@/shared/i18n'
 import {
   formatCurrency,
+  formatFullWeekdayDate,
   formatToLocalDateTime,
   getErrorMessage,
   getGreetingPeriod,
+  isToday,
   toTitleCase,
 } from '@/shared/utils'
+import { useFavoriteRUsStore } from '@/store'
 import { useThemeStore } from '@/store/themeStore'
 
 const QUICK_ACTIONS = [
@@ -48,15 +57,26 @@ export default function HomeScreen() {
   const { data: rechargeHistory } = useRechargeHistory()
   const themeColors = useThemeColors()
   const gradients = useGradientColors()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const restaurantMealLabels: Record<Refeicao, string> = {
+    cafe: t.restaurantMealCafe,
+    almoco: t.restaurantMealAlmoco,
+    jantar: t.restaurantMealJantar,
+  }
   const hideSensitiveData = useThemeStore((s) => s.hideSensitiveData)
   const toggleHideSensitiveData = useThemeStore((s) => s.toggleHideSensitiveData)
-  const [bannerDismissed, setBannerDismissed] = useState(false)
+  const favorites = useFavoriteRUsStore((state) => state.favorites)
+  const favoritesInitialized = useFavoriteRUsStore((state) => state.initialized)
+  const initializeFavorites = useFavoriteRUsStore((state) => state.initialize)
   const recentRecharges = useMemo(
     () => rechargeHistory?.pages[0]?.data.slice(0, 3) ?? [],
     [rechargeHistory],
   )
   const phraseIndex = useMemo(() => Math.floor(Math.random() * GREETING_PHRASES.length), [])
+
+  useEffect(() => {
+    if (!favoritesInitialized) initializeFavorites()
+  }, [favoritesInitialized, initializeFavorites])
 
   const handleQuickAction = useCallback(
     (key: string) => {
@@ -96,7 +116,6 @@ export default function HomeScreen() {
   }
 
   const saldo = data?.saldo?.credito_disponivel ?? 0
-
   const QUICK_ACTION_COLORS = [
     gradients.quickActionCardapio,
     gradients.quickActionHistorico,
@@ -125,15 +144,8 @@ export default function HomeScreen() {
         <Text className="text-xs text-text-secondary mt-0.5">{phrase}!</Text>
       </View>
 
-      {/* One attention slot, not two stacked — the low-balance warning is
-          actionable and takes priority over informational notices when both
-          would otherwise apply. */}
-      {!bannerDismissed &&
-        (saldo < LOW_BALANCE_THRESHOLD ? (
-          <LowBalanceBanner onDismiss={() => setBannerDismissed(true)} />
-        ) : (
-          <NoticeCarousel onDismiss={() => setBannerDismissed(true)} />
-        ))}
+      {saldo < LOW_BALANCE_THRESHOLD && <LowBalanceBanner />}
+      <NoticeCarousel />
 
       <View className="px-4 mb-4">
         <LinearGradient
@@ -152,8 +164,8 @@ export default function HomeScreen() {
                 accessibilityRole="switch"
                 accessibilityLabel={hideSensitiveData ? t.showSensitiveData : t.hideSensitiveData}
                 accessibilityState={{ checked: hideSensitiveData }}
-                hitSlop={8}
-                className="p-1"
+                hitSlop={10}
+                className="p-2"
               >
                 <Ionicons
                   name={hideSensitiveData ? 'eye-off' : 'eye'}
@@ -203,6 +215,112 @@ export default function HomeScreen() {
         ))}
       </View>
 
+      <View className="px-4 mb-5 gap-3">
+        <Text className="text-sm font-bold text-text-primary">
+          {favorites.length === 1 ? t.restaurantFavoriteSingular : t.restaurantFavoritePlural}
+        </Text>
+        {favoritesInitialized && favorites.length > 0 ? (
+          favorites.flatMap((favoriteRU) => {
+            const favoriteInfo = RU_INFO[favoriteRU]
+            if (!favoriteInfo) return []
+            const schedule =
+              favoriteInfo.horarios ?? favoriteInfo.unidadesFisicas?.map(({ horarios }) => horarios)
+            const status = schedule ? getRUStatus(schedule) : null
+            const notice = getAvisoAtivo(AVISOS_FUNCIONAMENTO, favoriteRU)
+            const noticeText = notice ? getAvisoTexto(notice, t) : null
+            const meal = status?.proximaAbertura
+              ? restaurantMealLabels[status.proximaAbertura.refeicao]
+              : ''
+            const nextOpening = status?.proximaAbertura
+              ? t.restaurantNextOpening
+                  .replace(
+                    '{date}',
+                    isToday(status.proximaAbertura.data)
+                      ? t.cardapioHoje
+                      : formatFullWeekdayDate(status.proximaAbertura.data, locale),
+                  )
+                  .replace('{meal}', meal)
+                  .replace(
+                    '{time}',
+                    status.proximaAbertura.data.toLocaleTimeString(locale, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    }),
+                  )
+              : ''
+            const statusLabel = notice
+              ? notice.suspendeFuncionamento
+                ? t.restaurantTemporaryClosed
+                : t.restaurantScheduleChanged
+              : status
+                ? status.aberto
+                  ? t.restaurantOpen.replace(
+                      '{meal}',
+                      restaurantMealLabels[status.refeicaoAtual ?? 'cafe'],
+                    )
+                  : t.restaurantClosed
+                : t.restaurantScheduleUnavailable
+
+            return (
+              <Pressable
+                key={favoriteRU}
+                onPress={() => router.push(`/restaurante/${favoriteInfo.codigo}`)}
+                accessibilityRole="button"
+                accessibilityLabel={t.restaurantDetailsA11y
+                  .replace('{name}', favoriteInfo.nome)
+                  .replace('{status}', nextOpening || statusLabel)}
+                className="min-h-[48px]"
+              >
+                <Card className="gap-2">
+                  <View className="flex-row items-center justify-between gap-3">
+                    <View className="flex-1">
+                      <Text className="text-base font-bold text-text-primary">
+                        {favoriteInfo.nome}
+                      </Text>
+                      <Text className="text-xs text-text-secondary">{favoriteInfo.campus}</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
+                  </View>
+                  {notice ? (
+                    <Text className="text-status-warning text-sm font-semibold">{statusLabel}</Text>
+                  ) : (
+                    <Text
+                      className={
+                        status?.aberto
+                          ? 'text-status-success text-sm font-semibold'
+                          : 'text-status-error text-sm font-semibold'
+                      }
+                    >
+                      {statusLabel}
+                    </Text>
+                  )}
+                  {!notice && !status?.aberto && status?.proximaAbertura && (
+                    <Text className="text-xs text-text-secondary">{nextOpening}</Text>
+                  )}
+                  {notice && (
+                    <Text accessibilityRole="alert" className="text-xs text-status-warning">
+                      {noticeText?.titulo}: {noticeText?.descricao}
+                    </Text>
+                  )}
+                </Card>
+              </Pressable>
+            )
+          })
+        ) : favoritesInitialized ? (
+          <Card className="gap-3">
+            <Text className="text-sm text-text-secondary">{t.restaurantEmptyFavorites}</Text>
+            <Pressable
+              onPress={() => router.push('/(tabs)/cardapio')}
+              accessibilityRole="button"
+              accessibilityLabel={t.restaurantChooseFavoriteA11y}
+              className="self-start min-h-[48px] justify-center"
+            >
+              <Text className="text-sm font-bold text-primary">{t.restaurantChooseInMenu}</Text>
+            </Pressable>
+          </Card>
+        ) : null}
+      </View>
+
       <View className="px-4 mb-4">
         <View className="flex-row items-center justify-between mb-3">
           <Text className="text-sm font-bold text-text-primary">{t.homeRecentRecharges}</Text>
@@ -210,6 +328,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/(tabs)/historico?tab=recargas')}
             accessibilityRole="button"
             accessibilityLabel={t.homeSeeAll}
+            className="min-h-[48px] justify-center px-2"
           >
             <Text className="text-sm font-semibold text-primary">{t.homeSeeAll}</Text>
           </Pressable>
@@ -231,7 +350,7 @@ export default function HomeScreen() {
                     idx < recentRecharges.length - 1 ? 'border-b border-outline-variant' : ''
                   }`}
                 >
-                  <View className="w-10 h-10 rounded-full bg-success/10 items-center justify-center">
+                  <View className="w-10 h-10 rounded-full bg-status-success/10 items-center justify-center">
                     <Ionicons name="card" size={20} color={themeColors.success} />
                   </View>
                   <View className="flex-1">
@@ -246,8 +365,8 @@ export default function HomeScreen() {
                     <Text className="text-sm font-bold text-text-primary">
                       +{formatCurrency(recarga.valor)}
                     </Text>
-                    <Text className="text-xs font-medium text-success">
-                      {recarga.status === 'aprovado' ? 'Aprovado' : recarga.status}
+                    <Text className="text-xs font-medium text-status-success">
+                      {recarga.status === 'aprovado' ? t.historyApproved : recarga.status}
                     </Text>
                   </View>
                 </Pressable>
@@ -258,7 +377,11 @@ export default function HomeScreen() {
       </View>
 
       {message && (
-        <Card accessibilityLabel="Alerta de conta" accessibilityRole="alert" className="mx-4 mb-4">
+        <Card
+          accessibilityLabel={t.homeAccountAlert}
+          accessibilityRole="alert"
+          className="mx-4 mb-4"
+        >
           <View className="flex-row items-center gap-3">
             <Ionicons name="information-circle" size={20} color={themeColors.primary} />
             <Text accessibilityRole="text" className="flex-1 text-sm text-text-secondary">
