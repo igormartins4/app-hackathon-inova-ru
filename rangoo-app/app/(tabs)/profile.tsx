@@ -2,13 +2,14 @@ import { Ionicons } from '@expo/vector-icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
-import { Alert, Linking, Pressable, ScrollView, View } from 'react-native'
+import { Linking, Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
 import { useMealHistory } from '@/features/history'
 import {
   AboutAppModal,
+  AppDialog,
   Button,
   Card,
   ErrorMessage,
@@ -75,6 +76,7 @@ export default function ProfileScreen() {
   const gradients = useGradientColors()
   const [demoScenario, setDemoScenarioState] = useState(getMockScenario())
   const [aboutVisible, setAboutVisible] = useState(false)
+  const [logoutDialogVisible, setLogoutDialogVisible] = useState(false)
   const { t, locale, setLocale } = useI18n()
 
   const isDark = useResolvedTheme() === 'dark'
@@ -106,12 +108,7 @@ export default function ProfileScreen() {
     refreshMockData()
   }
 
-  const handleLogout = () => {
-    Alert.alert('Sair da conta?', 'Você vai precisar do CPF e senha da FUMP pra entrar de novo.', [
-      { text: t.cancel, style: 'cancel' },
-      { text: t.logout, style: 'destructive', onPress: logout },
-    ])
-  }
+  const handleLogout = () => setLogoutDialogVisible(true)
 
   const totalGastoMes = (() => {
     if (!mealHistory?.pages) return 0
@@ -241,7 +238,7 @@ export default function ProfileScreen() {
           className="flex-row items-center justify-between py-3 border-b border-outline-variant"
         >
           <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full bg-warning/15 items-center justify-center">
+            <View className="w-10 h-10 rounded-full bg-status-warning/15 items-center justify-center">
               <Ionicons name={isDark ? 'moon' : 'sunny'} size={20} color={themeColors.warning} />
             </View>
             <View>
@@ -446,7 +443,7 @@ export default function ProfileScreen() {
           <Pressable
             onPress={() => setAboutVisible(true)}
             accessibilityRole="button"
-            accessibilityLabel="Sobre o Rangoo Universitário e o Hackathon InovaRU"
+            accessibilityLabel={t.profileAboutButtonA11y}
             className="flex-row items-center justify-between py-3"
           >
             <Text className="text-sm text-primary">Sobre o Rangoo · {t.profileHackathon}</Text>
@@ -517,9 +514,9 @@ export default function ProfileScreen() {
           <Pressable
             onPress={handleResetDemo}
             accessibilityRole="button"
-            accessibilityLabel="Resetar dados da demonstração"
-            accessibilityHint="Restaura saldo, pagamentos e históricos do cenário atual"
-            className="flex-row items-center justify-between pt-3 border-t border-outline-variant"
+            accessibilityLabel={t.profileResetDemo}
+            accessibilityHint={t.profileResetDemoHint}
+            className="flex-row items-center justify-between pt-3 min-h-[48px] border-t border-outline-variant"
           >
             <Text className="text-sm font-medium text-primary">{t.profileResetDemo}</Text>
             <Ionicons name="refresh" size={18} color={themeColors.primary} />
@@ -531,6 +528,24 @@ export default function ProfileScreen() {
 
       <View className="h-4" />
       <AboutAppModal visible={aboutVisible} onClose={() => setAboutVisible(false)} />
+      <AppDialog
+        visible={logoutDialogVisible}
+        title={t.logoutConfirmTitle}
+        body={t.logoutConfirmBody}
+        accessibilityLabel={t.logoutConfirmTitle}
+        onClose={() => setLogoutDialogVisible(false)}
+        actions={[
+          { label: t.cancel, style: 'cancel', onPress: () => setLogoutDialogVisible(false) },
+          {
+            label: t.logout,
+            style: 'destructive',
+            onPress: () => {
+              setLogoutDialogVisible(false)
+              logout()
+            },
+          },
+        ]}
+      />
     </ScrollView>
   )
 }
