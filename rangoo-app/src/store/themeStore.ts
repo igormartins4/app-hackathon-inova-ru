@@ -1,5 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AccessibilityInfo, Platform, type TextStyle, useColorScheme } from 'react-native'
+import {
+  AccessibilityInfo,
+  type ColorSchemeName,
+  Platform,
+  type TextStyle,
+  useColorScheme,
+} from 'react-native'
 import { create } from 'zustand'
 
 type Theme = 'light' | 'dark' | 'system'
@@ -188,26 +194,51 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
   },
 }))
 
-export function useResolvedTheme(): 'light' | 'dark' {
-  const systemColorScheme = useColorScheme()
-  const theme = useThemeStore((s) => s.theme)
-
+// Pure decision logic, extracted so it's unit-testable without rendering a
+// component — this project's Jest setup runs in `node` and has no React
+// hook-testing harness installed.
+export function resolveTheme(
+  theme: Theme,
+  systemColorScheme: ColorSchemeName | null | undefined,
+): 'light' | 'dark' {
   if (theme === 'system') return systemColorScheme === 'dark' ? 'dark' : 'light'
   return theme
 }
 
+export function getFontScale(fontSize: number): number {
+  return FONT_STEPS[fontSize].scale
+}
+
+export function getFontFamily(fontFamily: number): string | undefined {
+  return FONT_FAMILIES[fontFamily].family
+}
+
+export function getScaledFontStyle(
+  fontFamily: string | undefined,
+  scale: number,
+  baseFontSize: number,
+) {
+  return { ...(fontFamily ? { fontFamily } : null), fontSize: Math.round(baseFontSize * scale) }
+}
+
+export function useResolvedTheme(): 'light' | 'dark' {
+  const systemColorScheme = useColorScheme()
+  const theme = useThemeStore((s) => s.theme)
+  return resolveTheme(theme, systemColorScheme)
+}
+
 export function useFontScale(): number {
   const fontSize = useThemeStore((s) => s.fontSize)
-  return FONT_STEPS[fontSize].scale
+  return getFontScale(fontSize)
 }
 
 export function useFontFamily(): string | undefined {
   const fontFamily = useThemeStore((s) => s.fontFamily)
-  return FONT_FAMILIES[fontFamily].family
+  return getFontFamily(fontFamily)
 }
 
 export function useScaledFontStyle(baseFontSize = 16) {
   const scale = useFontScale()
   const fontFamily = useFontFamily()
-  return { ...(fontFamily ? { fontFamily } : null), fontSize: Math.round(baseFontSize * scale) }
+  return getScaledFontStyle(fontFamily, scale, baseFontSize)
 }

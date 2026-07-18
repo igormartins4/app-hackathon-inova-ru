@@ -12,7 +12,13 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   setItem: jest.fn(),
 }))
 
-import { colors, darkColors } from '@/config/theme'
+import {
+  colors,
+  darkColors,
+  gradientColors,
+  resolveGradientColors,
+  resolveThemeColors,
+} from '@/config/theme'
 
 function channel(value: number) {
   const normalized = value / 255
@@ -50,5 +56,47 @@ describe('theme contrast', () => {
     expect(contrast(darkColors.error, darkColors.surface)).toBeGreaterThanOrEqual(4.5)
     expect(contrast(darkColors.success, darkColors.surface)).toBeGreaterThanOrEqual(4.5)
     expect(contrast(darkColors.warning, darkColors.surface)).toBeGreaterThanOrEqual(4.5)
+  })
+})
+
+describe('resolveThemeColors', () => {
+  it('returns light colors for light theme without high contrast', () => {
+    expect(resolveThemeColors('light', false)).toEqual(colors)
+  })
+
+  it('returns dark colors for dark theme without high contrast', () => {
+    expect(resolveThemeColors('dark', false)).toEqual(darkColors)
+  })
+
+  it('overrides with high-contrast tokens in light theme', () => {
+    const result = resolveThemeColors('light', true)
+    expect(result.primary).toBe('#000000')
+    expect(result.background).toBe('#ffffff')
+  })
+
+  it('overrides with high-contrast tokens in dark theme', () => {
+    const result = resolveThemeColors('dark', true)
+    expect(result.primary).toBe('#ffffff')
+    expect(result.background).toBe('#000000')
+  })
+})
+
+describe('resolveGradientColors', () => {
+  it('returns light gradients for light theme without high contrast', () => {
+    expect(resolveGradientColors('light', false)).toEqual(gradientColors.light)
+  })
+
+  it('returns dark gradients for dark theme without high contrast', () => {
+    expect(resolveGradientColors('dark', false)).toEqual(gradientColors.dark)
+  })
+
+  it('returns flattened high-contrast gradients in light theme', () => {
+    const result = resolveGradientColors('light', true)
+    expect(result.quickActionCardapio).toBe('#e0e0e0')
+  })
+
+  it('returns flattened high-contrast gradients in dark theme', () => {
+    const result = resolveGradientColors('dark', true)
+    expect(result.quickActionCardapio).toBe('#222222')
   })
 })

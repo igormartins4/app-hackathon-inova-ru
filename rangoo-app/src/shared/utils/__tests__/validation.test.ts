@@ -11,6 +11,19 @@ describe('Validation utils', () => {
       expect(isValidCpf('123.456.789-01')).toBe(false)
     })
 
+    it('returns false when only the second check digit is wrong', () => {
+      // First check digit (0) is correct; second (should be 9) is wrong.
+      expect(isValidCpf('123.456.789-00')).toBe(false)
+    })
+
+    it('returns false when the first check digit is wrong', () => {
+      expect(isValidCpf('123.456.789-19')).toBe(false)
+    })
+
+    it('handles the mod-11 remainder-10-maps-to-0 rule on the second check digit', () => {
+      expect(isValidCpf('100.000.222-50')).toBe(true)
+    })
+
     it('returns false for all-same-digit CPFs', () => {
       expect(isValidCpf('111.111.111-11')).toBe(false)
       expect(isValidCpf('000.000.000-00')).toBe(false)

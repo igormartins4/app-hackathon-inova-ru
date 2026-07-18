@@ -75,6 +75,11 @@ describe('Mask utils', () => {
     it('strips non-digits and limits length', () => {
       expect(maskMoneyInput('R$ abc123456', 4)).toBe('R$ 12,34')
     })
+
+    it('returns empty string when there are no digits to format', () => {
+      expect(maskMoneyInput('')).toBe('')
+      expect(maskMoneyInput('R$ abc')).toBe('')
+    })
   })
 
   describe('parseMoneyInput', () => {
@@ -87,11 +92,19 @@ describe('Mask utils', () => {
     it('keeps only digits with limit', () => {
       expect(sanitizeDigits('ab12cd34', 3)).toBe('123')
     })
+
+    it('keeps all digits when no limit is given', () => {
+      expect(sanitizeDigits('ab12cd34')).toBe('1234')
+    })
   })
 
   describe('sanitizePassword', () => {
     it('removes line breaks and limits length', () => {
       expect(sanitizePassword('ab\ncd', 3)).toBe('abc')
+    })
+
+    it('uses the default max length when none is given', () => {
+      expect(sanitizePassword('short')).toBe('short')
     })
   })
 })

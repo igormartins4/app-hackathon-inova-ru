@@ -145,15 +145,22 @@ const highContrastDarkColors = {
   chipUnselected: '#222222',
 } as const
 
+// Pure decision logic, extracted so it's unit-testable without rendering a
+// component — this project's Jest setup runs in `node` and has no React
+// hook-testing harness installed.
+export function resolveThemeColors(resolvedTheme: 'light' | 'dark', highContrast: boolean) {
+  const base = resolvedTheme === 'dark' ? darkColors : colors
+  if (!highContrast) return base
+  const overrides = resolvedTheme === 'dark' ? highContrastDarkColors : highContrastColors
+  return { ...base, ...overrides }
+}
+
 // Resolves to the light or dark token set for native props that can't take a
 // NativeWind className (icon `color`, ActivityIndicator, tabBar tint colors).
 export function useThemeColors() {
   const resolvedTheme = useResolvedTheme()
   const highContrast = useThemeStore((s) => s.highContrast)
-  const base = resolvedTheme === 'dark' ? darkColors : colors
-  if (!highContrast) return base
-  const overrides = resolvedTheme === 'dark' ? highContrastDarkColors : highContrastColors
-  return { ...base, ...overrides }
+  return resolveThemeColors(resolvedTheme, highContrast)
 }
 
 const highContrastGradientColors = {
@@ -183,14 +190,19 @@ const highContrastGradientColors = {
   },
 } as const
 
-// Returns gradient colors for the current theme
-export function useGradientColors() {
-  const resolvedTheme = useResolvedTheme()
-  const highContrast = useThemeStore((s) => s.highContrast)
+// Pure decision logic — see resolveThemeColors above for why this is split out.
+export function resolveGradientColors(resolvedTheme: 'light' | 'dark', highContrast: boolean) {
   if (highContrast) {
     return resolvedTheme === 'dark'
       ? highContrastGradientColors.dark
       : highContrastGradientColors.light
   }
   return resolvedTheme === 'dark' ? gradientColors.dark : gradientColors.light
+}
+
+// Returns gradient colors for the current theme
+export function useGradientColors() {
+  const resolvedTheme = useResolvedTheme()
+  const highContrast = useThemeStore((s) => s.highContrast)
+  return resolveGradientColors(resolvedTheme, highContrast)
 }

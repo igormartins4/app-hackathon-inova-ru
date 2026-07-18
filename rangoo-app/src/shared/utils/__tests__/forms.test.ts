@@ -1,4 +1,4 @@
-import { loginSchema, rechargeSchema, transferSchema } from '@/shared/utils/forms'
+import { firstFieldError, loginSchema, rechargeSchema, transferSchema } from '@/shared/utils/forms'
 
 describe('form schemas', () => {
   it('validates login CPF and password', () => {
@@ -14,5 +14,15 @@ describe('form schemas', () => {
   it('validates transfer destination and amount', () => {
     expect(transferSchema(50).safeParse({ destination: '12345', amount: 10 }).success).toBe(true)
     expect(transferSchema(50).safeParse({ destination: 'ab', amount: 60 }).success).toBe(false)
+  })
+})
+
+describe('firstFieldError', () => {
+  it('returns the first error message for a field', () => {
+    expect(firstFieldError({ amount: ['too low', 'too high'] }, 'amount')).toBe('too low')
+  })
+
+  it('returns undefined when the field has no errors', () => {
+    expect(firstFieldError({}, 'amount')).toBeUndefined()
   })
 })
