@@ -14,18 +14,13 @@ import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/component
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { useI18n } from '@/shared/i18n'
 import { QUERY_PERSIST_MAX_AGE, queryClient, queryPersister } from '@/shared/services'
-import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
+import { useEffectiveReducedMotion, useResolvedTheme, useThemeStore } from '@/store/themeStore'
 
 SplashScreen.preventAutoHideAsync()
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const initialize = useThemeStore((s) => s.initialize)
   const resolvedTheme = useResolvedTheme()
   const highContrast = useThemeStore((s) => s.highContrast)
-
-  useEffect(() => {
-    initialize()
-  }, [initialize])
 
   const themeClasses = [resolvedTheme === 'dark' ? 'dark' : '', highContrast ? 'high-contrast' : '']
     .filter(Boolean)
@@ -42,7 +37,7 @@ function AuthGate() {
   const { isAuthenticated, isLoading } = useAuth()
   const { isOffline } = useNetworkStatus()
   const resolvedTheme = useResolvedTheme()
-  const reducedMotion = useThemeStore((s) => s.reducedMotion)
+  const reducedMotion = useEffectiveReducedMotion()
   const segments = useSegments()
   const router = useRouter()
   const { t } = useI18n()
@@ -85,6 +80,8 @@ function AuthGate() {
 
 export default function RootLayout() {
   const initializeI18n = useI18n((s) => s.initialize)
+  const initializeTheme = useThemeStore((s) => s.initialize)
+  const isThemeInitialized = useThemeStore((s) => s.isInitialized)
   const colorScheme = useColorScheme()
 
   const [fontsLoaded] = useFonts({
@@ -97,12 +94,16 @@ export default function RootLayout() {
   }, [initializeI18n])
 
   useEffect(() => {
-    if (fontsLoaded) {
+    initializeTheme()
+  }, [initializeTheme])
+
+  useEffect(() => {
+    if (fontsLoaded && isThemeInitialized) {
       SplashScreen.hideAsync()
     }
-  }, [fontsLoaded])
+  }, [fontsLoaded, isThemeInitialized])
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !isThemeInitialized) {
     const fallbackBackground = colorScheme === 'dark' ? darkColors.background : colors.background
     return <View style={{ flex: 1, backgroundColor: fallbackBackground }} />
   }

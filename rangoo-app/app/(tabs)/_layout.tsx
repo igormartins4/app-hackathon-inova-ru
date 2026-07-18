@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
+import { useWindowDimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeColors } from '@/config'
 import { useI18n } from '@/shared/i18n'
-import { useThemeStore } from '@/store/themeStore'
+import { useEffectiveReducedMotion } from '@/store/themeStore'
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name']
 
@@ -17,8 +18,10 @@ const TAB_ICONS: Record<string, { focused: IoniconsName; default: IoniconsName }
 
 export default function TabLayout() {
   const themeColors = useThemeColors()
-  const reducedMotion = useThemeStore((s) => s.reducedMotion)
+  const reducedMotion = useEffectiveReducedMotion()
+  const { width } = useWindowDimensions()
   const { t } = useI18n()
+  const isExpanded = width >= 768
 
   const TAB_LABELS: Record<string, string> = {
     home: t.tabHome,
@@ -37,9 +40,9 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: themeColors.surface,
             borderTopColor: themeColors.outline,
-            minHeight: 64,
-            paddingBottom: 8,
-            paddingTop: 8,
+            ...(isExpanded
+              ? { width: 96, paddingHorizontal: 8, paddingVertical: 12 }
+              : { minHeight: 64, paddingBottom: 8, paddingTop: 8 }),
           },
           tabBarLabelStyle: {
             fontSize: 12,
@@ -49,6 +52,7 @@ export default function TabLayout() {
           // o header nativo do Expo Router duplicava esse título (Ponto 10 do QA).
           headerShown: false,
           animation: reducedMotion ? 'none' : 'fade',
+          tabBarPosition: isExpanded ? 'left' : 'bottom',
         }}
       >
         <Tabs.Screen
