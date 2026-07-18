@@ -64,9 +64,9 @@ export default function RechargeScreen() {
   const [step, setStep] = useState<FlowStep>('amount')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null)
-  const [errorStatus, setErrorStatus] = useState<PaymentStatusResponse['status'] | 'timeout'>(
-    'timeout',
-  )
+  const [errorStatus, setErrorStatus] = useState<
+    PaymentStatusResponse['status'] | 'timeout' | 'pendingCredit'
+  >('timeout')
   const [newBalance, setNewBalance] = useState(0)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [selectedAmount, setSelectedAmount] = useState(0)
@@ -113,9 +113,9 @@ export default function RechargeScreen() {
     setStep('error')
   }, [])
 
-  const handleTimeout = useCallback(() => {
+  const handleTimeout = useCallback((pendingCredit: boolean) => {
     clearPendingPayment()
-    setErrorStatus('timeout')
+    setErrorStatus(pendingCredit ? 'pendingCredit' : 'timeout')
     setStep('error')
   }, [])
 

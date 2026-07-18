@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { ScrollView, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import type { BalanceResponse } from '@/features/balance'
 import { useBalance, useConsumerStatus } from '@/features/balance'
 import { createTransfer, TransferForm } from '@/features/transfer'
@@ -62,21 +62,26 @@ export default function TransferScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-4">
-      {disabled && (
-        <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
-          <Text className="text-center text-sm text-status-error">
-            {isOffline ? t.transferConecteSe : consumerMessage}
-          </Text>
-        </View>
-      )}
-      {error ? <ErrorMessage message={error} /> : null}
-      <TransferForm
-        currentBalance={currentBalance}
-        disabled={disabled}
-        loading={isSubmitting}
-        onSubmit={handleSubmit}
-      />
-    </ScrollView>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-4">
+        {disabled && (
+          <View accessibilityRole="alert" className="bg-status-error/10 rounded-lg p-3">
+            <Text className="text-center text-sm text-status-error">
+              {isOffline ? t.transferConecteSe : consumerMessage}
+            </Text>
+          </View>
+        )}
+        {error ? <ErrorMessage message={error} /> : null}
+        <TransferForm
+          currentBalance={currentBalance}
+          disabled={disabled}
+          loading={isSubmitting}
+          onSubmit={handleSubmit}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }

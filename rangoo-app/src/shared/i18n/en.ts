@@ -17,7 +17,6 @@ export default {
   loginPasswordLabel: 'Password',
   loginPasswordPlaceholder: 'Institutional password',
   loginButton: 'Sign in',
-  loginRegister: 'Register at FUMP',
   loginFumpLink: 'Visit the FUMP website',
   loginCpfA11yLabel: 'CPF field',
   loginCpfA11yHint: 'Enter the 11 digits of your institutional CPF',
@@ -31,6 +30,8 @@ export default {
   homeGreetingAfternoon: 'Good afternoon',
   homeGreetingEvening: 'Good evening',
   homePhrase: "Let's eat",
+  homePhrase2: 'Time to eat',
+  homePhrase3: 'Off to the RU',
   homeBalanceTitle: 'Available Balance',
   homeRechargeButton: 'Recharge via PIX',
   homeRecentRecharges: 'Recent recharges',
@@ -260,6 +261,9 @@ export default {
   paymentErrorTimeout:
     'Time expired. Check your balance before generating a new QR code — the payment may have been confirmed after the deadline.',
   paymentErrorTitle: 'Payment Not Confirmed',
+  paymentPendingCreditTitle: 'Payment Approved',
+  paymentPendingCreditMessage:
+    'Your payment was approved, but the balance credit is still processing. Check your balance in a few moments.',
   paymentErrorRetry: 'Try again',
   paymentErrorBack: 'Back to home',
   paymentErrorCheckHistory: 'View recharge history',

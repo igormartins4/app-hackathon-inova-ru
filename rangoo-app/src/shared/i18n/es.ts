@@ -17,7 +17,6 @@ export default {
   loginPasswordLabel: 'Contraseña',
   loginPasswordPlaceholder: 'Contraseña institucional',
   loginButton: 'Iniciar sesión',
-  loginRegister: 'Regístrate en la FUMP',
   loginFumpLink: 'Visita el sitio de la FUMP',
   loginCpfA11yLabel: 'Campo de CPF',
   loginCpfA11yHint: 'Ingresa los 11 dígitos de tu CPF institucional',
@@ -31,6 +30,8 @@ export default {
   homeGreetingAfternoon: 'Buenas tardes',
   homeGreetingEvening: 'Buenas noches',
   homePhrase: 'A comer',
+  homePhrase2: 'Hora de comer',
+  homePhrase3: 'Vamos al comedor',
   homeBalanceTitle: 'Saldo Disponible',
   homeRechargeButton: 'Recargar vía PIX',
   homeRecentRecharges: 'Últimas recargas',
@@ -265,6 +266,9 @@ export default {
   paymentErrorTimeout:
     'Tiempo agotado. Revisa tu saldo antes de generar un nuevo código QR — el pago pudo confirmarse después del plazo.',
   paymentErrorTitle: 'Pago No Confirmado',
+  paymentPendingCreditTitle: 'Pago Aprobado',
+  paymentPendingCreditMessage:
+    'Tu pago fue aprobado, pero el crédito en el saldo aún está en procesamiento. Revisa tu saldo en unos instantes.',
   paymentErrorRetry: 'Intentar de nuevo',
   paymentErrorBack: 'Volver al inicio',
   paymentErrorCheckHistory: 'Ver historial de recargas',

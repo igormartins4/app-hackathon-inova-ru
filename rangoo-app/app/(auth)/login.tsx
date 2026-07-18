@@ -44,8 +44,10 @@ export default function LoginScreen() {
   }
 
   const handleHelp = () => {
+    // Cadastro e "site da FUMP" apontavam pra mesma URL — o app não cria
+    // conta própria, então a única ação real pra quem esqueceu a senha ou
+    // nunca se cadastrou é ir direto pro site institucional.
     Alert.alert('Precisa de ajuda?', undefined, [
-      { text: t.loginRegister, onPress: () => Linking.openURL('https://fump.ufmg.br') },
       { text: t.loginFumpLink, onPress: () => Linking.openURL('https://fump.ufmg.br') },
       { text: 'Sobre o projeto', onPress: () => setAboutVisible(true) },
       { text: t.cancel, style: 'cancel' },

@@ -17,7 +17,6 @@ export default {
   loginPasswordLabel: 'Mot de passe',
   loginPasswordPlaceholder: 'Mot de passe institutionnel',
   loginButton: 'Se connecter',
-  loginRegister: "S'inscrire à la FUMP",
   loginFumpLink: 'Visiter le site de la FUMP',
   loginCpfA11yLabel: 'Champ CPF',
   loginCpfA11yHint: 'Saisissez les 11 chiffres de votre CPF institutionnel',
@@ -31,6 +30,8 @@ export default {
   homeGreetingAfternoon: 'Bon après-midi',
   homeGreetingEvening: 'Bonsoir',
   homePhrase: 'Bon appétit',
+  homePhrase2: "C'est l'heure de manger",
+  homePhrase3: 'Direction le RU',
   homeBalanceTitle: 'Solde Disponible',
   homeRechargeButton: 'Recharger via PIX',
   homeRecentRecharges: 'Derniers rechargements',
@@ -265,6 +266,9 @@ export default {
   paymentErrorTimeout:
     'Temps écoulé. Vérifiez votre solde avant de générer un nouveau code QR — le paiement a pu être confirmé après le délai.',
   paymentErrorTitle: 'Paiement Non Confirmé',
+  paymentPendingCreditTitle: 'Paiement Approuvé',
+  paymentPendingCreditMessage:
+    'Votre paiement a été approuvé, mais le crédit du solde est encore en cours de traitement. Vérifiez votre solde dans quelques instants.',
   paymentErrorRetry: 'Réessayer',
   paymentErrorBack: "Retour à l'accueil",
   paymentErrorCheckHistory: "Voir l'historique des recharges",

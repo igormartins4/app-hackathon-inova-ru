@@ -11,7 +11,11 @@ interface UsePollingOptions {
   startedAt?: number
   onApproved: () => void
   onTerminal: (status: PaymentStatusResponse['status']) => void
-  onTimeout: () => void
+  /** `pendingCredit` is true if the last poll saw `approved` with `creditado
+   * !== true` — the payment was confirmed but the balance credit is still
+   * being processed server-side, so the timeout message must not imply the
+   * payment itself failed. */
+  onTimeout: (pendingCredit: boolean) => void
 }
 
 export function usePolling({
@@ -23,6 +27,7 @@ export function usePolling({
 }: UsePollingOptions) {
   const startRef = useRef<number>(Date.now())
   const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingCreditRef = useRef(false)
   const callbacksRef = useRef({ onApproved, onTerminal, onTimeout })
 
   useEffect(() => {
@@ -32,7 +37,7 @@ export function usePolling({
   const scheduleNext = useCallback((pollFn: () => void) => {
     const elapsed = Date.now() - startRef.current
     if (shouldTimeout(elapsed)) {
-      callbacksRef.current.onTimeout()
+      callbacksRef.current.onTimeout(pendingCreditRef.current)
       return
     }
 
@@ -44,7 +49,7 @@ export function usePolling({
 
     const elapsed = Date.now() - startRef.current
     if (shouldTimeout(elapsed)) {
-      callbacksRef.current.onTimeout()
+      callbacksRef.current.onTimeout(pendingCreditRef.current)
       return
     }
 
@@ -62,6 +67,7 @@ export function usePolling({
       }
 
       // approved but creditado !== true → keep polling (webhook pending)
+      pendingCreditRef.current = res.status === 'approved'
       scheduleNext(poll)
     } catch {
       // Network error → keep trying until timeout
@@ -73,6 +79,7 @@ export function usePolling({
     if (!paymentId) return
 
     startRef.current = startedAt ?? Date.now()
+    pendingCreditRef.current = false
     poll()
 
     return () => {
