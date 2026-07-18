@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useCallback, useEffect, useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { useThemeColors } from '@/config'
@@ -8,10 +7,9 @@ import { MenuCalendar, RESTAURANTES_CARDAPIO, useCardapio } from '@/features/car
 import { Button, Card, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 import { formatFullWeekdayDate, isToday } from '@/shared/utils'
+import { useFavoriteRUsStore } from '@/store'
 
 type TipoRefeicao = 'almoco' | 'jantar'
-
-const FAVORITES_KEY = '@rangoo_favorite_rus'
 
 // Almoço nos RUs normalmente vai até meio da tarde; depois disso é mais
 // provável que o estudante que abrir o cardápio esteja pensando na janta.
@@ -27,32 +25,25 @@ export default function CardapioScreen() {
   const [tipoRefeicao, setTipoRefeicao] = useState<TipoRefeicao>(defaultMealForNow)
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [showCalendar, setShowCalendar] = useState(false)
-  const [favorites, setFavorites] = useState<FilialCode[]>([])
   const [showAll, setShowAll] = useState(true)
-  const [showSourceBanner, setShowSourceBanner] = useState(true)
+  const favorites = useFavoriteRUsStore((state) => state.favorites)
+  const favoritesInitialized = useFavoriteRUsStore((state) => state.initialized)
+  const initializeFavorites = useFavoriteRUsStore((state) => state.initialize)
+  const toggleStoredFavorite = useFavoriteRUsStore((state) => state.toggle)
 
   useEffect(() => {
-    AsyncStorage.getItem(FAVORITES_KEY).then((val) => {
-      if (val) {
-        try {
-          const parsed = JSON.parse(val) as FilialCode[]
-          setFavorites(parsed)
-          setShowAll(false)
-        } catch {}
-      }
-    })
-  }, [])
+    if (!favoritesInitialized) initializeFavorites()
+  }, [favoritesInitialized, initializeFavorites])
+
+  useEffect(() => {
+    setShowAll(!favorites.some((code) => RESTAURANTES_CARDAPIO.some((ru) => ru.key === code)))
+  }, [favorites])
 
   const toggleFavorite = useCallback(
     async (code: FilialCode) => {
-      const next = favorites.includes(code)
-        ? favorites.filter((f) => f !== code)
-        : [...favorites, code]
-      setFavorites(next)
-      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(next))
-      if (next.length > 0) setShowAll(false)
+      await toggleStoredFavorite(code)
     },
-    [favorites],
+    [toggleStoredFavorite],
   )
 
   const visibleRestaurantes = showAll
@@ -101,37 +92,6 @@ export default function CardapioScreen() {
         <Text className="text-2xl font-bold text-text-primary">{t.cardapioTitle}</Text>
         <Text className="text-xs text-text-secondary mt-0.5">{t.cardapioSubtitleConsulte}</Text>
       </View>
-
-      {showSourceBanner && (
-        <View
-          accessibilityRole="summary"
-          accessibilityLabel={t.cardapioFonteNaoOficial}
-          className="rounded-xl p-3"
-          style={{ backgroundColor: `${themeColors.warning}15` }}
-        >
-          <View className="flex-row items-start gap-3">
-            <Ionicons name="information-circle" size={20} color={themeColors.warning} />
-            <View className="flex-1 gap-1">
-              <Text
-                className="text-xs font-bold uppercase tracking-wider"
-                style={{ color: themeColors.warning }}
-              >
-                {t.cardapioFonteNaoOficial}
-              </Text>
-              <Text className="text-sm text-text-secondary">{t.cardapioFonteNaoOficialBody}</Text>
-            </View>
-            <Pressable
-              onPress={() => setShowSourceBanner(false)}
-              accessibilityRole="button"
-              accessibilityLabel={t.close}
-              hitSlop={16}
-              className="mt-0.5"
-            >
-              <Ionicons name="close" size={16} color={themeColors.textSecondary} />
-            </Pressable>
-          </View>
-        </View>
-      )}
 
       <View className="gap-2">
         <View className="flex-row items-center justify-between">
@@ -217,7 +177,9 @@ export default function CardapioScreen() {
             <Text className="text-sm font-medium text-text-primary">
               {formatFullWeekdayDate(selectedDate, locale)}
             </Text>
-            {today && <Text className="text-success text-xs font-bold"> · {t.cardapioHoje}</Text>}
+            {today && (
+              <Text className="text-status-success text-xs font-bold"> · {t.cardapioHoje}</Text>
+            )}
           </View>
           <Ionicons
             name={showCalendar ? 'chevron-up' : 'chevron-down'}
@@ -348,8 +310,10 @@ export default function CardapioScreen() {
                   {item.nome}
                 </Text>
                 {item.vegano && (
-                  <View className="bg-success/10 rounded-full px-2 py-0.5">
-                    <Text className="text-[10px] font-medium text-success">{t.cardapioVegano}</Text>
+                  <View className="bg-status-success/10 rounded-full px-2 py-0.5">
+                    <Text className="text-[10px] font-medium text-status-success">
+                      {t.cardapioVegano}
+                    </Text>
                   </View>
                 )}
               </View>
