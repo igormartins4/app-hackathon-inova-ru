@@ -9,7 +9,7 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 
 **Platform:** React Native (Expo SDK 57)
 **Architecture:** Feature-based
-**Team:** 2-3 people (Dev + Designer)
+**Team:** Igor de Oliveira Martins dos Santos · Ítalo Leal Lana Santos · Vitor Hugo Dias Santos
 **Timeline:** 1 week (12/07 to 18/07)
 <!-- GSD:project-end -->
 
@@ -17,20 +17,22 @@ App Android para estudantes da UFMG que permite consultar saldo e recarregar cr�
 ## Technology Stack
 
 - **Runtime:** Expo SDK 57 (React Native 0.86, React 19.2)
-- **Navigation:** React Navigation v7
-- **State:** TanStack Query (server state) + Zustand (client state)
+- **Navigation:** Expo Router 6 (file-based, React Navigation v7)
+- **State:** TanStack Query 5 (server state) + Zustand 5 (client state)
 - **Styling:** NativeWind v4 (Tailwind CSS 3.4)
 - **Security:** expo-secure-store (Android Keystore)
-- **Storage:** MMKV (fast local cache)
+- **Storage:** AsyncStorage (Expo Go compatible)
 - **QR Code:** react-native-qrcode-svg
-- **Animations:** React Native Reanimated v3
+- **Animations:** React Native Reanimated v4
+- **Validation:** Zod 4 + local masks
+- **Sharing:** expo-sharing (receipts)
 - **Build:** EAS Build
 <!-- GSD:stack-end -->
 
 <!-- GSD:conventions-start -->
 ## Conventions
 
-- Feature-based folder structure: `/auth`, `/balance`, `/recharge`, `/profile`
+- Feature-based folder structure: `/auth`, `/balance`, `/recharge`, `/profile`, `/history`, `/cardapio`, `/restaurantes`, `/transfer`
 - TypeScript strict mode
 - Biome for linting and formatting
 - Conventional commits
@@ -51,19 +53,27 @@ src/
 │   ├── auth/               # Login, token management
 │   ├── balance/            # Balance display, consumer data
 │   ├── recharge/           # PIX flow, QR Code, polling
+│   ├── history/            # Recharge and meal history
+│   ├── cardapio/           # Daily menu (unofficial integration)
+│   ├── restaurantes/       # RU info: schedules, notices, status, directions
+│   ├── transfer/           # Balance transfer (mock, bonus)
 │   └── profile/            # User profile
 ├── shared/
 │   ├── components/         # Reusable UI primitives
+│   │   └── ui/             # Button, Card, AppDialog, ScaledText, etc.
 │   ├── hooks/              # Custom hooks
 │   ├── services/           # API client, storage
 │   └── utils/              # Helpers
 ├── store/                  # Zustand stores (client state only)
+│   ├── authStore.ts        # Auth state
+│   ├── themeStore.ts       # Theme, accessibility, reduced motion
+│   └── favoriteRUsStore.ts # Favorite restaurants (shared Home/Cardapio)
 └── config/                 # Constants, theme
 ```
 
 **Data Flow:** API → TanStack Query → Components → Zustand (UI state)
 **Security:** JWT in expo-secure-store, never in plaintext
-**Offline:** TanStack Query stale-while-revalidate + MMKV cache
+**Offline:** TanStack Query stale-while-revalidate + AsyncStorage cache
 <!-- GSD:architecture-end -->
 
 <!-- GSD:skills-start -->
