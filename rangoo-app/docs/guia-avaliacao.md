@@ -2,15 +2,22 @@
 
 Este guia ajuda a equipe organizadora a navegar pelo Rangoo Universitário durante a avaliação do Hackathon InovaRU 2026/01.
 
+**Equipe:** Igor de Oliveira Martins dos Santos · Ítalo Leal Lana Santos · Vitor Hugo Dias Santos
+
 ## O que avaliar no app
 
 - Login com CPF e senha FUMP em modo mock.
 - Consulta de saldo, limite de recarga e dados do consumidor.
 - Recarga PIX com QR Code, copia-e-cola e polling até status final.
-- Histórico de recargas e refeições.
+- Histórico de recargas e refeições com detalhes em dialog acessível.
 - Cardápio do dia por RU, usando integração pública não-oficial da FUMP.
-- Perfil com acessibilidade: tema claro/escuro, alto contraste, reduzir movimento, fonte e cores do sistema.
+- Restaurantes: detalhes de cada RU com horários, avisos de férias, status em tempo real e como chegar.
+- Favoritos na Home com status e horários dos restaurantes escolhidos.
+- Transferência de saldo entre estudantes com comprovante compartilhável.
+- Perfil com acessibilidade: tema claro/escuro, alto contraste, reduzir movimento (respeita o sistema), fonte e cores do sistema.
 - Modo demonstração no Perfil para simular bloqueio, inatividade, rate limit, erro 500 e estados finais do PIX.
+- Tab bar expande para sidebar lateral em tablets (>= 768px).
+- Todos os alerts nativos substituídos por AppDialog acessível e consistente.
 
 ## Como rodar
 
@@ -36,11 +43,13 @@ pnpm start
 | Recarga PIX | `src/features/recharge/` |
 | Histórico | `src/features/history/` |
 | Cardápio | `src/features/cardapio/` |
+| Restaurantes | `src/features/restaurantes/` |
 | Transferência bônus | `src/features/transfer/` |
 | API/mock/cache | `src/shared/services/` |
 | Máscaras e schemas | `src/shared/utils/` |
 | UI base | `src/shared/components/ui/` |
 | Tema e contraste | `global.css`, `tailwind.config.js`, `src/config/theme.ts` |
+| Favoritos | `src/store/favoriteRUsStore.ts` |
 
 ## Regras de contrato
 
