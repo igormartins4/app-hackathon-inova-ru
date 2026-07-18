@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import {
-  Alert,
+  Image,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -15,7 +15,7 @@ import { useGradientColors, useThemeColors } from '@/config'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBiometricAuth } from '@/features/auth/hooks/useBiometricAuth'
-import { AboutAppModal, Text } from '@/shared/components/ui'
+import { AboutAppModal, AppDialog, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 
 export default function LoginScreen() {
@@ -25,6 +25,7 @@ export default function LoginScreen() {
   const themeColors = useThemeColors()
   const [biometricError, setBiometricError] = useState('')
   const [aboutVisible, setAboutVisible] = useState(false)
+  const [helpVisible, setHelpVisible] = useState(false)
   const { t } = useI18n()
 
   const handleSubmit = async (cpf: string, password: string) => {
@@ -45,11 +46,7 @@ export default function LoginScreen() {
     // Cadastro e "site da FUMP" apontavam pra mesma URL — o app não cria
     // conta própria, então a única ação real pra quem esqueceu a senha ou
     // nunca se cadastrou é ir direto pro site institucional.
-    Alert.alert(t.loginHelpTitle, undefined, [
-      { text: t.loginFumpLink, onPress: () => Linking.openURL('https://fump.ufmg.br') },
-      { text: t.loginHelpAbout, onPress: () => setAboutVisible(true) },
-      { text: t.cancel, style: 'cancel' },
-    ])
+    setHelpVisible(true)
   }
 
   return (
@@ -62,9 +59,11 @@ export default function LoginScreen() {
           style={{ flex: 1 }}
         >
           <View className="items-center justify-center pt-12 pb-20">
-            <View className="w-20 h-20 rounded-2xl bg-primary items-center justify-center mb-3 shadow-sm">
-              <Text className="text-3xl font-bold text-text-inverse">R</Text>
-            </View>
+            <Image
+              source={require('../../assets/icon.png')}
+              accessibilityLabel={t.loginTitle}
+              className="w-20 h-20 rounded-2xl mb-3"
+            />
             <Text className="text-2xl font-bold text-primary-dark">{t.loginTitle}</Text>
           </View>
         </LinearGradient>
@@ -139,6 +138,29 @@ export default function LoginScreen() {
         </KeyboardAvoidingView>
       </View>
       <AboutAppModal visible={aboutVisible} onClose={() => setAboutVisible(false)} />
+      <AppDialog
+        visible={helpVisible}
+        title={t.loginHelpTitle}
+        accessibilityLabel={t.loginHelpTitle}
+        onClose={() => setHelpVisible(false)}
+        actions={[
+          {
+            label: t.loginFumpLink,
+            onPress: () => {
+              setHelpVisible(false)
+              Linking.openURL('https://fump.ufmg.br')
+            },
+          },
+          {
+            label: t.loginHelpAbout,
+            onPress: () => {
+              setHelpVisible(false)
+              setAboutVisible(true)
+            },
+          },
+          { label: t.cancel, style: 'cancel', onPress: () => setHelpVisible(false) },
+        ]}
+      />
     </SafeAreaView>
   )
 }
