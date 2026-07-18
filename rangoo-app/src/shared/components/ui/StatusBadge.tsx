@@ -14,7 +14,7 @@ const LABELS: Record<string, string> = {
 }
 
 const COLORS: Record<string, string> = {
-  A: 'text-success',
+  A: 'text-status-success',
   B: 'text-status-error',
 }
 

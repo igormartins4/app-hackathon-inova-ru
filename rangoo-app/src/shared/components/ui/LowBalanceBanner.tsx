@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { useI18n } from '@/shared/i18n'
@@ -8,14 +9,13 @@ import { ScaledText as Text } from './ScaledText'
 
 export const LOW_BALANCE_THRESHOLD = RECHARGE_LIMITS.MIN * 2
 
-interface LowBalanceBannerProps {
-  onDismiss: () => void
-}
-
-export function LowBalanceBanner({ onDismiss }: LowBalanceBannerProps) {
+export function LowBalanceBanner() {
   const themeColors = useThemeColors()
   const { t } = useI18n()
   const router = useRouter()
+  const [dismissed, setDismissed] = useState(false)
+
+  if (dismissed) return null
 
   return (
     <View
@@ -47,11 +47,11 @@ export function LowBalanceBanner({ onDismiss }: LowBalanceBannerProps) {
           </Pressable>
         </View>
         <Pressable
-          onPress={onDismiss}
+          onPress={() => setDismissed(true)}
           accessibilityRole="button"
           accessibilityLabel={t.close}
           hitSlop={16}
-          className="mt-0.5"
+          className="w-12 h-12 -mr-2 -mt-2 items-center justify-center"
         >
           <Ionicons name="close" size={16} color={themeColors.textSecondary} />
         </Pressable>

@@ -53,7 +53,7 @@ export function ScaledText({ children, className, style, ...props }: ScaledTextP
   ]
 
   return (
-    <Text allowFontScaling={false} className={className} style={scaledStyle} {...props}>
+    <Text className={className} style={scaledStyle} {...props}>
       {children}
     </Text>
   )

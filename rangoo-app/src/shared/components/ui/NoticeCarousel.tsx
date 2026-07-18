@@ -36,11 +36,7 @@ const NOTICES: NoticeItem[] = [
 
 const TOTAL = NOTICES.length
 
-interface NoticeCarouselProps {
-  onDismiss: () => void
-}
-
-export function NoticeCarousel({ onDismiss }: NoticeCarouselProps) {
+export function NoticeCarousel() {
   const themeColors = useThemeColors()
   const { t } = useI18n()
   const [current, setCurrent] = useState(0)
@@ -82,11 +78,9 @@ export function NoticeCarousel({ onDismiss }: NoticeCarouselProps) {
         .replace('{index}', String(current + 1))
         .replace('{total}', String(TOTAL))}
       className="mx-4 mb-4 rounded-xl overflow-hidden"
-      style={{ backgroundColor: `${themeColors.warning}12`, height: 140 }}
+      style={{ backgroundColor: `${themeColors.warning}12` }}
     >
-      <View
-        style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-start', padding: 16, gap: 12 }}
-      >
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', padding: 16, gap: 12 }}>
         <Ionicons
           name={notice.icon}
           size={24}
@@ -97,23 +91,8 @@ export function NoticeCarousel({ onDismiss }: NoticeCarouselProps) {
           <Text className="text-sm font-bold" style={{ color: themeColors.warning }}>
             {title}
           </Text>
-          <Text
-            numberOfLines={2}
-            className="text-sm text-text-secondary"
-            style={{ lineHeight: 20 }}
-          >
-            {body}
-          </Text>
+          <Text className="text-sm text-text-secondary">{body}</Text>
         </View>
-        <Pressable
-          onPress={onDismiss}
-          accessibilityRole="button"
-          accessibilityLabel={t.close}
-          hitSlop={16}
-          style={{ marginTop: 2 }}
-        >
-          <Ionicons name="close" size={16} color={themeColors.textSecondary} />
-        </Pressable>
       </View>
 
       <View className="flex-row items-center justify-between px-4 pb-3">
@@ -121,7 +100,7 @@ export function NoticeCarousel({ onDismiss }: NoticeCarouselProps) {
           onPress={goPrev}
           accessibilityRole="button"
           accessibilityLabel={t.back}
-          hitSlop={16}
+          className="w-12 h-12 items-center justify-center"
         >
           <Ionicons name="chevron-back" size={20} color={themeColors.textSecondary} />
         </Pressable>
@@ -143,8 +122,8 @@ export function NoticeCarousel({ onDismiss }: NoticeCarouselProps) {
             onPress={() => setPaused((p) => !p)}
             accessibilityRole="button"
             accessibilityLabel={paused ? t.noticeResume : t.noticePause}
-            hitSlop={16}
-            style={{ marginLeft: 4 }}
+            accessibilityState={{ selected: paused }}
+            className="w-12 h-12 items-center justify-center"
           >
             <Ionicons
               name={paused ? 'play' : 'pause'}
@@ -158,7 +137,7 @@ export function NoticeCarousel({ onDismiss }: NoticeCarouselProps) {
           onPress={goNext}
           accessibilityRole="button"
           accessibilityLabel={t.noticeNext}
-          hitSlop={16}
+          className="w-12 h-12 items-center justify-center"
         >
           <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
         </Pressable>
