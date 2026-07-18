@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
-import { Alert, TextInput, View } from 'react-native'
+import { TextInput, View } from 'react-native'
 import { useThemeColors } from '@/config'
-import { Button, ErrorMessage, Text } from '@/shared/components/ui'
+import { AppDialog, Button, ErrorMessage, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 import {
   firstFieldError,
@@ -32,12 +32,14 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
   const [amount, setAmount] = useState('')
   const [destinatarioError, setDestinatarioError] = useState('')
   const [amountError, setAmountError] = useState('')
+  const [confirmDialogVisible, setConfirmDialogVisible] = useState(false)
   const value = parseMoneyInput(amount)
   const result = transferSchema(currentBalance).safeParse({
     destination: destinatario,
     amount: value,
   })
   const canSubmit = result.success
+  const projectedBalance = Math.max(0, currentBalance - value)
 
   function handleDestinationChange(text: string) {
     setDestinatario(sanitizeDigits(text, TRANSFER_DESTINATION_MAX_LENGTH))
@@ -58,17 +60,7 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
       return
     }
 
-    const recipient = destinatario.trim()
-    Alert.alert(
-      t.transferConfirmTitle,
-      t.transferConfirmBody
-        .replace('{amount}', formatCurrency(value))
-        .replace('{recipient}', recipient),
-      [
-        { text: t.transferConfirmBack, style: 'cancel' },
-        { text: t.transferConfirmSend, onPress: () => onSubmit(recipient, value) },
-      ],
-    )
+    setConfirmDialogVisible(true)
   }
 
   return (
@@ -96,7 +88,11 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
           className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
         />
         {destinatarioError ? (
-          <Text accessibilityRole="alert" className="text-xs text-status-error">
+          <Text
+            accessibilityRole="alert"
+            accessibilityLiveRegion="assertive"
+            className="text-xs text-status-error"
+          >
             {destinatarioError}
           </Text>
         ) : null}
@@ -121,9 +117,20 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
           style={inputTextStyle}
           className="bg-surface border border-outline rounded-xl px-4 py-3.5 text-base text-text-primary min-h-[48px]"
         />
-        <Text className="text-xs text-text-secondary">
-          {t.transferAvailableBalance.replace('{balance}', formatCurrency(currentBalance))}
-        </Text>
+        <View accessibilityRole="text" className="gap-1">
+          <Text className="text-xs text-text-secondary">
+            {t.transferCurrentBalance.replace('{balance}', formatCurrency(currentBalance))}
+          </Text>
+          <Text className="text-xs text-text-secondary">
+            {t.transferMinimum.replace('{amount}', formatCurrency(MIN_VALUE))}
+          </Text>
+          <Text className="text-xs text-text-secondary">
+            {t.transferMaximum.replace('{amount}', formatCurrency(currentBalance))}
+          </Text>
+          <Text className="text-xs text-text-secondary">
+            {t.transferProjectedBalance.replace('{balance}', formatCurrency(projectedBalance))}
+          </Text>
+        </View>
       </View>
 
       {amountError ? <ErrorMessage message={amountError} /> : null}
@@ -138,6 +145,29 @@ export function TransferForm({ currentBalance, disabled, loading, onSubmit }: Tr
         onPress={handleSubmit}
         disabled={!canSubmit || disabled || loading}
         loading={loading}
+      />
+      <AppDialog
+        visible={confirmDialogVisible}
+        title={t.transferConfirmTitle}
+        body={t.transferConfirmBody
+          .replace('{amount}', formatCurrency(value))
+          .replace('{recipient}', destinatario.trim())}
+        accessibilityLabel={t.transferConfirmTitle}
+        onClose={() => setConfirmDialogVisible(false)}
+        actions={[
+          {
+            label: t.transferConfirmBack,
+            style: 'cancel',
+            onPress: () => setConfirmDialogVisible(false),
+          },
+          {
+            label: t.transferConfirmSend,
+            onPress: () => {
+              setConfirmDialogVisible(false)
+              onSubmit(destinatario.trim(), value)
+            },
+          },
+        ]}
       />
     </View>
   )

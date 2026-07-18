@@ -4,8 +4,13 @@ import { useState } from 'react'
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native'
 import type { BalanceResponse } from '@/features/balance'
 import { useBalance, useConsumerStatus } from '@/features/balance'
-import { createTransfer, TransferForm } from '@/features/transfer'
-import { Button, Card, ErrorMessage, LoadingSpinner, Text } from '@/shared/components/ui'
+import {
+  createTransfer,
+  TransferForm,
+  TransferReceipt,
+  type TransferResponse,
+} from '@/features/transfer'
+import { Card, ErrorMessage, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { useI18n } from '@/shared/i18n'
 import { formatCurrency, getErrorMessage } from '@/shared/utils'
@@ -19,7 +24,7 @@ export default function TransferScreen() {
   const { isOffline } = useNetworkStatus()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<{ nome: string; saldo: number } | null>(null)
+  const [success, setSuccess] = useState<TransferResponse | null>(null)
 
   const currentBalance = balanceData?.saldo.credito_disponivel ?? 0
   const disabled = isBlocked || isInactive || isOffline
@@ -35,7 +40,7 @@ export default function TransferScreen() {
           ? { ...old, saldo: { ...old.saldo, credito_disponivel: response.saldo_atualizado } }
           : old,
       )
-      setSuccess({ nome: response.destinatario_nome, saldo: response.saldo_atualizado })
+      setSuccess(response)
     } catch (err) {
       setError(getErrorMessage(err))
     } finally {
@@ -51,12 +56,13 @@ export default function TransferScreen() {
         <Card accessibilityRole="summary" accessibilityLabel={t.transferSuccessTitle}>
           <Text className="text-2xl font-bold text-text-primary">{t.transferSuccessTitle}</Text>
           <Text className="text-sm text-text-secondary mt-2">
-            {t.transferSuccessMessage
-              .replace('{name}', success.nome)
-              .replace('{balance}', formatCurrency(success.saldo))}
+            {t.transferCurrentBalance.replace(
+              '{balance}',
+              formatCurrency(success.saldo_atualizado),
+            )}
           </Text>
         </Card>
-        <Button label={t.paymentSuccessVoltar} onPress={() => router.push('/(tabs)/home')} />
+        <TransferReceipt transfer={success} onBack={() => router.push('/(tabs)/home')} />
       </ScrollView>
     )
   }

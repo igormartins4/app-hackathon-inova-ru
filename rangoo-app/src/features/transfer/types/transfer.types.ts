@@ -8,4 +8,7 @@ export interface TransferResponse {
   status: 'approved'
   saldo_atualizado: number
   destinatario_nome: string
+  destinatario_documento: string
+  valor: number
+  data_hora: string
 }
