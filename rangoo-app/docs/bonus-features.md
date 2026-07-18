@@ -6,13 +6,19 @@ Este arquivo separa o que foi implementado para demonstração do que pertence a
 
 | Feature | Status | Observação |
 | --- | --- | --- |
-| Transferência de saldo | Mock local | A API FUMP v2.0 não define endpoint de transferência. O app usa `POST /creditos/transferir` apenas quando o mock local está ativo. |
+| Transferência de saldo | Mock local | A API FUMP v2.0 não define endpoint de transferência. O app usa `POST /creditos/transferir` apenas quando o mock local está ativo. Inclui comprovante compartilhável via expo-sharing. |
+| Restaurantes (info, horários, avisos) | Dados locais | Informações dos 5 RUs (Anexo A) com horários de funcionamento, avisos de férias, status em tempo real e como chegar (Google Maps). Fora do contrato v2.0. |
+| Favoritos na Home | App-only | Restaurantes favoritos são exibidos na Home com status em tempo real e horários. Gerenciados via Zustand store compartilhada com Cardápio. |
 | Material You simplificado | Parcial | Usa a cor de destaque nativa do Android para props nativas quando o tema está em `system`. Não altera o contrato nem payloads da API. |
-| Animações com opção reduzir movimento | App-only | Reanimated é usado somente na UI. Pode ser desligado em Perfil > Acessibilidade. |
+| Animações com opção reduzir movimento | App-only | Reanimated é usado somente na UI. Pode ser desligado em Perfil > Acessibilidade. Respeita preferência do sistema via AccessibilityInfo listener. |
 | Card de saldo projetado na recarga | App-only | Usa apenas `GET /creditos/saldo` e o valor selecionado localmente. Não credita saldo antes do webhook. |
 | Painel de cenários demo | Mock local | Perfil permite alternar respostas simuladas da API para demonstrar erro 404, 429, 500 e estados finais do PIX sem servidor externo. |
 | Modal sobre o projeto | App-only | Login e Perfil abrem um resumo do Rangoo, equipe, contexto do Hackathon InovaRU e notas técnicas. |
 | Máscaras e validação Zod | App-only | Campos usam máscara/sanitização/limites client-side antes de chamar a API, preservando o contrato dos payloads. |
+| AppDialog acessível | App-only | Substitui todos os `Alert.alert` nativos por dialog consistente com a marca, acessível e com suporte a dark mode. |
+| Tab bar lateral (tablets) | App-only | Em telas >= 768px, a tab bar expande para sidebar lateral. |
+| Calendário scrollável | App-only | Calendário do cardápio usa ScrollView horizontal para telas estreitas. |
+| ScaledText com lineHeight | App-only | Componente de texto escala fontSize e lineHeight proporcionalmente à escala de fonte do sistema. |
 
 ## Dentro do contrato
 
