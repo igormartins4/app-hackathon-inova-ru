@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useEffect, useMemo, useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
@@ -131,60 +131,66 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
         </Pressable>
       </View>
 
-      <View className="flex-row justify-between">
-        {WEEKDAY_KEYS.map((key, idx) => (
-          <View key={key} className="w-9 items-center">
-            <Text className="text-xs text-text-secondary font-medium">{weekdayLabels[idx]}</Text>
-          </View>
-        ))}
-      </View>
+      <ScrollView horizontal contentContainerClassName="min-w-[336px] gap-3">
+        <View className="flex-row justify-between">
+          {WEEKDAY_KEYS.map((key, idx) => (
+            <View key={key} className="flex-1 min-w-[48px] items-center">
+              <Text className="text-xs text-text-secondary font-medium">{weekdayLabels[idx]}</Text>
+            </View>
+          ))}
+        </View>
 
-      {weeks.map((week) => (
-        <View key={week[0].date.toISOString()} className="flex-row justify-between">
-          {week.map((cell) => {
-            if (!cell.inMonth) {
-              return <View key={cell.date.toISOString()} className="w-9 h-9" />
-            }
-            const isSelected = isSameDay(cell.date, selectedDate)
-            const isToday = isSameDay(cell.date, today)
-            const dayLabel = `${t.menuCalendarDayA11y
-              .replace('{day}', String(cell.date.getDate()))
-              .replace(
-                '{month}',
-                getMonthName(cell.date, locale),
-              )}${isToday ? t.menuCalendarTodaySuffix : ''}`
-            return (
-              <Pressable
-                key={cell.date.toISOString()}
-                onPress={() => onSelectDate(cell.date)}
-                accessibilityRole="button"
-                accessibilityLabel={dayLabel}
-                accessibilityState={{ selected: isSelected }}
-                hitSlop={8}
-                className="items-center justify-center w-9 h-9"
-              >
-                <View
-                  className={`w-9 h-9 rounded-full items-center justify-center ${
-                    isSelected ? 'bg-primary' : isToday ? 'border border-primary' : ''
-                  }`}
+        {weeks.map((week) => (
+          <View key={week[0].date.toISOString()} className="flex-row justify-between">
+            {week.map((cell) => {
+              if (!cell.inMonth) {
+                return (
+                  <View
+                    key={cell.date.toISOString()}
+                    className="flex-1 min-w-[48px] min-h-[48px]"
+                  />
+                )
+              }
+              const isSelected = isSameDay(cell.date, selectedDate)
+              const isToday = isSameDay(cell.date, today)
+              const dayLabel = `${t.menuCalendarDayA11y
+                .replace('{day}', String(cell.date.getDate()))
+                .replace(
+                  '{month}',
+                  getMonthName(cell.date, locale),
+                )}${isToday ? t.menuCalendarTodaySuffix : ''}`
+              return (
+                <Pressable
+                  key={cell.date.toISOString()}
+                  onPress={() => onSelectDate(cell.date)}
+                  accessibilityRole="button"
+                  accessibilityLabel={dayLabel}
+                  accessibilityState={{ selected: isSelected }}
+                  className="flex-1 min-w-[48px] min-h-[48px] items-center justify-center"
                 >
-                  <Text
-                    className={`text-sm font-medium ${
-                      isSelected
-                        ? 'text-text-inverse'
-                        : isToday
-                          ? 'text-primary'
-                          : 'text-text-primary'
+                  <View
+                    className={`w-9 h-9 rounded-full items-center justify-center ${
+                      isSelected ? 'bg-primary' : isToday ? 'border border-primary' : ''
                     }`}
                   >
-                    {cell.date.getDate()}
-                  </Text>
-                </View>
-              </Pressable>
-            )
-          })}
-        </View>
-      ))}
+                    <Text
+                      className={`text-sm font-medium ${
+                        isSelected
+                          ? 'text-text-inverse'
+                          : isToday
+                            ? 'text-primary'
+                            : 'text-text-primary'
+                      }`}
+                    >
+                      {cell.date.getDate()}
+                    </Text>
+                  </View>
+                </Pressable>
+              )
+            })}
+          </View>
+        ))}
+      </ScrollView>
     </View>
   )
 }

@@ -52,13 +52,13 @@ export function NoticeCarousel() {
 
   const goNext = useCallback(() => {
     setCurrent((prev) => (prev + 1) % TOTAL)
-    restartTimer()
-  }, [restartTimer])
+    if (!paused) restartTimer()
+  }, [paused, restartTimer])
 
   const goPrev = useCallback(() => {
     setCurrent((prev) => (prev - 1 + TOTAL) % TOTAL)
-    restartTimer()
-  }, [restartTimer])
+    if (!paused) restartTimer()
+  }, [paused, restartTimer])
 
   useEffect(() => {
     if (paused) return
