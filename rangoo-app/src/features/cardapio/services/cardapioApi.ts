@@ -32,45 +32,148 @@ const fumpMenuClient = axios.create({
 })
 
 // --- Mock data for cardapio (when EXPO_PUBLIC_USE_MOCK=true) ---
-const MOCK_FUMP_CARDAPIO: FumpCardapioRawResponse = {
-  id: 6,
-  nome: 'RU Setorial 1',
-  cardapios: [
-    {
-      data: toDateParam(new Date()),
-      refeicoes: [
-        {
-          tipoRefeicao: 'Almoço',
-          tipo: 1,
-          pratos: [
-            { tipoPrato: 'Prato Principal', descricaoPrato: 'Frango grelhado com arroz e feijão' },
-            { tipoPrato: 'Entrada', descricaoPrato: 'Salada verde' },
-            { tipoPrato: 'Sobremesa', descricaoPrato: 'Pudim de leite' },
-            { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
-            { tipoPrato: 'Guarnição', descricaoPrato: 'Vinagrete' },
-            { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de laranja' },
-          ],
-        },
-        {
-          tipoRefeicao: 'Jantar',
-          tipo: 2,
-          pratos: [
-            { tipoPrato: 'Prato Principal', descricaoPrato: 'Peixe frito com purê' },
-            { tipoPrato: 'Entrada', descricaoPrato: 'Legumes refogados' },
-            { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
-            { tipoPrato: 'Acompanhamento', descricaoPrato: 'Purê de batata' },
-            { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de maracujá' },
-          ],
-        },
-      ],
-    },
+// Uma variação por dia da semana (0 = domingo .. 6 = sábado), pra navegar o
+// calendário/trocar a refeição realmente mudar o que aparece na tela — cada
+// prato principal já vem com uma alternativa vegetariana na mesma seção.
+type Prato = { tipoPrato: string; descricaoPrato: string }
+
+const ALMOCO_POR_DIA: Prato[][] = [
+  // domingo
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Frango à parmegiana' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Lasanha de berinjela (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada de repolho' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Guarnição', descricaoPrato: 'Feijão carioca' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Pudim de leite' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de melancia' },
   ],
-}
+  // segunda
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Frango grelhado' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Grão-de-bico ao curry (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada verde' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Guarnição', descricaoPrato: 'Feijão carioca' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Doce de leite' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de laranja' },
+  ],
+  // terça
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Carne de panela' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Berinjela à parmegiana (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Couve refogada' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Guarnição', descricaoPrato: 'Feijão preto' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de maracujá' },
+  ],
+  // quarta
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Peixe assado' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Quibe de abóbora (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada de tomate' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Guarnição', descricaoPrato: 'Feijão carioca' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Banana com canela' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de acerola' },
+  ],
+  // quinta
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Escondidinho de carne seca' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Strogonoff de cogumelos (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada verde' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Guarnição', descricaoPrato: 'Feijão preto' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Pudim de leite' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de goiaba' },
+  ],
+  // sexta
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Carne moída ao molho' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Feijoada vegetariana' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada de pepino' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Guarnição', descricaoPrato: 'Farofa' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Doce de leite' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de uva' },
+  ],
+  // sábado
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Peixe à milanesa' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Omelete de legumes (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada verde' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Guarnição', descricaoPrato: 'Feijão carioca' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de laranja' },
+  ],
+]
+
+const JANTAR_POR_DIA: Prato[][] = [
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Frango ao molho branco' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Tofu grelhado com legumes (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Legumes refogados' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Purê de batata' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de maracujá' },
+  ],
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Peixe frito com purê' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Panqueca de espinafre (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada de alface e tomate' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Purê de batata' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Fruta da estação' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de laranja' },
+  ],
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Carne de panela desfiada' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Ratatouille (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Legumes refogados' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de melancia' },
+  ],
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Omelete simples' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Sopa de legumes (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada verde' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Purê de batata' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Fruta da estação' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de acerola' },
+  ],
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Frango grelhado' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Berinjela recheada (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Legumes refogados' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de goiaba' },
+  ],
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Peixe grelhado' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Risoto de cogumelos (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Salada de tomate' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Purê de batata' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Fruta da estação' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de uva' },
+  ],
+  [
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Carne moída ao molho' },
+    { tipoPrato: 'Prato Principal', descricaoPrato: 'Wrap de grão-de-bico (vegetariano)' },
+    { tipoPrato: 'Entrada', descricaoPrato: 'Legumes refogados' },
+    { tipoPrato: 'Acompanhamento', descricaoPrato: 'Arroz branco' },
+    { tipoPrato: 'Sobremesa', descricaoPrato: 'Gelatina' },
+    { tipoPrato: 'Bebida', descricaoPrato: '(Copão) Suco de laranja' },
+  ],
+]
 
 function mockCardapioAdapter(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
   const params = config.params as { id?: number; dataInicio?: string } | undefined
   const fumpId = params?.id ?? 6
   const dataInicio = params?.dataInicio ?? toDateParam(new Date())
+  const diaSemana = new Date(`${dataInicio}T12:00:00`).getDay()
 
   const nomeMap: Record<number, string> = {
     6: 'RU Setorial 1',
@@ -85,7 +188,10 @@ function mockCardapioAdapter(config: InternalAxiosRequestConfig): Promise<AxiosR
     cardapios: [
       {
         data: dataInicio,
-        refeicoes: MOCK_FUMP_CARDAPIO.cardapios[0].refeicoes,
+        refeicoes: [
+          { tipoRefeicao: 'Almoço', tipo: 1, pratos: ALMOCO_POR_DIA[diaSemana] },
+          { tipoRefeicao: 'Jantar', tipo: 2, pratos: JANTAR_POR_DIA[diaSemana] },
+        ],
       },
     ],
   }
@@ -108,13 +214,19 @@ const TIPO_REFEICAO_MAP: Record<CardapioParams['tipoRefeicao'], string> = {
   jantar: 'Jantar',
 }
 
+const VEGETARIANO_SUFFIX = /\s*\(vegetariano\)\s*$/i
+
 function groupPratosIntoSections(pratos: Array<{ tipoPrato: string; descricaoPrato: string }>) {
   const sections = new Map<string, MenuSection>()
 
   for (const prato of pratos) {
     const { titulo, icon } = classifyTipoPrato(prato.tipoPrato)
     const section = sections.get(titulo) ?? { titulo, icon, itens: [] }
-    section.itens.push({ nome: prato.descricaoPrato })
+    const vegano = VEGETARIANO_SUFFIX.test(prato.descricaoPrato)
+    section.itens.push({
+      nome: prato.descricaoPrato.replace(VEGETARIANO_SUFFIX, ''),
+      ...(vegano ? { vegano: true } : {}),
+    })
     sections.set(titulo, section)
   }
 

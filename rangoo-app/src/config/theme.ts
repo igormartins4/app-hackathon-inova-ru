@@ -5,7 +5,7 @@
 // (ActivityIndicator color, Ionicons color, tabBar*TintColor, etc.) needs a
 // literal color instead of a className, so nothing here is re-hardcoded.
 
-import { useResolvedTheme, useThemeStore } from '@/store/themeStore'
+import { useIsHighContrast, useResolvedTheme } from '@/store/themeStore'
 
 export const colors = {
   primary: '#1a5c4a',
@@ -160,7 +160,7 @@ export function resolveThemeColors(resolvedTheme: 'light' | 'dark', highContrast
 // NativeWind className (icon `color`, ActivityIndicator, tabBar tint colors).
 export function useThemeColors() {
   const resolvedTheme = useResolvedTheme()
-  const highContrast = useThemeStore((s) => s.highContrast)
+  const highContrast = useIsHighContrast()
   return resolveThemeColors(resolvedTheme, highContrast)
 }
 
@@ -204,6 +204,6 @@ export function resolveGradientColors(resolvedTheme: 'light' | 'dark', highContr
 // Returns gradient colors for the current theme
 export function useGradientColors() {
   const resolvedTheme = useResolvedTheme()
-  const highContrast = useThemeStore((s) => s.highContrast)
+  const highContrast = useIsHighContrast()
   return resolveGradientColors(resolvedTheme, highContrast)
 }

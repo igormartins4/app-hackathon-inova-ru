@@ -1,6 +1,7 @@
 export { DateFilter } from './components/DateFilter'
 export { FilialFilter } from './components/FilialFilter'
 export { HistoryList } from './components/HistoryList'
+export { useHistorySummary } from './hooks/useHistorySummary'
 export { useMealHistory } from './hooks/useMealHistory'
 export { useRechargeHistory } from './hooks/useRechargeHistory'
 export type { HistoryResponse, MealRecord, RechargeRecord } from './types/history.types'

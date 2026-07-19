@@ -14,13 +14,18 @@ import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/component
 import { useNetworkStatus } from '@/shared/hooks/useNetworkStatus'
 import { useI18n } from '@/shared/i18n'
 import { QUERY_PERSIST_MAX_AGE, queryClient, queryPersister } from '@/shared/services'
-import { useEffectiveReducedMotion, useResolvedTheme, useThemeStore } from '@/store/themeStore'
+import {
+  useEffectiveReducedMotion,
+  useIsHighContrast,
+  useResolvedTheme,
+  useThemeStore,
+} from '@/store/themeStore'
 
 SplashScreen.preventAutoHideAsync()
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const resolvedTheme = useResolvedTheme()
-  const highContrast = useThemeStore((s) => s.highContrast)
+  const highContrast = useIsHighContrast()
 
   const themeClasses = [resolvedTheme === 'dark' ? 'dark' : '', highContrast ? 'high-contrast' : '']
     .filter(Boolean)
@@ -94,8 +99,8 @@ export default function RootLayout() {
   }, [initializeI18n])
 
   useEffect(() => {
-    initializeTheme()
-  }, [initializeTheme])
+    initializeTheme(colorScheme === 'dark' ? 'dark' : 'light')
+  }, [initializeTheme, colorScheme])
 
   useEffect(() => {
     if (fontsLoaded && isThemeInitialized) {

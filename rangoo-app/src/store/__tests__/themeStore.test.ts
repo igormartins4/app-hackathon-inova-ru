@@ -4,6 +4,9 @@ jest.mock('react-native', () => ({
     select: (obj: Record<string, unknown>) => obj.android ?? obj.default ?? obj.ios,
   },
   useColorScheme: () => 'light',
+  PixelRatio: {
+    getFontScale: () => 1,
+  },
   AccessibilityInfo: {
     isReduceMotionEnabled: jest.fn(),
     addEventListener: jest.fn(() => ({ remove: jest.fn() })),
@@ -25,19 +28,20 @@ import { AccessibilityInfo } from 'react-native'
 import {
   FONT_FAMILIES,
   FONT_STEPS,
+  getDefaultFontSizeIndex,
   getFontFamily,
   getFontScale,
   getScaledFontStyle,
+  isHighContrastTheme,
   resolveReducedMotion,
   resolveTheme,
   useThemeStore,
 } from '@/store/themeStore'
 
 const INITIAL_STATE = {
-  theme: 'system' as const,
+  theme: 'light' as const,
   fontSize: 2,
   fontFamily: 0,
-  highContrast: false,
   reducedMotion: false,
   systemReducedMotion: false,
   isInitialized: false,
@@ -132,14 +136,6 @@ describe('themeStore', () => {
   })
 
   describe('toggles', () => {
-    it('toggleHighContrast flips the flag and persists it', () => {
-      useThemeStore.getState().toggleHighContrast()
-      expect(useThemeStore.getState().highContrast).toBe(true)
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith('@rangoo_high_contrast', 'true')
-      useThemeStore.getState().toggleHighContrast()
-      expect(useThemeStore.getState().highContrast).toBe(false)
-    })
-
     it('toggleReducedMotion flips the flag and persists it', () => {
       useThemeStore.getState().toggleReducedMotion()
       expect(useThemeStore.getState().reducedMotion).toBe(true)
@@ -163,7 +159,18 @@ describe('themeStore', () => {
     it('ignores an invalid saved theme', async () => {
       mockAsyncStorage['@rangoo_theme'] = 'not-a-theme'
       await useThemeStore.getState().initialize()
-      expect(useThemeStore.getState().theme).toBe('system')
+      expect(useThemeStore.getState().theme).toBe('light')
+    })
+
+    it('restores "high-contrast" as a valid saved theme', async () => {
+      mockAsyncStorage['@rangoo_theme'] = 'high-contrast'
+      await useThemeStore.getState().initialize()
+      expect(useThemeStore.getState().theme).toBe('high-contrast')
+    })
+
+    it('falls back to the OS color scheme when nothing is saved', async () => {
+      await useThemeStore.getState().initialize('dark')
+      expect(useThemeStore.getState().theme).toBe('dark')
     })
 
     it('migrates legacy "p"/"m"/"g" font size values', async () => {
@@ -194,12 +201,15 @@ describe('themeStore', () => {
       expect(useThemeStore.getState().fontSize).toBe(INITIAL_STATE.fontSize)
     })
 
-    it('restores highContrast and hideSensitiveData when "true"', async () => {
-      mockAsyncStorage['@rangoo_high_contrast'] = 'true'
+    it('restores hideSensitiveData when "true"', async () => {
       mockAsyncStorage['@rangoo_hide_sensitive'] = 'true'
       await useThemeStore.getState().initialize()
-      expect(useThemeStore.getState().highContrast).toBe(true)
       expect(useThemeStore.getState().hideSensitiveData).toBe(true)
+    })
+
+    it('derives the initial font size from the OS font scale when nothing is saved', async () => {
+      await useThemeStore.getState().initialize()
+      expect(useThemeStore.getState().fontSize).toBe(getDefaultFontSizeIndex(1))
     })
 
     it('restores a saved reducedMotion preference while retaining the OS preference', async () => {
@@ -242,22 +252,34 @@ describe('themeStore', () => {
 })
 
 describe('resolveTheme', () => {
-  it('resolves "system" to "dark" when the OS is in dark mode', () => {
-    expect(resolveTheme('system', 'dark')).toBe('dark')
+  it('resolves "dark" to "dark"', () => {
+    expect(resolveTheme('dark')).toBe('dark')
   })
 
-  it('resolves "system" to "light" when the OS is in light mode', () => {
-    expect(resolveTheme('system', 'light')).toBe('light')
+  it('resolves "light" to "light"', () => {
+    expect(resolveTheme('light')).toBe('light')
   })
 
-  it('resolves "system" to "light" when the OS scheme is unknown', () => {
-    expect(resolveTheme('system', null)).toBe('light')
-    expect(resolveTheme('system', undefined)).toBe('light')
+  it('resolves "high-contrast" to the light base tone', () => {
+    expect(resolveTheme('high-contrast')).toBe('light')
   })
+})
 
-  it('returns the explicit theme, ignoring the OS scheme', () => {
-    expect(resolveTheme('dark', 'light')).toBe('dark')
-    expect(resolveTheme('light', 'dark')).toBe('light')
+describe('isHighContrastTheme', () => {
+  it('is true only for "high-contrast"', () => {
+    expect(isHighContrastTheme('high-contrast')).toBe(true)
+    expect(isHighContrastTheme('light')).toBe(false)
+    expect(isHighContrastTheme('dark')).toBe(false)
+  })
+})
+
+describe('getDefaultFontSizeIndex', () => {
+  it('maps the OS font scale to the nearest FONT_STEPS index', () => {
+    expect(getDefaultFontSizeIndex(0.8)).toBe(0)
+    expect(getDefaultFontSizeIndex(0.9)).toBe(1)
+    expect(getDefaultFontSizeIndex(1)).toBe(2)
+    expect(getDefaultFontSizeIndex(1.15)).toBe(3)
+    expect(getDefaultFontSizeIndex(1.5)).toBe(4)
   })
 })
 

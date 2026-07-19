@@ -1,5 +1,5 @@
 import { View } from 'react-native'
-import { useThemeStore } from '@/store/themeStore'
+import { useIsHighContrast } from '@/store/themeStore'
 
 interface CardProps {
   children: React.ReactNode
@@ -14,7 +14,7 @@ export function Card({
   accessibilityLabel,
   accessibilityRole,
 }: CardProps) {
-  const highContrast = useThemeStore((s) => s.highContrast)
+  const highContrast = useIsHighContrast()
 
   // shadow-sm não produz nenhuma separação visível sobre um fundo preto puro
   // (sombra é um gradiente escuro — invisível contra preto). Em alto

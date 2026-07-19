@@ -9,11 +9,13 @@ import {
   HistoryList,
   type MealRecord,
   type RechargeRecord,
+  useHistorySummary,
   useMealHistory,
   useRechargeHistory,
 } from '@/features/history'
-import { Text } from '@/shared/components/ui'
+import { Card, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
+import { formatCurrency } from '@/shared/utils'
 
 type Tab = 'recargas' | 'refeicoes'
 
@@ -56,6 +58,30 @@ export default function HistoricoScreen() {
     () => activeQuery.data?.pages.flatMap((p) => p.data as (RechargeRecord | MealRecord)[]) ?? [],
     [activeQuery.data],
   )
+
+  const summarizeRecharges = useCallback(
+    (records: RechargeRecord[]) => records.reduce((sum, item) => sum + item.valor, 0),
+    [],
+  )
+  const summarizeMeals = useCallback(
+    (records: MealRecord[]) =>
+      records.filter((item) => !item.gratuidade).reduce((sum, item) => sum + item.valor_total, 0),
+    [],
+  )
+  const rechargeSummary = useHistorySummary({
+    query: rechargeQuery,
+    reducer: summarizeRecharges,
+    enabled: activeTab === 'recargas',
+  })
+  const mealSummary = useHistorySummary({
+    query: mealQuery,
+    reducer: summarizeMeals,
+    enabled: activeTab === 'refeicoes',
+  })
+  const summary = activeTab === 'recargas' ? rechargeSummary : mealSummary
+  const periodLabel = selectedDays
+    ? t.historySummaryPeriodDays.replace('{days}', String(selectedDays))
+    : t.historySummaryPeriodAll
 
   const handleRefresh = useCallback(() => {
     activeQuery.refetch()
@@ -148,6 +174,24 @@ export default function HistoricoScreen() {
           >
             <Text className="text-xs font-bold text-primary">{t.historyClearFilters}</Text>
           </Pressable>
+        </View>
+      )}
+
+      {summary.total > 0 && (
+        <View className="px-4 mb-2">
+          <Card className="flex-row items-center justify-between">
+            <View className="flex-1 pr-2">
+              <Text className="text-xs text-text-secondary" numberOfLines={1}>
+                {`${activeTab === 'recargas' ? t.historySummaryRecharges : t.historySummaryMeals} ${periodLabel}`}
+              </Text>
+              {!summary.isComplete && (
+                <Text className="text-[10px] text-text-secondary mt-0.5">{t.historyLoading}</Text>
+              )}
+            </View>
+            <Text className="text-lg font-bold text-text-primary">
+              {formatCurrency(summary.total)}
+            </Text>
+          </Card>
         </View>
       )}
 

@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Localization from 'expo-localization'
 import { create } from 'zustand'
 import en from './en'
 import es from './es'
@@ -6,6 +7,26 @@ import fr from './fr'
 import ptBR from './pt-BR'
 
 export type Locale = 'pt-BR' | 'en' | 'es' | 'fr'
+
+const LANGUAGE_CODE_TO_LOCALE: Record<string, Locale> = {
+  pt: 'pt-BR',
+  en: 'en',
+  es: 'es',
+  fr: 'fr',
+}
+
+/** Mapeia o idioma do SO (`Localization.getLocales()`) pra um dos 4 idiomas
+ * suportados, com fallback pt-BR — usado só como valor INICIAL quando não há
+ * preferência manual salva; o override manual continua tendo prioridade e
+ * persiste normalmente (mesmo padrão do tamanho de fonte). */
+export function getSystemLocale(): Locale {
+  try {
+    const languageCode = Localization.getLocales()[0]?.languageCode
+    return (languageCode && LANGUAGE_CODE_TO_LOCALE[languageCode]) || 'pt-BR'
+  } catch {
+    return 'pt-BR'
+  }
+}
 
 export type TranslationKeys = { [K in keyof typeof ptBR]: string }
 
@@ -42,10 +63,8 @@ export const useI18n = create<I18nState>((set, _get) => ({
   initialize: async () => {
     try {
       const saved = await AsyncStorage.getItem(STORAGE_KEY)
-      if (saved && saved in TRANSLATIONS) {
-        const locale = saved as Locale
-        set({ locale, t: TRANSLATIONS[locale] })
-      }
+      const locale = saved && saved in TRANSLATIONS ? (saved as Locale) : getSystemLocale()
+      set({ locale, t: TRANSLATIONS[locale] })
     } catch {}
   },
 }))

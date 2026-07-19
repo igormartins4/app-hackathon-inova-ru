@@ -1,14 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {
-  AccessibilityInfo,
-  type ColorSchemeName,
-  Platform,
-  type TextStyle,
-  useColorScheme,
-} from 'react-native'
+import { AccessibilityInfo, PixelRatio, Platform, type TextStyle } from 'react-native'
 import { create } from 'zustand'
 
-type Theme = 'light' | 'dark' | 'system'
+// 3 opções mutuamente exclusivas — sem cruzamento de "escuro" x "alto
+// contraste" como antes (2 toggles independentes geravam 4 combinações).
+// Alto contraste é sempre a variante clara (mais luminosidade/legibilidade,
+// não uma tela escura) — ver resolveThemeColors/resolveGradientColors em
+// src/config/theme.ts.
+export type Theme = 'light' | 'dark' | 'high-contrast'
 
 let reduceMotionSubscription: { remove: () => void } | undefined
 
@@ -50,7 +49,6 @@ const DEFAULT_FONT_FAMILY_INDEX = 0
 
 const STORAGE_KEY_THEME = '@rangoo_theme'
 const STORAGE_KEY_FONT_SIZE = '@rangoo_font_size'
-const STORAGE_KEY_HIGH_CONTRAST = '@rangoo_high_contrast'
 const STORAGE_KEY_REDUCED_MOTION = '@rangoo_reduced_motion'
 const STORAGE_KEY_FONT_FAMILY = '@rangoo_font_family'
 const STORAGE_KEY_HIDE_SENSITIVE = '@rangoo_hide_sensitive'
@@ -59,7 +57,6 @@ interface ThemeStoreState {
   theme: Theme
   fontSize: number
   fontFamily: number
-  highContrast: boolean
   reducedMotion: boolean
   systemReducedMotion: boolean
   isInitialized: boolean
@@ -70,17 +67,15 @@ interface ThemeStoreState {
   nextFontFamily: () => void
   increaseFontSize: () => void
   decreaseFontSize: () => void
-  toggleHighContrast: () => void
   toggleReducedMotion: () => void
   toggleHideSensitiveData: () => void
-  initialize: () => Promise<void>
+  initialize: (systemColorScheme?: 'light' | 'dark' | null) => Promise<void>
 }
 
 export const useThemeStore = create<ThemeStoreState>((set, get) => ({
-  theme: 'system',
+  theme: 'light',
   fontSize: DEFAULT_FONT_INDEX,
   fontFamily: DEFAULT_FONT_FAMILY_INDEX,
-  highContrast: false,
   reducedMotion: false,
   systemReducedMotion: false,
   isInitialized: false,
@@ -120,11 +115,6 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
       AsyncStorage.setItem(STORAGE_KEY_FONT_SIZE, String(prev))
     }
   },
-  toggleHighContrast: () => {
-    const next = !get().highContrast
-    set({ highContrast: next })
-    AsyncStorage.setItem(STORAGE_KEY_HIGH_CONTRAST, String(next))
-  },
   toggleReducedMotion: () => {
     const next = !get().reducedMotion
     set({ reducedMotion: next })
@@ -135,26 +125,24 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
     set({ hideSensitiveData: next })
     AsyncStorage.setItem(STORAGE_KEY_HIDE_SENSITIVE, String(next))
   },
-  initialize: async () => {
+  initialize: async (systemColorScheme) => {
     try {
-      const [
-        savedTheme,
-        savedFontSize,
-        savedHighContrast,
-        savedReducedMotion,
-        savedFontFamily,
-        savedHideSensitive,
-      ] = await Promise.all([
-        AsyncStorage.getItem(STORAGE_KEY_THEME),
-        AsyncStorage.getItem(STORAGE_KEY_FONT_SIZE),
-        AsyncStorage.getItem(STORAGE_KEY_HIGH_CONTRAST),
-        AsyncStorage.getItem(STORAGE_KEY_REDUCED_MOTION),
-        AsyncStorage.getItem(STORAGE_KEY_FONT_FAMILY),
-        AsyncStorage.getItem(STORAGE_KEY_HIDE_SENSITIVE),
-      ])
+      const [savedTheme, savedFontSize, savedReducedMotion, savedFontFamily, savedHideSensitive] =
+        await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY_THEME),
+          AsyncStorage.getItem(STORAGE_KEY_FONT_SIZE),
+          AsyncStorage.getItem(STORAGE_KEY_REDUCED_MOTION),
+          AsyncStorage.getItem(STORAGE_KEY_FONT_FAMILY),
+          AsyncStorage.getItem(STORAGE_KEY_HIDE_SENSITIVE),
+        ])
       const updates: Partial<ThemeStoreState> = {}
-      if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+      if (savedTheme && ['light', 'dark', 'high-contrast'].includes(savedTheme)) {
         updates.theme = savedTheme as Theme
+      } else if (systemColorScheme === 'dark') {
+        // Nunca abre em "system" (não existe mais como valor persistido) nem
+        // em alto-contraste por padrão — só puxa claro/escuro do SO na
+        // primeira abertura, sem preferência salva ainda.
+        updates.theme = 'dark'
       }
       if (savedFontSize !== null) {
         // Migrate legacy 'p'/'m'/'g' values to numeric indices
@@ -170,9 +158,10 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
             updates.fontSize = num
           }
         }
-      }
-      if (savedHighContrast === 'true') {
-        updates.highContrast = true
+      } else {
+        // Sem preferência manual salva — parte do multiplicador de fonte de
+        // acessibilidade do próprio SO, mapeado pro degrau mais próximo.
+        updates.fontSize = getDefaultFontSizeIndex(PixelRatio.getFontScale())
       }
       if (savedReducedMotion === 'true') updates.reducedMotion = true
       if (savedFontFamily !== null) {
@@ -206,12 +195,27 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
 // Pure decision logic, extracted so it's unit-testable without rendering a
 // component — this project's Jest setup runs in `node` and has no React
 // hook-testing harness installed.
-export function resolveTheme(
-  theme: Theme,
-  systemColorScheme: ColorSchemeName | null | undefined,
-): 'light' | 'dark' {
-  if (theme === 'system') return systemColorScheme === 'dark' ? 'dark' : 'light'
-  return theme
+//
+// Alto contraste é sempre resolvido pra base "light" — é a variante clara que
+// usa mais luminância/contraste, nunca uma tela escura (ver src/config/theme.ts).
+export function resolveTheme(theme: Theme): 'light' | 'dark' {
+  return theme === 'dark' ? 'dark' : 'light'
+}
+
+export function isHighContrastTheme(theme: Theme): boolean {
+  return theme === 'high-contrast'
+}
+
+// Mapeia o multiplicador de fonte do SO (PixelRatio.getFontScale()) pro
+// degrau mais próximo de FONT_STEPS, usado só como valor INICIAL quando não
+// há preferência manual salva — o usuário continua livre pra ajustar com os
+// botões +/-, e o ajuste manual passa a ter prioridade e persiste normalmente.
+export function getDefaultFontSizeIndex(systemFontScale: number): number {
+  if (systemFontScale <= 0.85) return 0
+  if (systemFontScale <= 0.95) return 1
+  if (systemFontScale <= 1.05) return 2
+  if (systemFontScale <= 1.2) return 3
+  return 4
 }
 
 export function getFontScale(fontSize: number): number {
@@ -231,9 +235,11 @@ export function getScaledFontStyle(
 }
 
 export function useResolvedTheme(): 'light' | 'dark' {
-  const systemColorScheme = useColorScheme()
-  const theme = useThemeStore((s) => s.theme)
-  return resolveTheme(theme, systemColorScheme)
+  return useThemeStore((s) => resolveTheme(s.theme))
+}
+
+export function useIsHighContrast(): boolean {
+  return useThemeStore((s) => isHighContrastTheme(s.theme))
 }
 
 export function useFontScale(): number {

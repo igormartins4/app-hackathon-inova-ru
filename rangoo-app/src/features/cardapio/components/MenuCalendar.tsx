@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useEffect, useMemo, useState } from 'react'
-import { Pressable, ScrollView, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import { Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
@@ -131,7 +131,7 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
         </Pressable>
       </View>
 
-      <ScrollView horizontal contentContainerClassName="min-w-[336px] gap-3">
+      <View className="gap-3">
         <View className="flex-row justify-between">
           {WEEKDAY_KEYS.map((key, idx) => (
             <View key={key} className="flex-1 min-w-[48px] items-center">
@@ -190,7 +190,7 @@ export function MenuCalendar({ selectedDate, onSelectDate }: MenuCalendarProps) 
             })}
           </View>
         ))}
-      </ScrollView>
+      </View>
     </View>
   )
 }

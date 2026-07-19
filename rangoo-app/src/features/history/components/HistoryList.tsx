@@ -237,7 +237,7 @@ function getDetails(record: SelectedRecord, t: Record<string, string>) {
     return {
       title: t.historyDetailsRecharge,
       body: [
-        `${t.historyDate}: ${formatCurrency(item.valor)}`,
+        `${t.historyValue}: ${formatCurrency(item.valor)}`,
         `${t.historyDate}: ${formatToLocalDate(item.data_hora)}`,
         `${t.historyTime}: ${formatToLocalTime(item.data_hora)}`,
         `${t.historyMethod}: ${item.metodo.toUpperCase()}`,
@@ -256,8 +256,8 @@ function getDetails(record: SelectedRecord, t: Record<string, string>) {
       `${t.historyTime}: ${formatToLocalTime(item.data_hora)}`,
       `${t.historyQuantity}: ${item.quantidade}x`,
       item.gratuidade
-        ? `${t.historyDate}: ${t.historyFree}`
-        : `${t.historyDate}: ${formatCurrency(item.valor_total)}`,
+        ? `${t.historyValue}: ${t.historyFree}`
+        : `${t.historyValue}: ${formatCurrency(item.valor_total)}`,
       `${t.historyType}: ${item.tipo_consumidor}`,
     ].join('\n'),
   }

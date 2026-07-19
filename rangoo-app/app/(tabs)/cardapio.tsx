@@ -4,6 +4,7 @@ import { Pressable, ScrollView, View } from 'react-native'
 import { useThemeColors } from '@/config'
 import type { FilialCode } from '@/features/cardapio'
 import { MenuCalendar, RESTAURANTES_CARDAPIO, useCardapio } from '@/features/cardapio'
+import { RU_INFO } from '@/features/restaurantes/data/ruInfo'
 import { Button, Card, LoadingSpinner, Text } from '@/shared/components/ui'
 import { useI18n } from '@/shared/i18n'
 import { formatFullWeekdayDate, isToday } from '@/shared/utils'
@@ -17,6 +18,9 @@ type TipoRefeicao = 'almoco' | 'jantar'
 function defaultMealForNow(): TipoRefeicao {
   return new Date().getHours() < 15 ? 'almoco' : 'jantar'
 }
+
+const PROTEINA_TITULOS = ['Prato Principal']
+const SOBREMESA_TITULOS = ['Sobremesa']
 
 export default function CardapioScreen() {
   const themeColors = useThemeColors()
@@ -35,10 +39,6 @@ export default function CardapioScreen() {
     if (!favoritesInitialized) initializeFavorites()
   }, [favoritesInitialized, initializeFavorites])
 
-  useEffect(() => {
-    setShowAll(!favorites.some((code) => RESTAURANTES_CARDAPIO.some((ru) => ru.key === code)))
-  }, [favorites])
-
   const toggleFavorite = useCallback(
     async (code: FilialCode) => {
       await toggleStoredFavorite(code)
@@ -56,6 +56,15 @@ export default function CardapioScreen() {
     data: selectedDate,
   })
   const secoes = data?.secoes ?? []
+  // Ordem de leitura: proteína (com a opção vegetariana já na mesma seção) no
+  // topo, acompanhamentos num bloco secundário mais discreto no meio, e
+  // sobremesa por último.
+  const secoesProteina = secoes.filter((secao) => PROTEINA_TITULOS.includes(secao.titulo))
+  const secoesSobremesa = secoes.filter((secao) => SOBREMESA_TITULOS.includes(secao.titulo))
+  const secoesSecundarias = secoes.filter(
+    (secao) =>
+      !PROTEINA_TITULOS.includes(secao.titulo) && !SOBREMESA_TITULOS.includes(secao.titulo),
+  )
   const today = isToday(selectedDate)
 
   const selectedRU = RESTAURANTES_CARDAPIO.find((r) => r.key === restaurante)
@@ -111,52 +120,68 @@ export default function CardapioScreen() {
           )}
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-2">
-          {visibleRestaurantes.map((r) => {
-            const isFav = favorites.includes(r.key)
-            return (
-              <View key={r.key} className="flex-row items-center gap-2">
+          <View className="flex-row gap-2">
+            {visibleRestaurantes.map((r) => {
+              const isFav = favorites.includes(r.key)
+              const selected = restaurante === r.key
+              return (
                 <Pressable
+                  key={r.key}
                   onPress={() => setRestaurante(r.key)}
                   accessibilityRole="button"
                   accessibilityLabel={`${t.cardapioRestaurante} ${r.label}`}
-                  accessibilityState={{ selected: restaurante === r.key }}
-                  className={`flex-row items-center gap-2 rounded-full px-4 py-2.5 min-h-[48px] ${
-                    restaurante === r.key ? 'bg-primary' : 'bg-surface border border-outline'
+                  accessibilityState={{ selected }}
+                  className={`flex-row items-center gap-1.5 rounded-full pl-4 pr-1.5 py-1.5 min-h-[48px] ${
+                    selected ? 'bg-primary' : 'bg-surface border border-outline'
                   }`}
                 >
-                  {restaurante === r.key && (
+                  {selected && (
                     <Ionicons name="checkmark" size={16} color={themeColors.textInverse} />
                   )}
                   <Text
                     numberOfLines={1}
                     className={`text-sm font-medium ${
-                      restaurante === r.key ? 'text-text-inverse' : 'text-text-primary'
+                      selected ? 'text-text-inverse' : 'text-text-primary'
                     }`}
                   >
                     {r.label}
                   </Text>
+                  {/* Estrela DENTRO do balão do próprio RU — antes ficava como
+                      um botão irmão ao lado, ambíguo sobre a qual chip
+                      pertencia numa fileira horizontal com vários RUs. */}
+                  <Pressable
+                    onPress={() => toggleFavorite(r.key)}
+                    accessibilityRole="button"
+                    accessibilityLabel={
+                      isFav
+                        ? `${t.back} ${r.label} ${t.cardapioFavoritos}`
+                        : `${t.cardapioFavoritos} ${r.label}`
+                    }
+                    hitSlop={8}
+                    className="w-9 h-9 rounded-full items-center justify-center"
+                  >
+                    <Ionicons
+                      name={isFav ? 'star' : 'star-outline'}
+                      size={16}
+                      color={
+                        isFav
+                          ? themeColors.warning
+                          : selected
+                            ? themeColors.textInverse
+                            : themeColors.textSecondary
+                      }
+                    />
+                  </Pressable>
                 </Pressable>
-                <Pressable
-                  onPress={() => toggleFavorite(r.key)}
-                  accessibilityRole="button"
-                  accessibilityLabel={
-                    isFav
-                      ? `${t.back} ${r.label} ${t.cardapioFavoritos}`
-                      : `${t.cardapioFavoritos} ${r.label}`
-                  }
-                  hitSlop={{ top: 12, bottom: 12, left: 4, right: 12 }}
-                  className="w-8 h-8 rounded-full items-center justify-center"
-                >
-                  <Ionicons
-                    name={isFav ? 'star' : 'star-outline'}
-                    size={16}
-                    color={isFav ? themeColors.warning : themeColors.textSecondary}
-                  />
-                </Pressable>
-              </View>
-            )
-          })}
+              )
+            })}
+          </View>
         </ScrollView>
+        {selectedRU && (
+          <Text className="text-xs text-text-secondary" numberOfLines={1}>
+            {RU_INFO[selectedRU.key]?.endereco ?? RU_INFO[selectedRU.key]?.campus}
+          </Text>
+        )}
         {favorites.length === 0 && !showAll && (
           <Text className="text-xs text-text-secondary">{t.cardapioNenhumFavorito}</Text>
         )}
@@ -288,7 +313,85 @@ export default function CardapioScreen() {
         </Card>
       )}
 
-      {secoes.map((secao) => (
+      {secoesProteina.map((secao) => (
+        <View key={secao.titulo} className="gap-2">
+          <View className="flex-row items-center gap-2 bg-primary/10 rounded-xl px-3 py-2">
+            <Ionicons
+              name={secao.icon as React.ComponentProps<typeof Ionicons>['name']}
+              size={18}
+              color={getIconColor(secao.icon)}
+            />
+            <Text className="text-xs font-bold text-primary uppercase">{secao.titulo}</Text>
+          </View>
+          <Card className="p-0 overflow-hidden">
+            {secao.itens.map((item, idx) => (
+              <View
+                key={item.nome}
+                className={`flex-row items-center justify-between px-3 py-2 ${
+                  idx < secao.itens.length - 1 ? 'border-b border-outline-variant' : ''
+                }`}
+              >
+                <Text className="flex-1 text-sm text-text-primary" numberOfLines={2}>
+                  {item.nome}
+                </Text>
+                {item.vegano && (
+                  <View className="bg-status-success/10 rounded-full px-2 py-0.5">
+                    <Text className="text-[10px] font-medium text-status-success">
+                      {t.cardapioVegano}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ))}
+          </Card>
+        </View>
+      ))}
+
+      {/* Acompanhamentos (entrada, arroz, feijão, bebida etc.) — bloco mais
+          discreto no meio, entre a proteína em destaque acima e a sobremesa
+          em destaque logo abaixo. */}
+      {secoesSecundarias.length > 0 && (
+        <View className="gap-2">
+          <Text className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+            {t.cardapioAcompanhamentos}
+          </Text>
+          <Card className="p-0 overflow-hidden">
+            {secoesSecundarias.map((secao, secaoIdx) => (
+              <View
+                key={secao.titulo}
+                className={
+                  secaoIdx < secoesSecundarias.length - 1 ? 'border-b border-outline-variant' : ''
+                }
+              >
+                <Text className="text-[10px] font-bold text-text-secondary uppercase px-3 pt-2">
+                  {secao.titulo}
+                </Text>
+                {secao.itens.map((item, idx) => (
+                  <View
+                    key={item.nome}
+                    className={`flex-row items-center justify-between px-3 py-2 ${
+                      idx < secao.itens.length - 1 ? 'border-b border-outline-variant' : ''
+                    }`}
+                  >
+                    <Text className="flex-1 text-sm text-text-secondary" numberOfLines={2}>
+                      {item.nome}
+                    </Text>
+                    {item.vegano && (
+                      <View className="bg-status-success/10 rounded-full px-2 py-0.5">
+                        <Text className="text-[10px] font-medium text-status-success">
+                          {t.cardapioVegano}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                ))}
+              </View>
+            ))}
+          </Card>
+        </View>
+      )}
+
+      {secoesSobremesa.map((secao) => (
         <View key={secao.titulo} className="gap-2">
           <View className="flex-row items-center gap-2 bg-primary/10 rounded-xl px-3 py-2">
             <Ionicons

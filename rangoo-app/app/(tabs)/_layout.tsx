@@ -4,7 +4,6 @@ import { useWindowDimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useThemeColors } from '@/config'
 import { useI18n } from '@/shared/i18n'
-import { useEffectiveReducedMotion } from '@/store/themeStore'
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name']
 
@@ -18,7 +17,6 @@ const TAB_ICONS: Record<string, { focused: IoniconsName; default: IoniconsName }
 
 export default function TabLayout() {
   const themeColors = useThemeColors()
-  const reducedMotion = useEffectiveReducedMotion()
   const { width } = useWindowDimensions()
   const { t } = useI18n()
   const isExpanded = width >= 768
@@ -51,7 +49,11 @@ export default function TabLayout() {
           // Cada tela já renderiza seu título estilizado no conteúdo —
           // o header nativo do Expo Router duplicava esse título (Ponto 10 do QA).
           headerShown: false,
-          animation: reducedMotion ? 'none' : 'fade',
+          // 'none' aqui (mesmo condicionado a reducedMotion) faz o
+          // @react-navigation/bottom-tabs v7 falhar em montar completamente o
+          // conteúdo da aba recém-focada — 'fade' é suave o bastante pra ser
+          // aceitável mesmo com "reduzir movimento" ativo.
+          animation: 'fade',
           tabBarPosition: isExpanded ? 'left' : 'bottom',
         }}
       >

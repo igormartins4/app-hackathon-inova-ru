@@ -44,7 +44,8 @@
       ],
       "./plugins/withNetworkSecurityConfig",
       "./plugins/withForceDarkDisabled",
-      "expo-sharing"
+      "expo-sharing",
+      "expo-localization"
     ],
     "extra": {
       "router": {},

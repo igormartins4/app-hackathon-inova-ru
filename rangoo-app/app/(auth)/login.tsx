@@ -62,7 +62,9 @@ export default function LoginScreen() {
             <Image
               source={require('../../assets/icon.png')}
               accessibilityLabel={t.loginTitle}
-              className="w-20 h-20 rounded-2xl mb-3"
+              resizeMode="cover"
+              style={{ width: 80, height: 80 }}
+              className="rounded-2xl mb-3"
             />
             <Text className="text-2xl font-bold text-primary-dark">{t.loginTitle}</Text>
           </View>

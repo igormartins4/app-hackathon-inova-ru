@@ -14,8 +14,24 @@ import { getToken, removeToken, removeUser } from './secureStorage'
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:3000'
 const USE_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false'
 
+// O adapter mock não passa pelo pipeline padrão do axios, então `config.params`
+// nunca vira querystring de verdade em `config.url` — sem isso, todo filtro
+// via query param (filial, dataInicio, dataFim etc.) seria silenciosamente
+// ignorado pelo mockHandler, que só lê a URL.
+function appendParamsToUrl(url: string, params?: Record<string, unknown>): string {
+  if (!params) return url
+  const search = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) search.append(key, String(value))
+  }
+  const qs = search.toString()
+  if (!qs) return url
+  return `${url}${url.includes('?') ? '&' : '?'}${qs}`
+}
+
 function mockAdapter(config: InternalAxiosRequestConfig): Promise<AxiosResponse> {
-  const mock = getMockResponse(config)
+  const url = appendParamsToUrl(config.url ?? '', config.params)
+  const mock = getMockResponse({ ...config, url })
   const response = {
     data: mock.data,
     status: mock.status,

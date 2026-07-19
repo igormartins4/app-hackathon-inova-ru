@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { LinearGradient } from 'expo-linear-gradient'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Linking, Pressable, ScrollView, View } from 'react-native'
 import { useGradientColors, useThemeColors } from '@/config'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useBalance } from '@/features/balance/hooks/useBalance'
-import { useMealHistory } from '@/features/history'
+import { type MealRecord, useHistorySummary, useMealHistory } from '@/features/history'
 import {
   AboutAppModal,
   AppDialog,
@@ -25,7 +25,7 @@ import {
   setMockScenario,
 } from '@/shared/services/mockHandler'
 import { formatCurrency, getErrorMessage } from '@/shared/utils'
-import { FONT_FAMILIES, FONT_STEPS, useResolvedTheme, useThemeStore } from '@/store/themeStore'
+import { FONT_FAMILIES, FONT_STEPS, type Theme, useThemeStore } from '@/store/themeStore'
 
 // Chaves de cenário de demonstração só existem enquanto o app roda contra o
 // mock local — nunca contra a API real da FUMP, onde não fariam sentido
@@ -55,21 +55,17 @@ export default function ProfileScreen() {
     error: balanceError,
     refetch: refetchBalance,
   } = useBalance()
+  const mealHistoryQuery = useMealHistory()
+  const { isError: isMealHistoryError, refetch: refetchMealHistory } = mealHistoryQuery
   const {
-    data: mealHistory,
-    isError: isMealHistoryError,
-    refetch: refetchMealHistory,
-  } = useMealHistory()
-  const {
+    theme,
     setTheme,
     fontSize,
     fontFamily,
     increaseFontSize,
     decreaseFontSize,
     setFontFamily,
-    highContrast,
     reducedMotion,
-    toggleHighContrast,
     toggleReducedMotion,
   } = useThemeStore()
   const themeColors = useThemeColors()
@@ -79,8 +75,6 @@ export default function ProfileScreen() {
   const [logoutDialogVisible, setLogoutDialogVisible] = useState(false)
   const { t, locale, setLocale } = useI18n()
 
-  const isDark = useResolvedTheme() === 'dark'
-
   const initials =
     user?.nome
       ?.split(' ')
@@ -89,9 +83,15 @@ export default function ProfileScreen() {
       .join('')
       .toUpperCase() ?? '??'
 
-  const handleToggleDark = () => {
-    setTheme(isDark ? 'light' : 'dark')
-  }
+  const THEME_OPTIONS: Array<{
+    key: Theme
+    label: string
+    icon: React.ComponentProps<typeof Ionicons>['name']
+  }> = [
+    { key: 'light', label: t.profileThemeLight, icon: 'sunny' },
+    { key: 'dark', label: t.profileThemeDark, icon: 'moon' },
+    { key: 'high-contrast', label: t.profileThemeHighContrast, icon: 'contrast' },
+  ]
 
   const refreshMockData = () => {
     queryClient.invalidateQueries()
@@ -110,19 +110,23 @@ export default function ProfileScreen() {
 
   const handleLogout = () => setLogoutDialogVisible(true)
 
-  const totalGastoMes = (() => {
-    if (!mealHistory?.pages) return 0
+  const summarizeMonthMeals = useCallback((records: MealRecord[]) => {
     const now = new Date()
-    const currentMonth = now.getMonth()
-    const currentYear = now.getFullYear()
-    return mealHistory.pages
-      .flatMap((p) => p.data)
+    return records
       .filter((item) => {
         const d = new Date(item.data_hora)
-        return d.getMonth() === currentMonth && d.getFullYear() === currentYear && !item.gratuidade
+        return (
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear() &&
+          !item.gratuidade
+        )
       })
       .reduce((sum, item) => sum + item.valor_total, 0)
-  })()
+  }, [])
+  const { total: totalGastoMes } = useHistorySummary({
+    query: mealHistoryQuery,
+    reducer: summarizeMonthMeals,
+  })
 
   if (isBalanceLoading) {
     return <LoadingSpinner message={t.loading} />
@@ -171,38 +175,6 @@ export default function ProfileScreen() {
         </View>
       </LinearGradient>
 
-      {balanceData?.consumidor && (
-        <Card accessibilityLabel={t.profileConsumerData} accessibilityRole="summary">
-          <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            {t.profileConsumerData}
-          </Text>
-          <View className="gap-2">
-            <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">{t.profileFullName}</Text>
-              <Text className="text-sm font-medium text-text-primary">
-                {balanceData.consumidor.nome}
-              </Text>
-            </View>
-            <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">{t.profileType}</Text>
-              <Text className="text-sm font-medium text-text-primary">
-                {balanceData.consumidor.tipo_consumidor.descricao}
-              </Text>
-            </View>
-            <View className="flex-row justify-between py-2 border-b border-outline-variant">
-              <Text className="text-sm text-text-secondary">{t.profileCostCenter}</Text>
-              <Text className="text-sm font-medium text-text-primary">
-                {balanceData.consumidor.centro_custo.descricao}
-              </Text>
-            </View>
-            <View className="flex-row justify-between py-2">
-              <Text className="text-sm text-text-secondary">{t.profileSituation}</Text>
-              <StatusBadge situacao={balanceData.consumidor.situacao} size="text-sm" />
-            </View>
-          </View>
-        </Card>
-      )}
-
       {isMealHistoryError && (
         <ErrorMessage message={t.profileMealHistoryError} onRetry={refetchMealHistory} />
       )}
@@ -229,55 +201,36 @@ export default function ProfileScreen() {
           {t.profileThemeGroup}
         </Text>
 
-        <Pressable
-          onPress={handleToggleDark}
-          accessibilityRole="switch"
-          accessibilityLabel={t.profileDarkMode}
-          accessibilityHint={t.profileDarkModeHint}
-          accessibilityState={{ checked: isDark }}
-          className="flex-row items-center justify-between py-3 border-b border-outline-variant"
-        >
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full bg-status-warning/15 items-center justify-center">
-              <Ionicons name={isDark ? 'moon' : 'sunny'} size={20} color={themeColors.warning} />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-text-primary">{t.profileDarkMode}</Text>
-              <Text className="text-xs text-text-secondary">{t.profileDarkModeHint}</Text>
-            </View>
-          </View>
-          <View className={`w-12 h-7 rounded-full p-0.5 ${isDark ? 'bg-primary' : 'bg-outline'}`}>
-            <View
-              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${isDark ? 'ml-5' : 'ml-0'}`}
-            />
-          </View>
-        </Pressable>
-
-        <Pressable
-          onPress={toggleHighContrast}
-          accessibilityRole="switch"
-          accessibilityLabel={t.profileHighContrast}
-          accessibilityHint={t.profileHighContrastHint}
-          accessibilityState={{ checked: highContrast }}
-          className="flex-row items-center justify-between py-3"
-        >
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
-              <Ionicons name="contrast" size={20} color={themeColors.primary} />
-            </View>
-            <View>
-              <Text className="text-sm font-medium text-text-primary">{t.profileHighContrast}</Text>
-              <Text className="text-xs text-text-secondary">{t.profileHighContrastHint}</Text>
-            </View>
-          </View>
-          <View
-            className={`w-12 h-7 rounded-full p-0.5 ${highContrast ? 'bg-primary' : 'bg-outline'}`}
-          >
-            <View
-              className={`w-6 h-6 rounded-full bg-text-inverse shadow ${highContrast ? 'ml-5' : 'ml-0'}`}
-            />
-          </View>
-        </Pressable>
+        <Text className="text-xs text-text-secondary mb-3">{t.profileThemeHint}</Text>
+        <View className="flex-row bg-surface-variant rounded-full p-1">
+          {THEME_OPTIONS.map((option) => {
+            const selected = theme === option.key
+            return (
+              <Pressable
+                key={option.key}
+                onPress={() => setTheme(option.key)}
+                accessibilityRole="tab"
+                accessibilityLabel={option.label}
+                accessibilityState={{ selected }}
+                className={`flex-1 min-h-[48px] flex-row items-center justify-center gap-1.5 rounded-full px-2 ${
+                  selected ? 'bg-primary' : ''
+                }`}
+              >
+                <Ionicons
+                  name={option.icon}
+                  size={16}
+                  color={selected ? themeColors.textInverse : themeColors.textSecondary}
+                />
+                <Text
+                  numberOfLines={1}
+                  className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
+                >
+                  {option.label}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </View>
       </Card>
 
       <Card>
@@ -407,6 +360,39 @@ export default function ProfileScreen() {
             })}
           </View>
         </View>
+      </Card>
+
+      <Card>
+        <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+          {t.profilePricingTitle}
+        </Text>
+        <View className="gap-0">
+          {(
+            [
+              ['profilePricingNivel1', t.profilePricingFree],
+              ['profilePricingNivel23', 'R$ 1,00'],
+              ['profilePricingNivel4a', 'R$ 2,00'],
+              ['profilePricingNivel4b', 'R$ 2,90'],
+              ['profilePricingRegular', 'R$ 5,60'],
+              ['profilePricingTecnico', 'R$ 8,50'],
+              ['profilePricingTerceirizado', 'R$ 8,50'],
+              ['profilePricingDocente', 'R$ 13,00'],
+              ['profilePricingVisitante', 'R$ 17,50'],
+              ['profilePricingCafe', t.profilePricingFree],
+            ] as const
+          ).map(([labelKey, value], idx, arr) => (
+            <View
+              key={labelKey}
+              className={`flex-row justify-between items-center py-2 gap-3 ${
+                idx < arr.length - 1 ? 'border-b border-outline-variant' : ''
+              }`}
+            >
+              <Text className="flex-1 text-sm text-text-secondary">{t[labelKey]}</Text>
+              <Text className="text-sm font-medium text-text-primary">{value}</Text>
+            </View>
+          ))}
+        </View>
+        <Text className="text-xs text-text-secondary mt-3">{t.profilePricingSource}</Text>
       </Card>
 
       <Card>
