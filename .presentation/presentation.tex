@@ -1,0 +1,388 @@
+\documentclass[10pt, aspectratio=169]{beamer}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+\fi
+\usepackage[brazilian]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+% Cores Rangoo / FUMP-UFMG
+\definecolor{rangoogreen}{HTML}{1A5C4A}
+
+\usetheme[
+  accent=rangoogreen,
+  progressbar=foot,
+  sectionpage=progressbar,
+  subsectionpage=none,
+  numbering=fraction,
+  numberrail=section,
+  block=fill,
+  mathfonts=none,
+  closing=contact
+]{cookie}
+
+% Metadados
+\title{Rangoo}
+\subtitle{Recarga de crédito do RU via PIX --- Apresentação Final}
+\author[Boliñas de Gorfe]{%
+  \begin{tabular}{@{}l@{}}
+    Igor de Oliveira Martins dos Santos \\
+    Ítalo Leal Lana Santos \\
+    Vitor Hugo Dias Santos
+  \end{tabular}%
+}
+\cookieuni{Universidade Federal de Minas Gerais (UFMG)}
+\cookietagline{Hackathon InovaRU 2026/01 --- FUMP}
+\date{Belo Horizonte, MG}
+
+\cookieclosingtitle{Obrigado!}
+\cookieclosingtext{Perguntas ou sugestões?}
+\cookieclosingqr{https://github.com/igormartins4/app-hackathon-inova-ru}
+\cookieclosingqrlabel{Código e slides no GitHub}
+
+\begin{document}
+
+\maketitle
+
+\section{A Jornada de Gerson}
+
+\begin{frame}{Gerson antes do Rangoo: Jantar contra o Relógio}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{block}{O Tempo Limite}
+        \small
+        \begin{itemize}
+          \item Aula acaba às 18h40 e a próxima inicia às 19h00.
+          \item Apenas 20 minutos de janela para jantarem no RU.
+          \item Pressão de tempo e correria diária.
+        \end{itemize}
+      \end{block}
+
+    \column{.48\textwidth}
+      \begin{block}{Sem Dinheiro Físico}
+        \small
+        \begin{itemize}
+          \item Se tivesse dinheiro em papel, passaria rápido.
+          \item Como não tem, é obrigado a encarar a enorme fila de pagamento com cartão de débito/crédito.
+        \end{itemize}
+      \end{block}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Gerson antes do Rangoo: O Gargalo do Caixa Físico}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{alertblock}{O Processo Manual no Caixa}
+        \small
+        \begin{itemize}
+          \item Fila do caixa anda muito lentamente devido ao fluxo manual.
+          \item O caixa precisa pegar a carteirinha física, verificar o saldo, digitar o valor na máquina de cartão, aguardar o aluno passar/digitar a senha, esperar a aprovação e só então liberar.
+        \end{itemize}
+      \end{alertblock}
+
+    \column{.48\textwidth}
+      \begin{block}{Consequência Acadêmica}
+        \small
+        \begin{itemize}
+          \item Tempo gasto na fila do caixa compromete a janta rápida.
+          \item Gerson perde o início da segunda aula (19h00).
+        \end{itemize}
+      \end{block}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Gerson com o Rangoo: Pagamento Descentralizado}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{block}{Zero Filas de Caixa}
+        \small
+        \begin{itemize}
+          \item Não há mais necessidade de atendimento manual ou máquinas de cartão na entrada.
+          \item Processo descentralizado: o estudante é dono do seu fluxo.
+        \end{itemize}
+      \end{block}
+
+    \column{.48\textwidth}
+      \begin{exampleblock}{Recarga Autônoma}
+        \small
+        \begin{itemize}
+          \item Recarga rápida via PIX feita antecipadamente ou na própria fila de acesso.
+          \item Saldo atualizado em segundos através de polling resiliente.
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Gerson com o Rangoo: A Catraca Inteligente}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{block}{Acesso Expresso}
+        \small
+        \begin{itemize}
+          \item Com saldo na conta, Gerson apenas aproxima a carteirinha/celular no sensor da catraca.
+          \item Funcionamento semelhante a um validador de ônibus: débito automático instantâneo e acesso liberado.
+        \end{itemize}
+      \end{block}
+
+    \column{.48\textwidth}
+      \begin{block}{Resiliência e Rotina}
+        \small
+        \begin{itemize}
+          \item Acesso rápido garante o jantar em poucos minutos.
+          \item Gerson entra sem atrasos na aula das 19h00.
+          \item Caching offline permite consultar saldo/cardápio mesmo sem sinal de rede móvel no RU.
+        \end{itemize}
+      \end{block}
+  \end{columns}
+\end{frame}
+
+\section{O Produto Entregue}
+
+\begin{frame}{Início, Saldo e Restaurantes}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{block}{Dashboard Principal}
+        \small
+        \begin{itemize}
+          \item \textbf{Saldo em Destaque}: Visão imediata do valor disponível.
+          \item \textbf{Alerta de Saldo Baixo}: Banner inteligente para incentivar a recarga preventiva.
+          \item \textbf{Carousel de Avisos}: Informes administrativos importantes da FUMP exibidos na Home.
+        \end{itemize}
+      \end{block}
+
+    \column{.48\textwidth}
+      \begin{exampleblock}{Contexto e Favoritos}
+        \small
+        \begin{itemize}
+          \item \textbf{Favoritos com Status}: Lista rápida de RUs com horários e nível de fila.
+          \item \textbf{Dados do Consumidor}: Detalhes sobre tipo de consumidor, centro de custo e situação (ativo/bloqueado).
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Recarga Expressa via PIX}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{block}{Fácil Seleção de Valores}
+        \small
+        \begin{itemize}
+          \item Chips de acesso rápido (R\$ 5, 10, 15, 20) ou entrada livre.
+          \item Validação inteligente contra o limite de saldo de recarga individual (Zod).
+        \end{itemize}
+      \end{block}
+
+    \column{.48\textwidth}
+      \begin{alertblock}{QR Code e Confirmação}
+        \small
+        \begin{itemize}
+          \item Código Pix Copia-e-Cola e exibição de QR Code Base64.
+          \item Timer de expiração (2 min) e Polling com backoff exponencial.
+          \item Confirmação de recebimento com saldo atualizado e comprovante.
+        \end{itemize}
+      \end{alertblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Cardápio, Restaurantes e Histórico}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{block}{Cardápio e Informações de RUs}
+        \small
+        \begin{itemize}
+          \item Calendário semanal de cardápios e tags de restrição alimentar.
+          \item Horários de funcionamento e rotas integradas via Google Maps.
+          \item Scraping resiliente do cardápio público da FUMP.
+        \end{itemize}
+      \end{block}
+
+    \column{.48\textwidth}
+      \begin{exampleblock}{Histórico Unificado}
+        \small
+        \begin{itemize}
+          \item Abas divididas entre refeições consumidas e recargas realizadas.
+          \item Filtros por data de consulta.
+          \item Scroll infinito com paginação automática baseada no contrato oficial.
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Transferência e Customizações do App}
+  \begin{columns}[T,onlytextwidth]
+    \column{.48\textwidth}
+      \begin{block}{Transferência de Saldo (Bônus)}
+        \small
+        \begin{itemize}
+          \item Envio de créditos de forma rápida entre estudantes através do CPF.
+          \item Geração de comprovante compartilhável nativamente no dispositivo.
+        \end{itemize}
+      \end{block}
+
+    \column{.48\textwidth}
+      \begin{exampleblock}{Visual e Temas}
+        \small
+        \begin{itemize}
+          \item Temas Escuro, Claro e Alto Contraste (Claro/Escuro) para ambientes externos.
+          \item Respeito automático ao modo do sistema ou seleção manual no Perfil.
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\section{Engenharia e Segurança}
+
+\begin{frame}{Segurança de Dados e APIs Oficiais}
+  \begin{columns}[T,onlytextwidth]
+    \column{.52\textwidth}
+      \begin{block}{Segurança dos Dados}
+        \small
+        \begin{itemize}
+          \item \textbf{Token JWT}: Criptografado via \texttt{expo-secure-store} (hardware - Android Keystore).
+          \item \textbf{Sem Senha Salva}: Senha institucional em memória volátil, nunca gravada em disco.
+          \item \textbf{Privacidade}: CPF omitido de requisições e URLs (obtido do JWT no backend).
+        \end{itemize}
+      \end{block}
+
+    \column{.44\textwidth}
+      \begin{exampleblock}{Integração com a FUMP}
+        \small
+        \begin{itemize}
+          \item Comunicação via HTTPS obrigatório (TLS 1.2+).
+          \item Endpoints alinhados ao contrato InovaRU v2.0.
+          \item Validações dinâmicas contra o limite e teto (R\$ 5 a R\$ 500).
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Resiliência em Rede Instável (Offline)}
+  \begin{columns}[T,onlytextwidth]
+    \column{.52\textwidth}
+      \begin{block}{Estratégia Offline-First}
+        \small
+        \begin{itemize}
+          \item \textbf{TanStack Query}: Exibe cache imediatamente (SWR) e revalida dados em background.
+          \item \textbf{AsyncStorage Cache}: Persiste cardápios, horários e histórico para uso sem sinal.
+          \item \textbf{Offline Banner}: Notificação visual discreta, sem travar a navegação.
+        \end{itemize}
+      \end{block}
+
+    \column{.44\textwidth}
+      \begin{alertblock}{Algoritmo de Polling do PIX}
+        \small
+        \begin{itemize}
+          \item \textbf{Backoff Exponencial}: Intervalos dinâmicos crescentes: 3s $\to$ 5s $\to$ 8s $\to$ 13s.
+          \item \textbf{Jitter Aleatório}: Ruído de $\pm$1s para evitar picos concorrentes na API.
+          \item \textbf{Timeout Seguro}: Limite de 2 minutos para poupar bateria e plano de dados.
+        \end{itemize}
+      \end{alertblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Tratamento Estrito de Erros (Critério do Edital)}
+  \begin{columns}[T,onlytextwidth]
+    \column{.50\textwidth}
+      \begin{block}{Mensagens Centralizadas}
+        \small
+        Erros de rede e HTTP mapeados em mensagens amigáveis:
+        \begin{itemize}
+          \item \textbf{401}: "Usuário ou senha inválidos."
+          \item \textbf{404}: "Conta inativa. Procure a FUMP."
+          \item \textbf{422}: "Valor fora do limite permitido."
+          \item \textbf{429}: "Muitas tentativas." (Lê header \texttt{Retry-After}).
+          \item \textbf{500}: "Ocorreu um erro. Tente novamente."
+        \end{itemize}
+      \end{block}
+
+    \column{.46\textwidth}
+      \begin{exampleblock}{Painel de Cenários Demo}
+        \small
+        Seletor no Perfil para testes rápidos de comportamento:
+        \begin{itemize}
+          \item Conta bloqueada ou inativa (Situação B).
+          \item Pix pendente, aprovado, rejeitado ou expirado.
+          \item Retornos HTTP específicos (401, 429, 500) e rede offline.
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\section{Acessibilidade e Inclusão}
+
+\begin{frame}{Acessibilidade de Ponta a Ponta (WCAG)}
+  \begin{columns}[T,onlytextwidth]
+    \column{.50\textwidth}
+      \begin{block}{Interface para Todo Mundo}
+        \small
+        \begin{itemize}
+          \item \textbf{Leitores de Tela}: TalkBack e VoiceOver com rótulos descritivos (\texttt{accessibilityLabel}).
+          \item \textbf{Área de Toque}: Targets com alvo mínimo de $48 \times 48\text{dp}$.
+          \item \textbf{Fontes Escaláveis}: \texttt{ScaledText} adapta fontSize e lineHeight do sistema operacional.
+        \end{itemize}
+      \end{block}
+
+    \column{.46\textwidth}
+      \begin{alertblock}{Além das Regras do Edital}
+        \small
+        \begin{itemize}
+          \item \textbf{Contraste WCAG AAA (7:1)}: Em saldo e valores para leitura sob luz solar.
+          \item \textbf{Feedback Redundante}: Estados sinalizados com cor, texto e ícone.
+          \item \textbf{Redução de Movimento}: Listener de preferência do sistema em tempo real.
+        \end{itemize}
+      \end{alertblock}
+  \end{columns}
+\end{frame}
+
+\section{Fechamento}
+
+\begin{frame}{Stack Tecnológica e Diferenciais}
+  \begin{columns}[T,onlytextwidth]
+    \column{.52\textwidth}
+      \begin{block}{A Stack do Rangoo}
+        \small
+        \begin{tabular}{@{}ll@{}}
+          \toprule
+          \textbf{Camada} & \textbf{Tecnologia} \\
+          \midrule
+          Mobile & React Native (Expo 57) \\
+          Navegação & Expo Router 6 \\
+          Estado (UI) & Zustand 5 \\
+          Estado (Server) & TanStack Query 5 \\
+          Estilos & NativeWind v4 \\
+          Segurança & Expo Secure Store \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+
+    \column{.44\textwidth}
+      \begin{exampleblock}{Diferenciais de Entrega}
+        \small
+        \begin{itemize}
+          \item \textbf{Software Livre}: Licença MIT garantindo conformidade legal com a FUMP.
+          \item \textbf{Zero Fricção de Login}: Uso de credenciais institucionais já existentes.
+          \item \textbf{Arquitetura Modular}: Organizado por features separadas, facilitando a manutenção e escala.
+        \end{itemize}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Demonstração Prática (Live Demo)}
+  \begin{block}{Apresentação em Tempo Real}
+    \small
+    Faremos agora a demonstração prática do Rangoo Universitário diretamente na tela do celular:
+    \begin{enumerate}
+      \item \textbf{Login e Dashboard}: Acesso rápido, visualização de saldo e aviso inteligente.
+      \item \textbf{Recarga Expressa}: PIX Copia-e-Cola e confirmação instantânea em menos de 30 segundos.
+      \item \textbf{Cardápio \& Histórico}: Consulta às opções do dia e extrato financeiro/consumo.
+      \item \textbf{Painel de Testes}: Simulação de erro 429 (Rate Limit), conta inativa (404) e rede offline.
+      \item \textbf{Transferência de Créditos}: Envio imediato de saldo para outro estudante.
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\end{document}
