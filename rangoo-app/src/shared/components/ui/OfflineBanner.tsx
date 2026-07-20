@@ -1,5 +1,6 @@
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useI18n } from '@/shared/i18n'
 import { ScaledText as Text } from './ScaledText'
 
 interface OfflineBannerProps {
@@ -8,6 +9,7 @@ interface OfflineBannerProps {
 
 export function OfflineBanner({ visible }: OfflineBannerProps) {
   const insets = useSafeAreaInsets()
+  const { t } = useI18n()
 
   if (!visible) return null
 
@@ -19,7 +21,7 @@ export function OfflineBanner({ visible }: OfflineBannerProps) {
       className="bg-status-error px-4 pb-3"
     >
       <Text className="text-center text-sm font-medium text-text-inverse">
-        Sem conexão. Verifique sua internet e tente novamente.
+        {t.offlineBannerMessage}
       </Text>
     </View>
   )

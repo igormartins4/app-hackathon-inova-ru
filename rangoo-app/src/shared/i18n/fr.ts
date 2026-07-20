@@ -1,5 +1,6 @@
 export default {
   loading: 'Chargement',
+  offlineBannerMessage: 'Pas de connexion. Vérifiez votre internet et réessayez.',
   error: 'Erreur',
   retry: 'Réessayer',
   cancel: 'Annuler',

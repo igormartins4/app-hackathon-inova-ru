@@ -47,7 +47,7 @@ const QUICK_ACTIONS = [
   },
 ]
 
-const GREETING_PHRASES = ['homePhrase'] as const
+const GREETING_PHRASES = ['homePhrase', 'homePhrase2', 'homePhrase3'] as const
 
 export default function HomeScreen() {
   const router = useRouter()

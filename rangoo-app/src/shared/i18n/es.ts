@@ -1,5 +1,6 @@
 export default {
   loading: 'Cargando',
+  offlineBannerMessage: 'Sin conexión. Verifica tu internet e intenta de nuevo.',
   error: 'Error',
   retry: 'Intentar de nuevo',
   cancel: 'Cancelar',
