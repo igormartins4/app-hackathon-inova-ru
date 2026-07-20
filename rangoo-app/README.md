@@ -79,7 +79,7 @@ O app tem **dois jeitos de mockar a API**, escolhidos pela variável `EXPO_PUBLI
 |---|---|---|
 | **Setup** | Zero — já vem pronto | `pnpm mock` num segundo terminal |
 | **`.env`** | `EXPO_PUBLIC_USE_MOCK=true` (ou nem crie o `.env`) | `EXPO_PUBLIC_USE_MOCK=false` + `EXPO_PUBLIC_API_URL` |
-| **Roda de verdade na rede?** | Não — tudo dentro do processo JS | Sim — HTTP real em `localhost:3001` |
+| **Roda de verdade na rede?** | Não — tudo dentro do processo JS | Sim — HTTP real em `localhost:3002` |
 | **Testa o polling de verdade?** | Sim — simula `pending` antes de `approved` + `creditado:true` | Sim — simula `pending` 3x antes de aprovar |
 | **Testa `network_security_config.xml`?** | Não | Sim |
 | **Quando usar** | Desenvolvimento rápido de UI | Testar fluxo de pagamento/erro de ponta a ponta |
@@ -109,14 +109,14 @@ cd rangoo-app
 pnpm mock
 ```
 
-Fica ouvindo em `http://localhost:3001`, mostrando o log de cada requisição. `Ctrl+C` pra parar.
+Fica ouvindo em `http://localhost:3002`, mostrando o log de cada requisição. `Ctrl+C` pra parar.
 
 **Terminal 2 — configura o `.env` e sobe o app:**
 
 ```env
 # rangoo-app/.env
 EXPO_PUBLIC_USE_MOCK=false
-EXPO_PUBLIC_API_URL=http://10.0.2.2:3001
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3002
 ```
 
 ```bash
@@ -124,7 +124,7 @@ cd rangoo-app
 pnpm start
 ```
 
-> `10.0.2.2` é o alias que o **emulador Android** usa pra falar com a máquina host — é o `localhost` de fora do emulador. Testando no navegador (`pnpm web`) ou no Expo Go de um celular físico na mesma rede Wi-Fi, troque por `http://<ip-da-sua-maquina>:3001` (ex.: `192.168.1.50`).
+> `10.0.2.2` é o alias que o **emulador Android** usa pra falar com a máquina host — é o `localhost` de fora do emulador. Testando no navegador (`pnpm web`) ou no Expo Go de um celular físico na mesma rede Wi-Fi, troque por `http://<ip-da-sua-maquina>:3002` (ex.: `192.168.1.50`).
 
 **Login (Mockoon):** CPF válido como `52998224725` + senha **exatamente** `senha_do_usuario` (única credencial configurada com sucesso — qualquer outra senha responde `401`, de propósito, pra testar o fluxo de erro).
 
@@ -185,7 +185,7 @@ Os testes unitários cobrem polling, CPF, máscaras, validação de formulários
 
 ## API
 
-Conecta na API FUMP v2.0. Veja `src/config/constants.ts` para os endpoints.
+Conecta na API FUMP v2.0. Cada endpoint é definido no serviço da própria feature (`src/features/auth/services/authApi.ts`, `src/features/balance/services/balanceApi.ts`, `src/features/recharge/services/rechargeApi.ts`, `src/features/history/services/historyApi.ts`).
 
 | Endpoint | Método | Descrição |
 |----------|--------|-----------|
@@ -203,6 +203,7 @@ Conecta na API FUMP v2.0. Veja `src/config/constants.ts` para os endpoints.
 - Reduzir movimento respeita tanto a preferência do app quanto a do sistema (Android AccessibilityInfo), com listener em tempo real.
 - Cores do sistema usam Material You em props nativas quando disponível; alto contraste tem prioridade e desativa cores dinâmicas.
 - Todos os campos têm máscara, sanitização e limite por contexto.
+- i18n completo em 4 idiomas (pt-BR, en, es, fr) via store Zustand (`src/shared/i18n/`), incluindo formatação de data/mês/dia da semana localizada com `Intl.DateTimeFormat`.
 - Dialogs nativos (`Alert.alert`) substituídos por `AppDialog` acessível e consistente com a marca.
 - Tab bar expande para sidebar lateral em tablets (>= 768px).
 - Calendário do cardápio scrollável horizontalmente em telas estreitas.

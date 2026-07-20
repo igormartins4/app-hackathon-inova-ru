@@ -22,6 +22,31 @@ O Rangoo Universitário resolve os gargalos de fila nos RUs da UFMG ao permitir 
 
 ---
 
+## Identidade Visual
+
+![Logo do Rangoo Universitário](rangoo-app/assets/icon.png)
+
+**Conceito:** "O RU Digital de Confiança" — o guichê do RU virando app. Precisa ter a seriedade de quem mexe com dado institucional (CPF, JWT, dinheiro) e a leveza de quem é feito pra estudante correndo entre aulas, não pra cliente de agência bancária. Rejeita explicitamente qualquer estética "fintech corporativa fria" (navy escuro solene, excesso de formalidade visual).
+
+### Paleta
+
+| Token | Claro | Escuro | Uso |
+| --- | --- | --- | --- |
+| `primary` | `#1a5c4a` | `#34d399` | Ações principais, ícone de status ativo, âncora de marca |
+| `background` / `surface-variant` | `#f0faf6` | `#0f1f1a` | Fundo de tela |
+| `surface` | `#ffffff` | `#1a2e28` | Cards, inputs |
+| `text-primary` | `#1a2e28` | `#f0faf6` | Corpo de texto |
+| `text-secondary` | `#4d6b61` | `#a8d5c5` | Texto de apoio (≥4.5:1 medido, nunca estimado) |
+| `status-success` / `status-error` / `status-warning` | `#2e7d4f` / `#c62828` / `#8a5a00` | `#4ade80` / `#f87171` / `#fbbf24` | Estados semânticos |
+
+Quatro temas disponíveis: claro, escuro, alto-contraste-claro e alto-contraste-escuro (preto + branco/amarelo, sem meio-termo) — auditados via cálculo real de contraste WCAG AA (não estimado). Regra dura do projeto: nenhuma cor literal em componente, sempre token semântico via `global.css`/`tailwind.config.js` ou `useThemeColors()`. Detalhes completos (tipografia, componentes, do's/don'ts) em [`DESIGN.md`](DESIGN.md).
+
+### Tipografia
+
+Fonte nativa do sistema (`System`) em pesos variados — sem fonte customizada — pra manter leveza de carregamento e familiaridade. Hierarquia: Display (700/40px) pro saldo em destaque, Headline (700/28px) pros títulos de tela, Body (400/16px) pro texto corrido, Label (700/12px, uppercase, tracking) pros rótulos de status.
+
+---
+
 ## Telas do Protótipo
 
 > **[Figma — Telas Hackathon](https://www.figma.com/design/dfXpSXKWY3FOLlIZIbQNGC/Telas-Hackathon?node-id=0-1&t=rAANqahZo3F58UAm-1)** · **[Visualizar protótipo interativo](https://www.figma.com/proto/dfXpSXKWY3FOLlIZIbQNGC/Telas-Hackathon)**

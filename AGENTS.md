@@ -179,7 +179,7 @@ Os agentes devem seguir rigorosamente as chaves, tipos e estruturas dos payloads
 | `"I"` | Inativo | Nunca aparece num `200` — o próprio endpoint responde `404` para consumidor inativo. Não codifique um caso `situacao === "I"` esperando um 200; a detecção de inatividade é pelo status HTTP 404, não pelo campo. |
 | `"B"` | Bloqueado | Recarga desabilitada, aviso pedindo para procurar a FUMP |
 
-`limite_recarga` é **dinâmico** — nunca hardcode R$ 500,00 como teto fixo; sempre leia o valor retornado por este endpoint.
+`limite_recarga` é o teto de **saldo total** que o consumidor pode manter (§6.2) — conceito diferente do teto do próprio endpoint de pagamento. O endpoint `POST /creditos/pagamento` (§7.3) tem validação de valor **fixa e universal**: mínimo R$ 5,00 / máximo R$ 500,00, independente do consumidor. Na prática o client deve validar contra `Math.min(limite_recarga, 500)` — nunca permitir um valor de PIX acima do teto fixo do endpoint mesmo que `limite_recarga` seja maior, mas respeitar um `limite_recarga` menor quando ele for a restrição mais apertada. Implementado em `src/features/recharge/components/RechargeForm.tsx` (`maxVal = Math.min(limiteRecarga ?? MAX_VALUE, MAX_VALUE)`).
 
 ### 2.3 Solicitação de Recarga PIX (`POST /creditos/pagamento`)
 
@@ -394,7 +394,7 @@ Utilize Jest para testes de unidade de lógica pura de negócio. **Convenção r
 ### O que DEVE ter teste
 
 - **Algoritmo de Polling + Backoff Exponencial** (`PAY-05`): Testar cálculo de tempo com jitter dentro dos limites ±1s
-- **Validação de Limites de Recarga** (`PAY-01`, `BALC-01`): valor entre R$ 5,00 e R$ 500,00 (limite é o `limite_recarga` dinâmico da API, não um teto fixo)
+- **Validação de Limites de Recarga** (`PAY-01`, `BALC-01`): valor entre R$ 5,00 e o menor entre R$ 500,00 (teto fixo do endpoint de pagamento, §7.3) e `limite_recarga` (teto de saldo do consumidor, §6.2, quando mais apertado)
 - **Máscaras e Validadores de Entrada**: CPF limpo com exatamente 11 dígitos no campo `user`
 - **Estado da máquina de polling**: Transições de status (pending → approved/rejected/cancelled/expired)
 
