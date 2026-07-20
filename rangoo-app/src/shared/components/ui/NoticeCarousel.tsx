@@ -40,108 +40,73 @@ export function NoticeCarousel() {
   const themeColors = useThemeColors()
   const { t } = useI18n()
   const [current, setCurrent] = useState(0)
-  const [paused, setPaused] = useState(false)
+  const [isManual, setIsManual] = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const restartTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current)
+  useEffect(() => {
+    if (isManual) {
+      if (timerRef.current) clearInterval(timerRef.current)
+      return
+    }
     timerRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % TOTAL)
-    }, 8000)
-  }, [])
-
-  const goNext = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % TOTAL)
-    if (!paused) restartTimer()
-  }, [paused, restartTimer])
-
-  const goPrev = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + TOTAL) % TOTAL)
-    if (!paused) restartTimer()
-  }, [paused, restartTimer])
-
-  useEffect(() => {
-    if (paused) return
-    restartTimer()
+    }, 4000)
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [paused, restartTimer])
+  }, [isManual])
+
+  const handleCardPress = useCallback(() => {
+    setIsManual(true)
+    setCurrent((prev) => (prev + 1) % TOTAL)
+  }, [])
 
   const notice = NOTICES[current]
   const { title, body } = notice.getText(t)
 
   return (
-    <View
-      accessibilityRole="summary"
-      accessibilityLabel={t.noticeCarouselAcessibilidade
+    <Pressable
+      onPress={handleCardPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${title}. ${body}. ${t.noticeCarouselAcessibilidade
         .replace('{index}', String(current + 1))
-        .replace('{total}', String(TOTAL))}
-      className="mx-4 mb-4 rounded-xl overflow-hidden"
-      style={{ backgroundColor: `${themeColors.warning}12` }}
+        .replace('{total}', String(TOTAL))}`}
+      style={{ backgroundColor: themeColors.surfaceVariant, borderColor: themeColors.outline + '40' }}
+      className="mx-4 mb-4 rounded-2xl overflow-hidden min-h-[136px] justify-between border p-4 shadow-sm"
     >
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start', padding: 16, gap: 12 }}>
-        <Ionicons
-          name={notice.icon}
-          size={24}
-          color={themeColors.warning}
-          style={{ marginTop: 2 }}
-        />
-        <View style={{ flex: 1, gap: 4 }}>
-          <Text className="text-sm font-bold" style={{ color: themeColors.warning }}>
-            {title}
+      <View className="flex-row items-start gap-3">
+        <View
+          style={{ backgroundColor: themeColors.primary + '1F' }}
+          className="w-10 h-10 rounded-xl items-center justify-center mt-0.5"
+        >
+          <Ionicons name={notice.icon} size={20} color={themeColors.primary} />
+        </View>
+        <View className="flex-1 gap-1">
+          <Text className="text-sm font-bold text-text-primary">{title}</Text>
+          <Text className="text-xs text-text-secondary leading-relaxed font-medium" numberOfLines={3}>
+            {body}
           </Text>
-          <Text className="text-sm text-text-secondary">{body}</Text>
         </View>
       </View>
 
-      <View className="flex-row items-center justify-between px-4 pb-3">
-        <Pressable
-          onPress={goPrev}
-          accessibilityRole="button"
-          accessibilityLabel={t.back}
-          className="w-12 h-12 items-center justify-center"
-        >
-          <Ionicons name="chevron-back" size={20} color={themeColors.textSecondary} />
-        </Pressable>
-
-        <View className="flex-row items-center gap-2">
-          {NOTICES.map((n) => (
+      <View
+        style={{ borderTopColor: themeColors.outline + '30' }}
+        className="flex-row items-center justify-between pt-2.5 border-t mt-1"
+      >
+        <View className="flex-row items-center gap-1.5">
+          {NOTICES.map((n, idx) => (
             <View
               key={n.key}
-              className="rounded-full"
+              className={`rounded-full ${idx === current ? 'w-[18px]' : 'w-[6px]'}`}
               style={{
-                width: n.key === notice.key ? 20 : 8,
-                height: 8,
-                backgroundColor:
-                  n.key === notice.key ? themeColors.primary : themeColors.outlineVariant,
+                height: 6,
+                backgroundColor: idx === current ? themeColors.primary : themeColors.primary + '40',
               }}
             />
           ))}
-          <Pressable
-            onPress={() => setPaused((p) => !p)}
-            accessibilityRole="button"
-            accessibilityLabel={paused ? t.noticeResume : t.noticePause}
-            accessibilityState={{ selected: paused }}
-            className="w-12 h-12 items-center justify-center"
-          >
-            <Ionicons
-              name={paused ? 'play' : 'pause'}
-              size={14}
-              color={themeColors.textSecondary}
-            />
-          </Pressable>
         </View>
-
-        <Pressable
-          onPress={goNext}
-          accessibilityRole="button"
-          accessibilityLabel={t.noticeNext}
-          className="w-12 h-12 items-center justify-center"
-        >
-          <Ionicons name="chevron-forward" size={20} color={themeColors.textSecondary} />
-        </Pressable>
+        <Text className="text-[10px] font-bold text-primary uppercase tracking-wider">TOQUE PARA AVANÇAR</Text>
       </View>
-    </View>
+    </Pressable>
   )
 }

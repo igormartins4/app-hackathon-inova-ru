@@ -97,10 +97,10 @@ export default function HistoricoScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
+      <View className="flex-row items-center justify-between px-4 pt-4 pb-3 bg-primary z-10 shadow-md mb-3">
         <View>
-          <Text className="text-2xl font-bold text-text-primary">{t.historicoTitle}</Text>
-          <Text className="text-xs text-text-secondary mt-0.5">{t.historicoSubtitle}</Text>
+          <Text className="text-xl font-bold text-white">{t.historicoTitle}</Text>
+          <Text className="text-xs text-white/80 mt-0.5">{t.historicoSubtitle}</Text>
         </View>
         <Pressable
           onPress={() => setShowFilter((v) => !v)}
@@ -109,41 +109,60 @@ export default function HistoricoScreen() {
             hasActiveFilter ? `${t.historicoFiltrarPeriodo} (ativo)` : t.historicoFiltrarPeriodo
           }
           accessibilityState={{ selected: showFilter }}
-          className="w-12 h-12 rounded-full bg-surface items-center justify-center"
+          className="w-10 h-10 rounded-full bg-white/20 items-center justify-center border border-white/25"
         >
-          <Ionicons name="filter" size={20} color={themeColors.primary} />
+          <Ionicons name="filter" size={18} color="#ffffff" />
           {hasActiveFilter && (
-            <View className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-primary" />
+            <View className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-amber-400" />
           )}
         </Pressable>
       </View>
 
-      <View className="flex-row px-4 gap-1 mb-2">
+      <View className="flex-row px-4 gap-2 mb-3">
         {(
           [
-            { key: 'recargas' as const, label: t.historicoRecargasTab },
-            { key: 'refeicoes' as const, label: t.historicoRefeicoesTab },
+            {
+              key: 'recargas' as const,
+              label: t.historicoRecargasTab,
+              icon: 'card-outline' as const,
+            },
+            {
+              key: 'refeicoes' as const,
+              label: t.historicoRefeicoesTab,
+              icon: 'restaurant-outline' as const,
+            },
           ] as const
-        ).map((tab) => (
-          <Pressable
-            key={tab.key}
-            onPress={() => setActiveTab(tab.key)}
-            accessibilityRole="tab"
-            accessibilityLabel={tab.label}
-            accessibilityState={{ selected: activeTab === tab.key }}
-            className={`flex-1 items-center py-3 min-h-[48px] rounded-xl ${
-              activeTab === tab.key ? 'bg-primary/10' : ''
-            }`}
-          >
-            <Text
-              className={`text-sm font-medium ${
-                activeTab === tab.key ? 'text-primary font-bold' : 'text-text-secondary'
-              }`}
+        ).map((tab) => {
+          const selected = activeTab === tab.key
+          return (
+            <Pressable
+              key={tab.key}
+              onPress={() => setActiveTab(tab.key)}
+              accessibilityRole="tab"
+              accessibilityLabel={tab.label}
+              accessibilityState={{ selected }}
+              className="flex-1 flex-row items-center justify-center gap-2 py-3 min-h-[48px] rounded-xl border"
+              style={{
+                backgroundColor: selected ? themeColors.primary : themeColors.surface,
+                borderColor: selected ? themeColors.primary : themeColors.outline,
+              }}
             >
-              {tab.label}
-            </Text>
-          </Pressable>
-        ))}
+              <Ionicons
+                name={tab.icon}
+                size={18}
+                color={selected ? themeColors.textInverse : themeColors.textSecondary}
+              />
+              <Text
+                className="text-sm font-bold"
+                style={{
+                  color: selected ? themeColors.textInverse : themeColors.textSecondary,
+                }}
+              >
+                {tab.label}
+              </Text>
+            </Pressable>
+          )
+        })}
       </View>
 
       {showFilter && (
@@ -177,23 +196,29 @@ export default function HistoricoScreen() {
         </View>
       )}
 
-      {summary.total > 0 && (
-        <View className="px-4 mb-2">
-          <Card className="flex-row items-center justify-between">
-            <View className="flex-1 pr-2">
-              <Text className="text-xs text-text-secondary" numberOfLines={1}>
-                {`${activeTab === 'recargas' ? t.historySummaryRecharges : t.historySummaryMeals} ${periodLabel}`}
-              </Text>
-              {!summary.isComplete && (
-                <Text className="text-[10px] text-text-secondary mt-0.5">{t.historyLoading}</Text>
-              )}
-            </View>
-            <Text className="text-lg font-bold text-text-primary">
+      <View className="px-4 mb-3">
+        <Card className="bg-primary/5 border border-primary/20 gap-1.5">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-xs font-bold text-primary uppercase tracking-wider">
+              {activeTab === 'recargas' ? 'Total Recarregado' : 'Total em Refeições'}
+            </Text>
+            <Text className="text-xs text-text-secondary font-medium">
+              {periodLabel}
+            </Text>
+          </View>
+          <View className="flex-row items-baseline justify-between pt-1">
+            <Text className="text-2xl font-extrabold text-text-primary">
               {formatCurrency(summary.total)}
             </Text>
-          </Card>
-        </View>
-      )}
+            <Text className="text-xs text-text-secondary">
+              {activeTab === 'recargas' ? 'Créditos adicionados' : 'Gasto em RUs'}
+            </Text>
+          </View>
+          {!summary.isComplete && (
+            <Text className="text-[10px] text-text-secondary">{t.historyLoading}</Text>
+          )}
+        </Card>
+      </View>
 
       <HistoryList
         data={items}

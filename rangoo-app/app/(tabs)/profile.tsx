@@ -141,11 +141,13 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="p-4 gap-4">
-      <View>
-        <Text className="text-2xl font-bold text-text-primary">{t.profileTitle}</Text>
-        <Text className="text-xs text-text-secondary mt-0.5">{t.profileSubtitle}</Text>
+    <View className="flex-1 bg-background">
+      <View className="px-4 pt-4 pb-3 bg-primary z-10 shadow-md">
+        <Text className="text-xl font-bold text-white">{t.profileTitle}</Text>
+        <Text className="text-xs text-white/80 mt-0.5">{t.profileSubtitle}</Text>
       </View>
+
+      <ScrollView className="flex-1" contentContainerClassName="p-4 gap-4">
 
       <LinearGradient
         colors={gradients.profileCard}
@@ -177,20 +179,6 @@ export default function ProfileScreen() {
 
       {isMealHistoryError && (
         <ErrorMessage message={t.profileMealHistoryError} onRetry={refetchMealHistory} />
-      )}
-
-      {!isMealHistoryError && totalGastoMes > 0 && (
-        <Card>
-          <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-            {t.profileMonthlyExpenses}
-          </Text>
-          <View className="flex-row justify-between items-center">
-            <Text className="text-sm text-text-secondary">{t.profileTotalMeals}</Text>
-            <Text className="text-lg font-bold text-text-primary">
-              {formatCurrency(totalGastoMes)}
-            </Text>
-          </View>
-        </Card>
       )}
 
       <Card>
@@ -362,6 +350,36 @@ export default function ProfileScreen() {
         </View>
       </Card>
 
+      {/* Idioma / Language movido para logo após Leitura (Acessibilidade) */}
+      <Card>
+        <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
+          Idioma / Language
+        </Text>
+        <View className="flex-row flex-wrap gap-2">
+          {(Object.keys(LOCALES) as Locale[]).map((loc) => {
+            const selected = locale === loc
+            return (
+              <Pressable
+                key={loc}
+                onPress={() => setLocale(loc)}
+                accessibilityRole="button"
+                accessibilityLabel={`${LOCALES[loc].flag} ${LOCALES[loc].label}`}
+                accessibilityState={{ selected }}
+                className={`px-3 py-2 rounded-full border min-h-[48px] items-center justify-center ${
+                  selected ? 'bg-primary border-primary' : 'bg-surface border-outline-variant'
+                }`}
+              >
+                <Text
+                  className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
+                >
+                  {LOCALES[loc].flag} {LOCALES[loc].label}
+                </Text>
+              </Pressable>
+            )
+          })}
+        </View>
+      </Card>
+
       <Card>
         <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
           {t.profilePricingTitle}
@@ -401,6 +419,11 @@ export default function ProfileScreen() {
         </Text>
 
         <View className="gap-0">
+          <View className="flex-row items-center justify-between py-3 border-b border-outline-variant">
+            <Text className="text-sm text-text-primary">{t.version}</Text>
+            <Text className="text-sm text-text-secondary">{t.profileAppVersion}</Text>
+          </View>
+
           <Pressable
             onPress={() => Linking.openURL('https://fump.ufmg.br')}
             accessibilityRole="link"
@@ -410,11 +433,6 @@ export default function ProfileScreen() {
             <Text className="text-sm text-primary">{t.profilePrivacy}</Text>
             <Ionicons name="open-outline" size={16} color={themeColors.primary} />
           </Pressable>
-
-          <View className="flex-row items-center justify-between py-3 border-b border-outline-variant">
-            <Text className="text-sm text-text-primary">{t.version}</Text>
-            <Text className="text-sm text-text-secondary">{t.profileAppVersion}</Text>
-          </View>
 
           <Pressable
             onPress={() => Linking.openURL('https://opensource.org/licenses/MIT')}
@@ -435,35 +453,6 @@ export default function ProfileScreen() {
             <Text className="text-sm text-primary">Sobre o Rangoo · {t.profileHackathon}</Text>
             <Ionicons name="chevron-forward" size={16} color={themeColors.primary} />
           </Pressable>
-        </View>
-      </Card>
-
-      <Card>
-        <Text className="text-xs font-bold text-primary mb-3 uppercase tracking-wider">
-          Idioma / Language
-        </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {(Object.keys(LOCALES) as Locale[]).map((loc) => {
-            const selected = locale === loc
-            return (
-              <Pressable
-                key={loc}
-                onPress={() => setLocale(loc)}
-                accessibilityRole="button"
-                accessibilityLabel={`${LOCALES[loc].flag} ${LOCALES[loc].label}`}
-                accessibilityState={{ selected }}
-                className={`px-3 py-2 rounded-full border min-h-[48px] items-center justify-center ${
-                  selected ? 'bg-primary border-primary' : 'bg-surface border-outline-variant'
-                }`}
-              >
-                <Text
-                  className={`text-xs font-bold ${selected ? 'text-text-inverse' : 'text-text-primary'}`}
-                >
-                  {LOCALES[loc].flag} {LOCALES[loc].label}
-                </Text>
-              </Pressable>
-            )
-          })}
         </View>
       </Card>
 
@@ -533,5 +522,6 @@ export default function ProfileScreen() {
         ]}
       />
     </ScrollView>
+    </View>
   )
 }

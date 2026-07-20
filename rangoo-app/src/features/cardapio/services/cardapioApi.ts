@@ -220,7 +220,7 @@ function groupPratosIntoSections(pratos: Array<{ tipoPrato: string; descricaoPra
   const sections = new Map<string, MenuSection>()
 
   for (const prato of pratos) {
-    const { titulo, icon } = classifyTipoPrato(prato.tipoPrato)
+    const { titulo, icon } = classifyTipoPrato(prato.tipoPrato, prato.descricaoPrato)
     const section = sections.get(titulo) ?? { titulo, icon, itens: [] }
     const vegano = VEGETARIANO_SUFFIX.test(prato.descricaoPrato)
     section.itens.push({
@@ -247,17 +247,25 @@ function groupPratosIntoSections(pratos: Array<{ tipoPrato: string; descricaoPra
   })
 }
 
-function classifyTipoPrato(tipoPrato: string): { titulo: string; icon: string } {
-  const normalized = tipoPrato.toLowerCase()
-  if (normalized.startsWith('entrada')) return { titulo: 'Entrada', icon: 'leaf' }
-  if (normalized.startsWith('prato prot')) return { titulo: 'Prato Principal', icon: 'restaurant' }
-  if (normalized.startsWith('acompanhamento'))
-    return { titulo: 'Acompanhamento', icon: 'restaurant' }
-  if (normalized.startsWith('guarni')) return { titulo: 'Guarnição', icon: 'restaurant' }
-  if (normalized.startsWith('sobremesa')) return { titulo: 'Sobremesa', icon: 'ice-cream' }
-  if (normalized.startsWith('(') || normalized.includes('copo'))
+function classifyTipoPrato(tipoPrato: string, descricaoPrato: string): { titulo: string; icon: string } {
+  const normTipo = tipoPrato.toLowerCase().trim()
+  const normDesc = descricaoPrato.toLowerCase().trim()
+
+  if (normTipo.startsWith('entrada') || normDesc.startsWith('salada')) return { titulo: 'Entrada', icon: 'leaf' }
+  if (normTipo.startsWith('sobremesa') || normDesc.includes('doce') || normDesc.includes('fruta') || normDesc.includes('pudim') || normDesc.includes('gelatina')) {
+    return { titulo: 'Sobremesa', icon: 'ice-cream' }
+  }
+  if (normTipo.startsWith('(') || normDesc.startsWith('(') || normDesc.includes('suco') || normDesc.includes('refresco') || normDesc.includes('copo')) {
     return { titulo: 'Bebida', icon: 'water' }
-  return { titulo: 'Outros', icon: 'restaurant' }
+  }
+  if (normTipo.startsWith('acompanhamento') || normDesc.includes('arroz') || normDesc.includes('macarrão') || normDesc.includes('farofa')) {
+    return { titulo: 'Acompanhamento', icon: 'restaurant' }
+  }
+  if (normTipo.startsWith('guarni') || normDesc.includes('feijão') || normDesc.includes('purê') || normDesc.includes('batata')) {
+    return { titulo: 'Guarnição', icon: 'restaurant' }
+  }
+
+  return { titulo: 'Prato Principal', icon: 'restaurant' }
 }
 
 export async function fetchCardapio(params: CardapioParams): Promise<CardapioResponse> {

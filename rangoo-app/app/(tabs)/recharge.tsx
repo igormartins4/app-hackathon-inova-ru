@@ -185,7 +185,13 @@ export default function RechargeScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5">
+      <View className="flex-1 bg-background">
+        <View className="px-4 pt-4 pb-3 bg-primary z-10 shadow-md">
+          <Text className="text-xl font-bold text-white">{t.rechargeTitle}</Text>
+          <Text className="text-xs text-white/80 mt-0.5">{t.rechargeFormSubtitle}</Text>
+        </View>
+
+        <ScrollView className="flex-1" contentContainerClassName="p-5">
         {step === 'amount' && (
           <>
             {(isBlocked || isInactive) && (
@@ -248,6 +254,7 @@ export default function RechargeScreen() {
           />
         )}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
+  </KeyboardAvoidingView>
   )
 }

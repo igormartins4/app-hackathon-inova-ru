@@ -8,6 +8,8 @@ import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { useColorScheme, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { useColorScheme as useNativeWindColorScheme } from 'nativewind'
+
 import { colors, darkColors } from '@/config/theme'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ErrorBoundary, LoadingSpinner, OfflineBanner } from '@/shared/components/ui'
@@ -26,13 +28,16 @@ SplashScreen.preventAutoHideAsync()
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const resolvedTheme = useResolvedTheme()
   const highContrast = useIsHighContrast()
+  const { setColorScheme } = useNativeWindColorScheme()
 
-  const themeClasses = [resolvedTheme === 'dark' ? 'dark' : '', highContrast ? 'high-contrast' : '']
-    .filter(Boolean)
-    .join(' ')
+  useEffect(() => {
+    setColorScheme(resolvedTheme === 'dark' ? 'dark' : 'light')
+  }, [resolvedTheme, setColorScheme])
 
   return (
-    <View style={{ flex: 1 }} className={themeClasses}>
+    <View
+      className={`flex-1 ${resolvedTheme === 'dark' ? 'dark' : ''} ${highContrast ? 'high-contrast' : ''}`}
+    >
       {children}
     </View>
   )
@@ -60,26 +65,28 @@ function AuthGate() {
   }, [isAuthenticated, isLoading, segments, router])
 
   return (
-    <ErrorBoundary>
-      <View className="flex-1">
-        <OfflineBanner visible={isOffline} />
-        {isLoading ? (
-          <LoadingSpinner message={t.loading} />
-        ) : (
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: reducedMotion ? 'none' : 'slide_from_right',
-            }}
-          >
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="restaurante/[codigo]" />
-          </Stack>
-        )}
-        <StatusBar style={resolvedTheme === 'dark' ? 'light' : 'dark'} />
-      </View>
-    </ErrorBoundary>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <View className="flex-1">
+          <OfflineBanner visible={isOffline} />
+          {isLoading ? (
+            <LoadingSpinner message={t.loading} />
+          ) : (
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                animation: reducedMotion ? 'none' : 'slide_from_right',
+              }}
+            >
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="restaurante/[codigo]" />
+            </Stack>
+          )}
+          <StatusBar style={resolvedTheme === 'dark' ? 'light' : 'dark'} />
+        </View>
+      </ErrorBoundary>
+    </ThemeProvider>
   )
 }
 
@@ -109,8 +116,7 @@ export default function RootLayout() {
   }, [fontsLoaded, isThemeInitialized])
 
   if (!fontsLoaded || !isThemeInitialized) {
-    const fallbackBackground = colorScheme === 'dark' ? darkColors.background : colors.background
-    return <View style={{ flex: 1, backgroundColor: fallbackBackground }} />
+    return <View className="flex-1 bg-background" />
   }
 
   return (
@@ -119,9 +125,7 @@ export default function RootLayout() {
         client={queryClient}
         persistOptions={{ persister: queryPersister, maxAge: QUERY_PERSIST_MAX_AGE }}
       >
-        <ThemeProvider>
-          <AuthGate />
-        </ThemeProvider>
+        <AuthGate />
       </PersistQueryClientProvider>
     </SafeAreaProvider>
   )

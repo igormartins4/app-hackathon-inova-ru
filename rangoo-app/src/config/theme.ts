@@ -34,27 +34,24 @@ export const colors = {
 } as const
 
 export const darkColors = {
-  primary: '#34d399',
-  primaryLight: '#6ee7b7',
-  primaryContainer: '#0f3d31',
-  primaryDark: '#059669',
-  surface: '#1a2e28',
-  surfaceVariant: '#1f3830',
-  background: '#0f1f1a',
-  /* 3:1 min against surface (WCAG 1.4.11, meaningful UI boundary) */
-  outline: '#628a76',
-  outlineVariant: '#1f3830',
-  textPrimary: '#f0faf6',
-  /* WCAG AA: #a8d5c5 on #1a2e28 ≈ 5.0:1 */
-  textSecondary: '#a8d5c5',
-  /* WCAG AA: #82a597 on #1a2e28 ≈ 5.31:1 — also used as placeholder color */
-  textDisabled: '#82a597',
-  textInverse: '#0f1f1a',
+  primary: '#10b981',
+  primaryLight: '#34d399',
+  primaryContainer: '#064e3b',
+  primaryDark: '#047857',
+  surface: '#121e1a',
+  surfaceVariant: '#182923',
+  background: '#09120e',
+  outline: '#3b574d',
+  outlineVariant: '#1a2b25',
+  textPrimary: '#f3fcf8',
+  textSecondary: '#9ecbb9',
+  textDisabled: '#6e9383',
+  textInverse: '#09120e',
   success: '#4ade80',
   error: '#f87171',
   warning: '#fbbf24',
-  chipSelected: '#34d399',
-  chipUnselected: '#1f3830',
+  chipSelected: '#10b981',
+  chipUnselected: '#182923',
   black: '#000000',
 } as const
 
