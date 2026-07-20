@@ -69,9 +69,14 @@ apiClient.interceptors.response.use(
   (res) => res,
   async (error) => {
     const status = error.response?.status as number | undefined
-    let userMessage: string = status
-      ? (ERROR_MESSAGES[status as keyof typeof ERROR_MESSAGES] ?? ERROR_MESSAGES[500])
-      : ERROR_MESSAGES.NETWORK
+    // Spec §3/§9: toda resposta de erro traz `{ message }` — prioriza o texto
+    // real do backend e só cai no mapa estático quando ele não vier.
+    const serverMessage = error.response?.data?.message as string | undefined
+    let userMessage: string =
+      serverMessage ??
+      (status
+        ? (ERROR_MESSAGES[status as keyof typeof ERROR_MESSAGES] ?? ERROR_MESSAGES[500])
+        : ERROR_MESSAGES.NETWORK)
 
     // Spec §10.2: on 429 the API returns `Retry-After` (seconds) — surface the
     // exact wait time instead of a generic message.

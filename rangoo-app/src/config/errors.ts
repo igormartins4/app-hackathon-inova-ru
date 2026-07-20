@@ -1,4 +1,5 @@
 export const ERROR_MESSAGES = {
+  400: 'Requisição inválida. Verifique os dados e tente novamente.',
   401: 'Usuário ou senha inválidos.',
   403: 'Acesso não autorizado. Verifique suas credenciais.',
   404: 'Recurso não encontrado. Tente novamente.',

@@ -61,7 +61,9 @@ export function RechargeForm({
 
   const customValue = parseMoneyInput(customAmount)
   const activeAmount = selectedAmount ?? (customValue >= MIN_VALUE ? customValue : 0)
-  const maxVal = limiteRecarga ?? MAX_VALUE
+  // O teto de R$500 do endpoint de pagamento é fixo por contrato — mesmo que
+  // limite_recarga do consumidor seja maior, o PIX nunca pode passar disso.
+  const maxVal = Math.min(limiteRecarga ?? MAX_VALUE, MAX_VALUE)
   const validation = rechargeSchema(currentBalance, maxVal).safeParse({ amount: activeAmount })
   const validationError =
     activeAmount > 0 && !validation.success
