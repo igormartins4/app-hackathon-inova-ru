@@ -12,7 +12,7 @@ const TAB_ICONS: Record<string, { focused: IoniconsName; default: IoniconsName }
   recharge: { focused: 'refresh-circle', default: 'refresh-circle-outline' },
   cardapio: { focused: 'book', default: 'book-outline' },
   historico: { focused: 'time', default: 'time-outline' },
-  profile: { focused: 'person', default: 'person-outline' },
+  profile: { focused: 'settings', default: 'settings-outline' },
 }
 
 export default function TabLayout() {

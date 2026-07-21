@@ -143,6 +143,7 @@ export default function LoginScreen() {
       <AppDialog
         visible={helpVisible}
         title={t.loginHelpTitle}
+        body={t.loginHelpBody}
         accessibilityLabel={t.loginHelpTitle}
         onClose={() => setHelpVisible(false)}
         actions={[

@@ -56,16 +56,23 @@ const BASE_CONSUMER = {
   situacao: 'A',
 }
 
-const INITIAL_RECHARGES: RechargeRecord[] = [
-  { id: 3, valor: 25, metodo: 'PIX', status: 'aprovado', data_hora: '2026-07-08T09:00:00-03:00' },
-  { id: 2, valor: 30, metodo: 'PIX', status: 'aprovado', data_hora: '2026-07-10T14:15:00-03:00' },
-  { id: 1, valor: 50, metodo: 'PIX', status: 'aprovado', data_hora: '2026-07-12T10:30:00-03:00' },
+function getRelativeDate(daysAgo: number, timeStr: string): string {
+  const d = new Date()
+  d.setDate(d.getDate() - daysAgo)
+  const dateStr = d.toISOString().slice(0, 10)
+  return `${dateStr}T${timeStr}-03:00`
+}
+
+const INITIAL_RECHARGES = (): RechargeRecord[] => [
+  { id: 3, valor: 25, metodo: 'PIX', status: 'aprovado', data_hora: getRelativeDate(5, '09:00:00') },
+  { id: 2, valor: 30, metodo: 'PIX', status: 'aprovado', data_hora: getRelativeDate(3, '14:15:00') },
+  { id: 1, valor: 50, metodo: 'PIX', status: 'aprovado', data_hora: getRelativeDate(1, '10:30:00') },
 ]
 
 // Códigos e nomes oficiais do Anexo A da Especificação Técnica API InovaRU v2.0.
-const INITIAL_MEALS: MealRecord[] = [
+const INITIAL_MEALS = (): MealRecord[] => [
   {
-    data_hora: '2026-07-12T12:30:00-03:00',
+    data_hora: getRelativeDate(1, '12:30:00'),
     filial: { codigo: '0003', nome: 'RU Setorial 1' },
     quantidade: 1,
     valor_total: 3.2,
@@ -73,7 +80,7 @@ const INITIAL_MEALS: MealRecord[] = [
     tipo_consumidor: 'ESTUDANTE REGULAR',
   },
   {
-    data_hora: '2026-07-12T19:00:00-03:00',
+    data_hora: getRelativeDate(1, '19:00:00'),
     filial: { codigo: '0003', nome: 'RU Setorial 1' },
     quantidade: 1,
     valor_total: 3.2,
@@ -81,7 +88,7 @@ const INITIAL_MEALS: MealRecord[] = [
     tipo_consumidor: 'ESTUDANTE REGULAR',
   },
   {
-    data_hora: '2026-07-11T12:15:00-03:00',
+    data_hora: getRelativeDate(2, '12:15:00'),
     filial: { codigo: '0002', nome: 'RU Setorial 2' },
     quantidade: 1,
     valor_total: 3.2,
@@ -96,8 +103,8 @@ let paymentId = 1000
 let rechargeId = 10
 let transferId = 2000
 let payments = new Map<number, PaymentRecord>()
-let recharges = [...INITIAL_RECHARGES]
-let meals = [...INITIAL_MEALS]
+let recharges = INITIAL_RECHARGES()
+let meals = INITIAL_MEALS()
 
 export function setMockScenario(scenario: DemoScenario) {
   activeScenario = scenario
@@ -114,8 +121,8 @@ export function resetMockState() {
   rechargeId = 10
   transferId = 2000
   payments = new Map()
-  recharges = [...INITIAL_RECHARGES]
-  meals = [...INITIAL_MEALS]
+  recharges = INITIAL_RECHARGES()
+  meals = INITIAL_MEALS()
 }
 
 function ok(data: unknown, status = 200, headers?: Record<string, string>): MockResponse {

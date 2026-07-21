@@ -41,49 +41,46 @@
 
 .high-contrast {
   --color-primary: #000000;
-  --color-primary-light: #333333;
-  --color-primary-container: #e0e0e0;
+  --color-primary-light: #000000;
+  --color-primary-container: #e5e5e5;
   --color-primary-dark: #000000;
   --color-text-primary: #000000;
-  --color-text-secondary: #1a1a1a;
-  --color-text-disabled: #666666;
+  --color-text-secondary: #000000;
+  --color-text-disabled: #555555;
   --color-text-inverse: #ffffff;
   --color-outline: #000000;
-  --color-outline-variant: #cccccc;
+  --color-outline-variant: #000000;
   --color-surface: #ffffff;
-  --color-surface-variant: #f5f5f5;
+  --color-surface-variant: #f0f0f0;
   --color-background: #ffffff;
   --color-success: #006400;
   --color-error: #cc0000;
-  /* #cc8800 measured 2.96:1 on white — worse than the non-high-contrast warning. Darkened to stay >= 4.5:1 */
   --color-warning: #663f00;
   --color-chip-selected: #000000;
   --color-chip-unselected: #ffffff;
 }
 
 .dark {
-  /* Primary — Brighter teal for dark mode */
-  --color-primary: #34d399;
-  --color-primary-light: #6ee7b7;
-  --color-primary-container: #0f3d31;
-  --color-primary-dark: #059669;
+  /* Primary — Brighter emerald green for dark mode */
+  --color-primary: #10b981;
+  --color-primary-light: #34d399;
+  --color-primary-container: #064e3b;
+  --color-primary-dark: #047857;
 
-  /* Surface & Background */
-  --color-surface: #1a2e28;
-  --color-surface-variant: #1f3830;
-  --color-background: #0f1f1a;
+  /* Surface & Background — Deep pitch dark */
+  --color-surface: #121e1a;
+  --color-surface-variant: #182923;
+  --color-background: #09120e;
 
-  /* Outline — 3:1 min against surface (WCAG 1.4.11, meaningful UI boundary) */
-  --color-outline: #628a76;
-  --color-outline-variant: #1f3830;
+  /* Outline */
+  --color-outline: #3b574d;
+  --color-outline-variant: #1a2b25;
 
   /* Text */
-  --color-text-primary: #f0faf6;
-  /* WCAG AA (4.5:1) confirmed: #a8d5c5 on #1a2e28 measures ~5.0:1 */
-  --color-text-secondary: #a8d5c5;
-  /* WCAG AA (4.5:1) confirmed: #82a597 on #1a2e28 measures ~5.31:1 — also used as placeholder color, never the muted-gray default */
-  --color-text-disabled: #82a597;
-  --color-text-inverse: #0f1f1a;
+  --color-text-primary: #f3fcf8;
+  --color-text-secondary: #9ecbb9;
+  --color-text-disabled: #6e9383;
+  --color-text-inverse: #09120e;
 
   /* Status */
   --color-success: #4ade80;
@@ -91,27 +88,23 @@
   --color-warning: #fbbf24;
 
   /* Chips */
-  --color-chip-selected: #34d399;
-  --color-chip-unselected: #1f3830;
+  --color-chip-selected: #10b981;
+  --color-chip-unselected: #182923;
 }
 
-/* Alto contraste escuro: só preto + branco/amarelo nos elementos de marca —
-   sem verde/neon. Status (sucesso/erro) mantém cor semântica distinta, pois
-   depende de cor pra diferenciar aprovado/rejeitado além do texto. */
-.high-contrast.dark {
+/* Alto contraste escuro */
+.high-contrast.dark,
+.dark.high-contrast {
   --color-primary: #ffffff;
   --color-primary-light: #ffff00;
-  --color-primary-container: #333300;
-  --color-primary-dark: #cccc00;
+  --color-primary-container: #222200;
+  --color-primary-dark: #ffff00;
   --color-text-primary: #ffffff;
   --color-text-secondary: #ffff00;
-  --color-text-disabled: #999999;
+  --color-text-disabled: #aaaaaa;
   --color-text-inverse: #000000;
-  /* Não usar branco puro aqui — colidiria com --color-primary (também
-     branco) em qualquer par visual on/off (ex.: trilha de switch ligado vs
-     desligado), tornando os dois estados indistinguíveis. */
-  --color-outline: #999999;
-  --color-outline-variant: #666666;
+  --color-outline: #ffffff;
+  --color-outline-variant: #ffffff;
   --color-surface: #000000;
   --color-surface-variant: #111111;
   --color-background: #000000;
@@ -119,5 +112,5 @@
   --color-error: #ff3333;
   --color-warning: #ffbb00;
   --color-chip-selected: #ffffff;
-  --color-chip-unselected: #222222;
+  --color-chip-unselected: #000000;
 }

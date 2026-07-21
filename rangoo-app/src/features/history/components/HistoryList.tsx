@@ -242,6 +242,7 @@ function getDetails(record: SelectedRecord, t: Record<string, string>) {
         `${t.historyTime}: ${formatToLocalTime(item.data_hora)}`,
         `${t.historyMethod}: ${item.metodo.toUpperCase()}`,
         `${t.historyStatus}: ${item.status === 'aprovado' ? t.historyApproved : item.status}`,
+        `${t.historySender}: ${t.historySenderValue}`,
         `${t.historyId}: #${item.id}`,
       ].join('\n'),
     }
@@ -259,6 +260,7 @@ function getDetails(record: SelectedRecord, t: Record<string, string>) {
         ? `${t.historyValue}: ${t.historyFree}`
         : `${t.historyValue}: ${formatCurrency(item.valor_total)}`,
       `${t.historyType}: ${item.tipo_consumidor}`,
+      `\n${t.historyMenu}:\n${t.historyMenuValue}`,
     ].join('\n'),
   }
 }
